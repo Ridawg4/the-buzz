@@ -1,5 +1,6 @@
 package com.teamyellow.thebuzz.Services;
 
+import com.teamyellow.thebuzz.Resources.ResourcePaths;
 import io.lindstrom.m3u8.model.MediaPlaylist;
 import io.lindstrom.m3u8.parser.MediaPlaylistParser;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +17,7 @@ public class LocalStorage {
     private static final String LOCAL_DIRECTORY = System.getenv("PWD");
 
     public static String addToTempStorage(MultipartFile file, String filename) {
-        File tempFile = new File(Path.of(LOCAL_DIRECTORY + File.separator
-                + "TEMP" + File.separator + filename).toUri());
+        File tempFile = new File(ResourcePaths.TEMP_DIRECTORY + filename);
         try {
             tempFile.createNewFile();
             FileOutputStream stream = new FileOutputStream(tempFile);
@@ -31,8 +31,7 @@ public class LocalStorage {
     }
 
     public static String addToLiveStorage(MediaPlaylist mediaPlaylist, String filename) {
-        File tempFile = new File(Path.of(LOCAL_DIRECTORY + File.separator
-                + "Live" + File.separator + filename).toUri());
+        File tempFile = new File(ResourcePaths.LIVE_DIRECTORY + filename);
         try {
             tempFile.createNewFile();
             FileOutputStream stream = new FileOutputStream(tempFile);

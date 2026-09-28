@@ -22,10 +22,6 @@ public class PlaylistBuilder {
     private static AtomicBoolean killSig = null;
     private static long indexOfPlaylist = 0;
 
-    static final String LOCAL_DIRECTORY = System.getenv("PWD");
-    static final URI dirPath = Path.of(LOCAL_DIRECTORY + File.separator
-            + "TEMP" + File.separator).toUri();
-
     public static void init(AtomicBoolean killSignal) {
         killSig = killSignal;
         generateM3U8();
