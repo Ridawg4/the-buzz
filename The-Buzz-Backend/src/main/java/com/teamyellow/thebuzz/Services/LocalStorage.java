@@ -3,19 +3,13 @@ package com.teamyellow.thebuzz.Services;
 import com.teamyellow.thebuzz.Resources.ResourcePaths;
 import io.lindstrom.m3u8.model.MediaPlaylist;
 import io.lindstrom.m3u8.parser.MediaPlaylistParser;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
 
 public class LocalStorage {
-    private static final String LOCAL_DIRECTORY = System.getenv("PWD");
-
     public static String addToTempStorage(MultipartFile file, String filename) {
         File tempFile = new File(ResourcePaths.TEMP_DIRECTORY + filename);
         try {

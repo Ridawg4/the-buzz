@@ -32,7 +32,7 @@ public class AudioEncoderController {
 
 
     @PostMapping("/live")
-    public ResponseEntity<String> uploadAudioClip(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadLiveAudioClip(@RequestParam("file") MultipartFile file) {
         // Takes the received file and creates a file for it in local storage
         String fileName = LocalStorage.addToTempStorage(file, file.getOriginalFilename());
 
@@ -83,6 +83,18 @@ public class AudioEncoderController {
         } else {
             resp = new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+
+        return resp;
+    }
+
+    @PostMapping("/recorded")
+    public ResponseEntity<String> uploadRecordedAudio(@RequestParam("file") MultipartFile file) {
+        // Takes the received file and creates a file for it in local storage
+        String fileName = LocalStorage.addToTempStorage(file, file.getOriginalFilename());
+
+        // Adds the newly created file into the queue to create the playlist with
+        PlaylistBuilder.addFileToQueue(fileName);
+        ResponseEntity<String> resp = new ResponseEntity<>(HttpStatus.ACCEPTED);
 
         return resp;
     }

@@ -2,12 +2,6 @@ package com.teamyellow.thebuzz.Services;
 
 import io.lindstrom.m3u8.model.MediaPlaylist;
 import io.lindstrom.m3u8.model.MediaSegment;
-import io.lindstrom.m3u8.model.PartialSegment;
-import io.lindstrom.m3u8.model.PlaylistType;
-
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Path;
 
 public class M3U8Encoder {
 
