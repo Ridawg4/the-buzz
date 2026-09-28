@@ -24,6 +24,20 @@ public class LocalStorage {
         return tempFile.getName();
     }
 
+    public static String createEmptyFile(String filename) {
+        File tempFile = new File(ResourcePaths.TEMP_DIRECTORY + filename);
+        try {
+            tempFile.createNewFile();
+            FileOutputStream stream = new FileOutputStream(tempFile);
+            stream.write("".getBytes());
+            stream.close();
+        } catch (IOException e) {
+
+        }
+
+        return tempFile.getName();
+    }
+
     public static String addToLiveStorage(MediaPlaylist mediaPlaylist, String filename) {
         File tempFile = new File(ResourcePaths.LIVE_DIRECTORY + filename);
         try {

@@ -4,6 +4,7 @@
 
 package com.teamyellow.thebuzz.Controllers;
 
+import com.teamyellow.thebuzz.FFMpegController;
 import com.teamyellow.thebuzz.Resources.ResourcePaths;
 import com.teamyellow.thebuzz.Services.LocalStorage;
 import com.teamyellow.thebuzz.Services.PlaylistBuilder;
@@ -16,16 +17,19 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/audio")
 public class AudioEncoderController {
     private static final AtomicBoolean killSig = new AtomicBoolean(false);
+
     static {
         PlaylistBuilder.init(killSig);
     }
@@ -88,12 +92,16 @@ public class AudioEncoderController {
     }
 
     @PostMapping("/recorded")
-    public ResponseEntity<String> uploadRecordedAudio(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadRecordedAudio(@RequestParam("file") MultipartFile file) throws IOException {
         // Takes the received file and creates a file for it in local storage
         String fileName = LocalStorage.addToTempStorage(file, file.getOriginalFilename());
 
         // Adds the newly created file into the queue to create the playlist with
-        PlaylistBuilder.addFileToQueue(fileName);
+        FFMpegController ffMpegController = new FFMpegController();
+
+        ffMpegController.splitAudioIntoSegments(ResourcePaths.TEMP_DIRECTORY + fileName, 10);
+
+        PlaylistBuilder.addFilesToQueueFromFolder();
         ResponseEntity<String> resp = new ResponseEntity<>(HttpStatus.ACCEPTED);
 
         return resp;
