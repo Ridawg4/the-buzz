@@ -1,15 +1,12 @@
-package com.teamyellow.thebuzz;
+package com.teamyellow.thebuzz.Controllers;
 
 import com.teamyellow.thebuzz.Resources.ResourcePaths;
 import com.teamyellow.thebuzz.Services.LocalStorage;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
-import net.bramp.ffmpeg.FFmpegUtils;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
-import net.bramp.ffmpeg.progress.Progress;
-import net.bramp.ffmpeg.progress.ProgressListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,14 +28,14 @@ public class FFMpegController {
         }
     }
 
-    public boolean splitAudioIntoSegments(String fileInput, int lengthOfSegments) throws IOException {
+    public boolean splitAudioIntoSegments(String fileInput, int lengthOfSegments, String fileOutput) throws IOException {
         FFmpegProbeResult probeResult = fprobe.probe(fileInput);
 
         if(!probeResult.hasError()) {
             long totalSegments = (long) Math.ceil(probeResult.getFormat().getDuration() / lengthOfSegments);
 
             for(int i = 0; i < totalSegments; i++) {
-                splitAudio(probeResult, lengthOfSegments, i, "segment" + i + ".mp3");
+                splitAudio(probeResult, lengthOfSegments, i, i + ".mp3", fileOutput);
             }
         } else {
             throw new FileNotFoundException();
@@ -46,21 +43,15 @@ public class FFMpegController {
         return true;
     }
 
-    private boolean splitAudio(FFmpegProbeResult probeResult, int lengthOfSegments, int offset, String fileOutput) throws IOException {
-        File file = new File(fileOutput);
-        if(!file.exists()) {
-            LocalStorage.createEmptyFile(fileOutput);
-        }
-
+    private boolean splitAudio(FFmpegProbeResult probeResult, int lengthOfSegments, int offset, String fileName, String fileOutput) throws IOException {
         FFmpegBuilder builder = new FFmpegBuilder()
                 .setInput(probeResult)
                 .done()
 
-                .addOutput(ResourcePaths.TEMP_DIRECTORY + "temp")
-                .setDuration(lengthOfSegments, TimeUnit.SECONDS)
-                .setStartOffset(offset, TimeUnit.SECONDS)
+                .addOutput(fileOutput + ResourcePaths.SEPARATOR + fileName)
+                .setDuration((long) (lengthOfSegments + 0.05), TimeUnit.SECONDS)
+                .setStartOffset((long) (offset * lengthOfSegments), TimeUnit.SECONDS)
                 .setAudioCodec("libmp3lame")
-                .setFilename(fileOutput)
                 .done();
 
         FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, fprobe);
