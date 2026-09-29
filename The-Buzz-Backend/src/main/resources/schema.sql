@@ -1,7 +1,15 @@
---order modified from the schemas so the referenced keys are created before being referenced 
+# order modified from the schemas so the referenced keys are created before being referenced
+
+# UUID converts to BINARY(16) and is converted back at request
+# To generate a UUID to put in a table, when inserting into the table, use UUID_TO_BIN(UUID())
+# UUID() will generate a new UUID, and UUID_TO_BIN() will convert that UUID to BINARY
+
+CREATE DATABASE development;
+
+USE development;
 
 CREATE TABLE users (
-    user_id UUID PRIMARY KEY,
+    user_id BINARY(16) PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     oauth_key VARCHAR(255),
@@ -10,10 +18,10 @@ CREATE TABLE users (
     full_name VARCHAR(255),
     user_pfp_location VARCHAR(255),
     email VARCHAR(255),
-    favorites JSONB,
-    volume_settings JSONB,
-    notification_settings JSONB,
-    permission_data JSONB
+    favorites JSON,
+    volume_settings JSON,
+    notification_settings JSON,
+    permission_data JSON
 );
 CREATE TABLE permissions (
     permission_id INTEGER PRIMARY KEY,
@@ -21,8 +29,8 @@ CREATE TABLE permissions (
     is_moderator BOOLEAN NOT NULL,
     is_dj BOOLEAN NOT NULL,
     is_custom_permissions BOOLEAN NOT NULL,
-    permissions JSONB,
-    created_by UUID,
+    permissions JSON,
+    created_by BINARY(16),
     created_at TIMESTAMP,
     permission_desc VARCHAR(255),
 
@@ -30,8 +38,8 @@ CREATE TABLE permissions (
         REFERENCES users(user_id)
 );
 CREATE TABLE djs (
-    dj_id UUID PRIMARY KEY,
-    user_id UUID NOT NULL,
+    dj_id BINARY(16) PRIMARY KEY,
+    user_id BINARY(16) NOT NULL,
     dj_name VARCHAR(255) NOT NULL,
     genre VARCHAR(255),
     dj_pfp_location VARCHAR(255),
@@ -40,10 +48,10 @@ CREATE TABLE djs (
         REFERENCES users(user_id)
 );
 CREATE TABLE shows (
-    show_id UUID PRIMARY KEY,
+    show_id BINARY(16) PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description VARCHAR(1000),
-    dj_id UUID NOT NULL,
+    dj_id BINARY(16) NOT NULL,
     start_time TIMESTAMP,
     end_time TIMESTAMP,
     show_date DATE,
@@ -52,7 +60,7 @@ CREATE TABLE shows (
         REFERENCES djs(dj_id)
 );
 CREATE TABLE account_moderation (
-    user_id UUID NOT NULL,
+    user_id BINARY(16) NOT NULL,
     moderation_desc VARCHAR(255),
     date_applied TIMESTAMP,
     moderator_applied_action VARCHAR(255),
@@ -64,7 +72,7 @@ CREATE TABLE account_moderation (
 );
 CREATE TABLE comments (
     comment_id INTEGER PRIMARY KEY,
-    user_id UUID NOT NULL,
+    user_id BINARY(16) NOT NULL,
     post_id INTEGER NOT NULL,
     reply_id INTEGER,
     comment_content VARCHAR(1000) NOT NULL,
@@ -77,3 +85,9 @@ CREATE TABLE comments (
     FOREIGN KEY (reply_id)
         REFERENCES comments(comment_id)
 );
+
+CREATE USER "credentialsReader"@"localhost" IDENTIFIED BY "testingpassword";
+CREATE USER "credentialsWriter"@"localhost" IDENTIFIED BY "testingpassword";
+
+GRANT SELECT ON development.users TO 'credentialsReader'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON development.users TO 'credentialsWriter'@'localhost';

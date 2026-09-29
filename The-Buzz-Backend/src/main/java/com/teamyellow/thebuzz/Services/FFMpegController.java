@@ -1,4 +1,4 @@
-package com.teamyellow.thebuzz.Controllers;
+package com.teamyellow.thebuzz.Services;
 
 import com.teamyellow.thebuzz.Resources.ResourcePaths;
 import com.teamyellow.thebuzz.Services.LocalStorage;
