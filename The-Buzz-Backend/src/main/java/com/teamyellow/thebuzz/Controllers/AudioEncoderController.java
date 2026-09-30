@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
@@ -98,14 +99,23 @@ public class AudioEncoderController {
         // Adds the newly created file into the queue to create the playlist with
         FFMpegController ffMpegController = new FFMpegController();
 
-        if(isLive) {
-            lastThreeLiveSegmentFiles =
-                    AudioProcessingService.processLiveAudioFiles(ffMpegController, file, lastThreeLiveSegmentFiles);
-            Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(Arrays.toString(lastThreeLiveSegmentFiles));
+        Executors.defaultThreadFactory().newThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (isLive) {
+                        lastThreeLiveSegmentFiles =
+                                AudioProcessingService.processLiveAudioFiles(ffMpegController, file, lastThreeLiveSegmentFiles);
+                        Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(Arrays.toString(lastThreeLiveSegmentFiles));
 
-        } else {
-            AudioProcessingService.processPrerecordedAudioFiles(ffMpegController, recordingName, file);
-        }
+                    } else {
+                        AudioProcessingService.processPrerecordedAudioFiles(ffMpegController, recordingName, file);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
+        }).start();
 
         ResponseEntity<String> resp = new ResponseEntity<>(HttpStatus.ACCEPTED);
 
