@@ -1,0 +1,65 @@
+package com.teamyellow.thebuzz.model;
+
+import java.sql.Timestamp;
+import java.util.UUID;
+
+public class AccountModeration {
+
+    private UUID userId;
+    private String moderationDesc;
+    private Timestamp dateApplied;
+    private String moderatorAppliedAction;
+    private String moderationSeverity;
+    private Timestamp dateExpires;
+
+    public AccountModeration() {
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public String getModerationDesc() {
+        return moderationDesc;
+    }
+
+    public void setModerationDesc(String moderationDesc) {
+        this.moderationDesc = moderationDesc;
+    }
+
+    public Timestamp getDateApplied() {
+        return dateApplied;
+    }
+
+    public void setDateApplied(Timestamp dateApplied) {
+        this.dateApplied = dateApplied;
+    }
+
+    public String getModeratorAppliedAction() {
+        return moderatorAppliedAction;
+    }
+
+    public void setModeratorAppliedAction(String moderatorAppliedAction) {
+        this.moderatorAppliedAction = moderatorAppliedAction;
+    }
+
+    public String getModerationSeverity() {
+        return moderationSeverity;
+    }
+
+    public void setModerationSeverity(String moderationSeverity) {
+        this.moderationSeverity = moderationSeverity;
+    }
+
+    public Timestamp getDateExpires() {
+        return dateExpires;
+    }
+
+    public void setDateExpires(Timestamp dateExpires) {
+        this.dateExpires = dateExpires;
+    }
+}
