@@ -1,0 +1,128 @@
+package com.teamyellow.thebuzz.model;
+
+import java.sql.Timestamp;
+import java.util.UUID;
+
+public class User {
+
+    private UUID userId;
+    private String username;
+    private String passwordHash;
+    private String oauthKey;
+    private Timestamp joinDate;
+    private String userDesc;
+    private String fullName;
+    private String userPfpLocation;
+    private String email;
+    private String favorites;
+    private String volumeSettings;
+    private String notificationSettings;
+    private String permissionData;
+
+    public User() {
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getOauthKey() {
+        return oauthKey;
+    }
+
+    public void setOauthKey(String oauthKey) {
+        this.oauthKey = oauthKey;
+    }
+
+    public Timestamp getJoinDate() {
+        return joinDate;
+    }
+
+    public void setJoinDate(Timestamp joinDate) {
+        this.joinDate = joinDate;
+    }
+
+    public String getUserDesc() {
+        return userDesc;
+    }
+
+    public void setUserDesc(String userDesc) {
+        this.userDesc = userDesc;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getUserPfpLocation() {
+        return userPfpLocation;
+    }
+
+    public void setUserPfpLocation(String userPfpLocation) {
+        this.userPfpLocation = userPfpLocation;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFavorites() {
+        return favorites;
+    }
+
+    public void setFavorites(String favorites) {
+        this.favorites = favorites;
+    }
+
+    public String getVolumeSettings() {
+        return volumeSettings;
+    }
+
+    public void setVolumeSettings(String volumeSettings) {
+        this.volumeSettings = volumeSettings;
+    }
+
+    public String getNotificationSettings() {
+        return notificationSettings;
+    }
+
+    public void setNotificationSettings(String notificationSettings) {
+        this.notificationSettings = notificationSettings;
+    }
+
+    public String getPermissionData() {
+        return permissionData;
+    }
+
+    public void setPermissionData(String permissionData) {
+        this.permissionData = permissionData;
+    }
+}
