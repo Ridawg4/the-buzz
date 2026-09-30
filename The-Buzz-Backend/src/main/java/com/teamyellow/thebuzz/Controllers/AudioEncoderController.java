@@ -33,10 +33,6 @@ public class AudioEncoderController {
     private static final AtomicBoolean killSig = new AtomicBoolean(false);
     private static String[] lastThreeLiveSegmentFiles =  {"", "", ""};
 
-    static {
-        PlaylistBuilder.init(killSig);
-    }
-
     @GetMapping("/live")
     public ResponseEntity<Resource> getAudio() throws MalformedURLException {
         ResponseEntity<Resource> resp;
