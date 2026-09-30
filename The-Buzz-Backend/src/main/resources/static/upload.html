@@ -9,12 +9,17 @@
     <input type="file" name="file" id="file">
     <label>Set the resource name</label>
     <input type="text" name="resourceName" id="resourceName">
+    <label for="isLive">
+        Is this for the live feed?: <input type="checkbox" name="isLive" id="isLive">
+    </label>
     <button>submit</button>
 </form>
 <script>
     const form = document.getElementById("form")
     const file = document.getElementById("file")
     const resourceName = document.getElementById("resourceName")
+    const isLive = document.getElementById("isLive")
+
 
 
     form.addEventListener("submit", submitFile)
@@ -22,7 +27,7 @@
     function submitFile(e) {
         e.preventDefault()
         let data = new FormData(form)
-        fetch("api/v1/audio/recorded?recordingName=" + resourceName.value, {
+        fetch("api/v1/audio/upload?recordingName=" + resourceName.value, {
             method: "POST",
             body: data
         })

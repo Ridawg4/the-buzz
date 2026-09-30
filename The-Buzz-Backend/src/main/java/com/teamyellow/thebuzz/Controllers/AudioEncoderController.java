@@ -20,12 +20,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/audio")
 public class AudioEncoderController {
     private static final AtomicBoolean killSig = new AtomicBoolean(false);
+    private static String[] lastThreeLiveSegmentFiles =  {"", "", ""};
 
     static {
         PlaylistBuilder.init(killSig);
@@ -35,11 +39,16 @@ public class AudioEncoderController {
     public ResponseEntity<Resource> getAudio() throws MalformedURLException {
         ResponseEntity<Resource> resp;
 
-        if(new File(ResourcePaths.LIVE_DIRECTORY + "live.m3u8").exists()) {
-            Resource file = new UrlResource("file://" + ResourcePaths.LIVE_DIRECTORY + "live.m3u8");
+        /* An Optional<T> is a wrapper you can create to alert the programmer that an object
+          or may not be present inside. This is a slightly nicer way to handle null objects */
+        Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
+                ResourcePaths.LIVE_SEGMENTS_DIRECTORY, "live.m3u8");
 
-            resp = new ResponseEntity<>(file, HttpStatus.OK);
+        if(resourceOptional.isPresent()) {
+            resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
+            // HTTP standard indicate that .m3u8 files are returned with the type shown below
             resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, "application/x-mpegURL");
+
         } else {
             resp = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -47,13 +56,15 @@ public class AudioEncoderController {
         return resp;
     }
 
-    @GetMapping("/live/{path}")
-    public ResponseEntity<Resource> getLiveAudioSegment(@PathVariable String path) throws MalformedURLException {
-        Resource file = new UrlResource(ResourcePaths.LIVE_SEGMENTS_DIRECTORY + path);
+    @GetMapping("/{filename}")
+    public ResponseEntity<Resource> getLiveAudioSegment(@PathVariable String filename) throws MalformedURLException {
         ResponseEntity<Resource> resp;
 
-        if(new File("file://" + ResourcePaths.LIVE_SEGMENTS_DIRECTORY + path).exists()) {
-            resp = new ResponseEntity<>(file, HttpStatus.OK);
+        Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
+                ResourcePaths.LIVE_SEGMENTS_DIRECTORY, filename);
+
+        if(resourceOptional.isPresent()) {
+            resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
         } else {
             resp = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -65,13 +76,12 @@ public class AudioEncoderController {
     public ResponseEntity<Resource> getAudio(@PathVariable String filename, @PathVariable String resource) throws MalformedURLException {
         ResponseEntity<Resource> resp;
 
+        Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
+                ResourcePaths.TEMP_DIRECTORY + resource + ResourcePaths.SEPARATOR
+                        + "Segments", filename);
 
-        if(new File(ResourcePaths.TEMP_DIRECTORY + resource + ResourcePaths.SEPARATOR
-                + "Segments" + ResourcePaths.SEPARATOR + filename).exists()) {
-            Resource file = new UrlResource("file://" + ResourcePaths.TEMP_DIRECTORY + resource
-                    + ResourcePaths.SEPARATOR
-                    + "Segments" + ResourcePaths.SEPARATOR + filename);
-            resp = new ResponseEntity<>(file, HttpStatus.OK);
+        if(resourceOptional.isPresent()) {
+            resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
             resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, "application/x-mpegURL");
         } else {
             resp = new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -89,7 +99,10 @@ public class AudioEncoderController {
         FFMpegController ffMpegController = new FFMpegController();
 
         if(isLive) {
-            AudioProcessingService.processLiveAudioFiles(ffMpegController, file);
+            lastThreeLiveSegmentFiles =
+                    AudioProcessingService.processLiveAudioFiles(ffMpegController, file, lastThreeLiveSegmentFiles);
+            Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(Arrays.toString(lastThreeLiveSegmentFiles));
+
         } else {
             AudioProcessingService.processPrerecordedAudioFiles(ffMpegController, recordingName, file);
         }

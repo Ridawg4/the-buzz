@@ -17,13 +17,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 public class PlaylistBuilder {
     private static final Queue<String> uriToFiles = new ConcurrentLinkedQueue<>();
     private static AtomicBoolean killSig = null;
     private static int segments = 3;
-    private static long indexOfPlaylist = 0;
+    private static AtomicLong indexOfPlaylist = new AtomicLong(0);
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
 
@@ -36,7 +37,7 @@ public class PlaylistBuilder {
         uriToFiles.add(fileName);
     }
 
-    public static void buildQueueFromFolder(String filePath) {
+    public static void buildQueueFromFolder(String filePath, String fileName, boolean isLive) {
         File directory = new File(filePath);
         ArrayList<String> fileNamesAl = new ArrayList<>();
 
@@ -64,26 +65,31 @@ public class PlaylistBuilder {
             }
         });
 
-        Queue<String> fileNames = new ConcurrentLinkedQueue<>(fileNamesAl);
-        fileNames.add(filePath);
-        LOGGER.info(filePath);
-        generateM3U8(fileNames);
+        Queue<String> uriNames = new ConcurrentLinkedQueue<>(fileNamesAl);
+        generateM3U8(uriNames, filePath, fileName, isLive);
 
     }
 
-    private static void generateM3U8(Queue<String> uriToFiles) {
+    private static void generateM3U8(Queue<String> uriToFiles, String filePath, String filename, boolean isLive) {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
+                MediaPlaylist playlist;
                 int uriLength = uriToFiles.size();
                 String[] fileNames = new String[uriLength];
-                for (int i = 0; i < uriLength - 1; i++) {
+
+                for (int i = 0; i < uriLength; i++) {
                     fileNames[i] = uriToFiles.poll();
                 }
-                MediaPlaylist playlist = M3U8Encoder.createPlaylist(fileNames, 0, fileNames.length - 1);
-                String filePathReceived = uriToFiles.poll();
 
-                LocalStorage.addToAudioStorage(playlist, "recorded.m3u8", filePathReceived);
+                if(isLive) {
+                    playlist = M3U8Encoder.createPlaylist(fileNames, indexOfPlaylist.get(), fileNames.length, true);
+                    indexOfPlaylist.getAndIncrement();
+                } else {
+                    playlist = M3U8Encoder.createPlaylist(fileNames, 0, fileNames.length, false);
+                }
+
+                LocalStorage.addToAudioStorage(playlist, filename, filePath);
             }
         });
         thread.start();

@@ -11,12 +11,14 @@ import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class FFMpegController {
     private static FFmpeg ffmpeg = null;
     private static FFprobe fprobe = null;
+    private static long currentFileIndex = 0;
 
     public FFMpegController() {
         try {
@@ -28,19 +30,45 @@ public class FFMpegController {
         }
     }
 
-    public boolean splitAudioIntoSegments(String fileInput, int lengthOfSegments, String fileOutput) throws IOException {
+    public String[] splitAudioIntoSegments(String fileInput, int lengthOfSegments, String fileOutput,
+                                           boolean isLive) throws IOException {
         FFmpegProbeResult probeResult = fprobe.probe(fileInput);
+        String[] lastThreeFileNames = new String[3];
 
         if(!probeResult.hasError()) {
             long totalSegments = (long) Math.ceil(probeResult.getFormat().getDuration() / lengthOfSegments);
 
-            for(int i = 0; i < totalSegments; i++) {
-                splitAudio(probeResult, lengthOfSegments, i, i + ".mp3", fileOutput);
+            if (isLive) {
+                if (totalSegments == 1) {
+                    lastThreeFileNames[0] = String.valueOf(currentFileIndex) + ".mp3";
+                } else if (totalSegments == 2) {
+                    lastThreeFileNames[0] = String.valueOf(currentFileIndex) + ".mp3";
+                    lastThreeFileNames[1] = String.valueOf(currentFileIndex + 1) + ".mp3";
+                } else if (totalSegments == 3) {
+                    lastThreeFileNames[0] = String.valueOf(currentFileIndex) + ".mp3";
+                    lastThreeFileNames[1] = String.valueOf(currentFileIndex + 1) + ".mp3";
+                    lastThreeFileNames[2] = String.valueOf(currentFileIndex + 2) + ".mp3";
+                }
+
+                for (int i = 0; i < totalSegments; i++) {
+                    if (totalSegments - i == 3) {
+                        lastThreeFileNames[0] = String.valueOf(currentFileIndex) + ".mp3";
+                        lastThreeFileNames[1] = String.valueOf(currentFileIndex + 1) + ".mp3";
+                        lastThreeFileNames[2] = String.valueOf(currentFileIndex + 2) + ".mp3";
+                    }
+                    splitAudio(probeResult, lengthOfSegments, i, currentFileIndex + ".mp3", fileOutput);
+                    currentFileIndex++;
+                }
+            } else {
+                for (int i = 0; i < totalSegments; i++) {
+                    splitAudio(probeResult, lengthOfSegments, i, i + ".mp3", fileOutput);
+                    currentFileIndex++;
+                }
             }
         } else {
             throw new FileNotFoundException();
         }
-        return true;
+        return lastThreeFileNames;
     }
 
     private boolean splitAudio(FFmpegProbeResult probeResult, int lengthOfSegments, int offset, String fileName, String fileOutput) throws IOException {
@@ -48,7 +76,7 @@ public class FFMpegController {
                 .setInput(probeResult)
                 .done()
 
-                .addOutput(fileOutput + ResourcePaths.SEPARATOR + fileName)
+                .addOutput(fileOutput + fileName)
                 .setDuration((long) (lengthOfSegments + 0.05), TimeUnit.SECONDS)
                 .setStartOffset((long) (offset * lengthOfSegments), TimeUnit.SECONDS)
                 .setAudioCodec("libmp3lame")

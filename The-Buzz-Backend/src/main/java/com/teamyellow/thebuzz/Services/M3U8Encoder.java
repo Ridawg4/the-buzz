@@ -4,32 +4,14 @@ import io.lindstrom.m3u8.model.MediaPlaylist;
 import io.lindstrom.m3u8.model.MediaSegment;
 
 public class M3U8Encoder {
-
-    public static MediaPlaylist createPlaylist(String[] fileNames, long playlistIndex) {
-        MediaSegment[] segments = new MediaSegment[3];
-
-        for(int i = 0; i < fileNames.length; i++) {
-            segments[i] = MediaSegment.builder()
-                    .duration(10.0)
-                    .uri(String.valueOf(fileNames[i]))
-                    .build();
+    public static MediaPlaylist createPlaylist(String[] fileNames, long playlistIndex,
+                                               int totalSegments, boolean isLive) {
+        if(totalSegments <=0) {
+            throw new RuntimeException();
         }
-
-        MediaPlaylist.Builder playlist = MediaPlaylist.builder();
-        for(MediaSegment segment : segments) {
-            playlist.addMediaSegments(segment);
-        }
-        playlist.version(3);
-        playlist.allowCache(false);
-        playlist.ongoing(true);
-        playlist.targetDuration(10);
-        playlist.mediaSequence(playlistIndex);
-
-        return playlist.build();
-    }
-
-    public static MediaPlaylist createPlaylist(String[] fileNames, long playlistIndex, int totalSegments) {
         MediaSegment[] segments = new MediaSegment[totalSegments];
+        String firstFileInList = fileNames[0];
+        long indexOfFirstFile = Long.parseLong(firstFileInList.substring(0, (firstFileInList.length() - ".mp3".length())));
 
         for(int i = 0; i < totalSegments; i++) {
             segments[i] = MediaSegment.builder()
@@ -39,14 +21,22 @@ public class M3U8Encoder {
         }
 
         MediaPlaylist.Builder playlist = MediaPlaylist.builder();
+        playlist.version(3);
+
         for(MediaSegment segment : segments) {
             playlist.addMediaSegments(segment);
         }
-        playlist.version(3);
-        playlist.allowCache(true);
-        playlist.ongoing(false);
+
+        if(isLive) {
+            playlist.allowCache(false);
+            playlist.ongoing(true);
+            playlist.mediaSequence(indexOfFirstFile);
+        } else {
+            playlist.allowCache(true);
+            playlist.ongoing(false);
+            playlist.mediaSequence(0);
+        }
         playlist.targetDuration(10);
-        playlist.mediaSequence(playlistIndex);
 
         return playlist.build();
     }
