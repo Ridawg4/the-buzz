@@ -1,0 +1,55 @@
+package com.teamyellow.thebuzz.model;
+
+import java.util.UUID;
+
+public class DJ {
+
+    private UUID djId;
+    private UUID userId;
+    private String djName;
+    private String genre;
+    private String djPfpLocation;
+
+    public DJ() {
+    }
+
+    public UUID getDjId() {
+        return djId;
+    }
+
+    public void setDjId(UUID djId) {
+        this.djId = djId;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public String getDjName() {
+        return djName;
+    }
+
+    public void setDjName(String djName) {
+        this.djName = djName;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public String getDjPfpLocation() {
+        return djPfpLocation;
+    }
+
+    public void setDjPfpLocation(String djPfpLocation) {
+        this.djPfpLocation = djPfpLocation;
+    }
+}
