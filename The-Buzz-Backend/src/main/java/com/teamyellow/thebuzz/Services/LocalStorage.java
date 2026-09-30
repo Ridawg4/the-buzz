@@ -19,8 +19,21 @@ import java.util.logging.Logger;
 
 public class LocalStorage {
 
+    /**
+     * Adds the MediaPlaylist file to the associated file path with the denoted filename
+     * <p>
+     * Created specifically for Audio processing pipeline
+     * </p>
+     * <p>
+     * Does not include any separators, the path should end with a separator
+     *</p>
+     * @param mediaPlaylist Playlist file to save
+     * @param filename Name of the file to save
+     * @param filePath Path to save the file
+     * @return String filename
+     */
     public static String addToAudioStorage(MediaPlaylist mediaPlaylist, String filename, String filePath) {
-        File tempFile = new File(filePath + ResourcePaths.SEPARATOR + filename);
+        File tempFile = new File(filePath + filename);
         try {
             tempFile.createNewFile();
             FileOutputStream stream = new FileOutputStream(tempFile);
@@ -35,6 +48,19 @@ public class LocalStorage {
         return tempFile.getName();
     }
 
+    /**
+     * Adds the MutlipartFile file to the associated file path with the denoted filename
+     * <p>
+     * Created specifically for Audio processing pipeline
+     * </p>
+     * <p>
+     * Does not include any separators, the path should end with a separator
+     *</p>
+     * @param file File to save
+     * @param filename Name of the file to save
+     * @param filePath Path to save the file
+     * @return String filename
+     */
     public static String addToAudioStorage(MultipartFile file, String filename, String filePath) {
         File dir = new File(filePath);
         if(!dir.exists()) {
@@ -57,6 +83,21 @@ public class LocalStorage {
         return tempFile.getName();
     }
 
+    /**
+     * Adds the MutlipartFile file to the associated file path and folder pathway
+     * with the denoted filename
+     * <p>
+     * Created specifically for Audio processing pipeline
+     * </p>
+     * <p>
+     * Does not include any separators, the path should end with a separator
+     *</p>
+     * @param file File to save
+     * @param filename Name of the file to save
+     * @param filePath Path to save the file
+     * @param folderToCreate The folder to place content inside of
+     * @return String filename
+     */
     public static String addToAudioStorage(MultipartFile file, String filename, String filePath, String folderToCreate) {
         File dir = new File(filePath
                 + folderToCreate + ResourcePaths.SEPARATOR);
@@ -82,8 +123,17 @@ public class LocalStorage {
         return tempFile.getName();
     }
 
-    public static String createEmptyFile(String filename) {
-        File tempFile = new File(ResourcePaths.TEMP_DIRECTORY + filename);
+    /**
+     * Creates an empty file at the given filepath with the given filename
+     * <p>
+     * Does not include any separators, the path should end with a separator
+     *</p>
+     * @param filename Name of the file to create
+     * @param path Pathway to create the file in
+     * @return String the name of the created file
+     */
+    public static String createEmptyFile(String filename, String path) {
+        File tempFile = new File(path + filename);
         try {
             tempFile.createNewFile();
             FileOutputStream stream = new FileOutputStream(tempFile);
@@ -96,17 +146,43 @@ public class LocalStorage {
         return tempFile.getName();
     }
 
-    public static boolean doesFileExistAtDirectory(String pathToFile) throws FileNotFoundException {
-        File file = new File(pathToFile);
+    /**
+     * Checks if a file at a given path
+     * <p>
+     * Does not include any separators, the path should end with a separator
+     *</p>
+     * @param path Path to check for the file
+     * @param fileName Name of the file to check for
+     * @return boolean Does the file exist?
+     */
+    public static boolean doesFileExistAtDirectory(String path, String fileName) {
+        File file = new File(path + fileName);
 
         return file.exists();
     }
 
+    /**
+     * Deletes a file at the given path with the given filename
+     *
+     * @param filename Name of the file to delete
+     * @param filePath Path the files exists within
+     * @return boolean Was deletion successful?
+     */
     public static boolean removeFileFromLocalStorage(String filename, String filePath) {
-        File tempFile = new File(filePath + ResourcePaths.SEPARATOR + filename);
+        File tempFile = new File(filePath + filename);
         return tempFile.delete();
     }
 
+    /**
+     * Deletes all files within a given file path
+     * <p>
+     * THIS IS NOT A REVERSIBLE ACTION AND MODIFIES SYSTEM STORAGE AT RUNTIME
+     * STICK WITHIN ResourcePaths DEFINED DIRECTORIES OR UNDESIRED DELETIONS
+     * INSIDE YOUR FILE SYSTEM MAY OCCUR
+     *</p>
+     * @param filePath Path to folder to delete all files within
+     * @return boolean Was deletion successful?
+     */
     public static boolean removeFilesFromLocalStorage(String filePath) {
         File dir = new File(filePath);
 
@@ -121,6 +197,18 @@ public class LocalStorage {
         return true;
     }
 
+    /**
+     * Deletes all files within a given file path, ignoring files with names that are excluded as
+     * provided
+     * <p>
+     * THIS IS NOT A REVERSIBLE ACTION AND MODIFIES SYSTEM STORAGE AT RUNTIME
+     * STICK WITHIN ResourcePaths DEFINED DIRECTORIES OR UNDESIRED DELETIONS
+     * INSIDE YOUR FILE SYSTEM MAY OCCUR
+     *</p>
+     * @param filePath Path to folder to delete all files within
+     * @param exclusions A String array containing filenames of files to not delete within a directory
+     * @return boolean Was deletion successful?
+     */
     public static boolean removeFilesFromLocalStorage(String filePath, String[] exclusions) {
         File dir = new File(filePath);
 
@@ -145,8 +233,17 @@ public class LocalStorage {
         return true;
     }
 
+    /**
+     * Attempts to retrieve a file resource from local storage based on provided path and filename
+     * Does not include any separators, the path should end with a separator
+     *
+     * @param path Pathway to the file requested
+     * @param filename name of the file requested
+     * @return Optional<Resource> File that may or may not be present
+     * @throws MalformedURLException If the path & filename are invalid or not present
+     */
     public static Optional<Resource> retrieveFileFromLocalStorage(String path, String filename) throws MalformedURLException {
-        File fileToReturn = new File(path + ResourcePaths.SEPARATOR + filename);
+        File fileToReturn = new File(path + filename);
         if(fileToReturn.exists()) {
             return Optional.of(new UrlResource( fileToReturn.toURI()));
         } else {

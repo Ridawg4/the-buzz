@@ -16,7 +16,7 @@ public class AudioProcessingService {
                         + ResourcePaths.SEPARATOR + "Segments" + ResourcePaths.SEPARATOR, false);
 
         PlaylistBuilder.buildQueueFromFolder(ResourcePaths.TEMP_DIRECTORY + recordingName
-                + ResourcePaths.SEPARATOR + "Segments", "recorded.m3u8", false);
+                + ResourcePaths.SEPARATOR + "Segments" + ResourcePaths.SEPARATOR, "recorded.m3u8", false);
         LocalStorage.removeFileFromLocalStorage(fileName, ResourcePaths.TEMP_DIRECTORY + recordingName);
     }
 

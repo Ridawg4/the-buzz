@@ -99,28 +99,40 @@ public class AudioEncoderController {
         // Adds the newly created file into the queue to create the playlist with
         FFMpegController ffMpegController = new FFMpegController();
 
+        // @TODO Abstract this method call to either a SpringBoot job handler
+        // or implement a job handler class
+        /* For long running tasks, it is necessary to create a new Thread to run the tasks
+           Otherwise, further code will not be sent until the tasks are completed,
+           which can cause users to believe something is broken
+
+           Creating a new Thread solves this problem, as it allows the current thread to
+           finish execution and the new Thread will run the tasks separately as called.
+         */
         Executors.defaultThreadFactory().newThread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    // Processing live stream audio clips is separate than prerecorded audio clips
                     if (isLive) {
+                        /* Preserves the last three files generated to allow
+                     new listeners to get those files and for current listeners to know
+                     where to start */
                         lastThreeLiveSegmentFiles =
-                                AudioProcessingService.processLiveAudioFiles(ffMpegController, file, lastThreeLiveSegmentFiles);
-                        Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(Arrays.toString(lastThreeLiveSegmentFiles));
-
+                                AudioProcessingService.processLiveAudioFiles(ffMpegController,
+                                        file, lastThreeLiveSegmentFiles);
                     } else {
-                        AudioProcessingService.processPrerecordedAudioFiles(ffMpegController, recordingName, file);
+                        // Doesn't need to preserve any files upon processing
+                        AudioProcessingService.processPrerecordedAudioFiles(ffMpegController,
+                                recordingName, file);
                     }
                 } catch (IOException e) {
+                    // In the case the thread encounters an error
                     throw new RuntimeException(e.getMessage());
                 }
             }
-        }).start();
+        }).start(); // Starts this thread
 
-        ResponseEntity<String> resp = new ResponseEntity<>(HttpStatus.ACCEPTED);
-
-        return resp;
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    // @TODO DOCUMENT AND MAKE PRETTY
 }
