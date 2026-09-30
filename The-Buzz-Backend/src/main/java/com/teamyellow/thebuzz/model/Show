@@ -1,0 +1,75 @@
+package com.teamyellow.thebuzz.model;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.UUID;
+
+public class Show {
+
+    private UUID showId;
+    private String title;
+    private String description;
+    private UUID djId;
+    private Timestamp startTime;
+    private Timestamp endTime;
+    private Date showDate;
+
+    public Show() {
+    }
+
+    public UUID getShowId() {
+        return showId;
+    }
+
+    public void setShowId(UUID showId) {
+        this.showId = showId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public UUID getDjId() {
+        return djId;
+    }
+
+    public void setDjId(UUID djId) {
+        this.djId = djId;
+    }
+
+    public Timestamp getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Timestamp startTime) {
+        this.startTime = startTime;
+    }
+
+    public Timestamp getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
+    }
+
+    public Date getShowDate() {
+        return showDate;
+    }
+
+    public void setShowDate(Date showDate) {
+        this.showDate = showDate;
+    }
+}
