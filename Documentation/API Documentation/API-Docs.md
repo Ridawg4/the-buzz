@@ -43,10 +43,10 @@ No request body is required.
 
 ### Responses
 
-| Status | Description |
-| --- | --- |
-| `200 OK` | Returns the `.m3u8` playlist file for the current audio stream. |
-| `204 No Content` | The `.m3u8` playlist file is not available. |
+| Status          | Description |
+|-----------------| --- |
+| `200 OK`        | Returns the `.m3u8` playlist file for the current audio stream. |
+| `404 Not Found` | The `.m3u8` playlist file is not available. |
 
 ---
 
@@ -67,15 +67,15 @@ The requested filename must be supplied in the `{file}` path parameter.
 **Example:**
 
 ```text
-GET /api/v1/audio/example.ts
+GET /api/v1/audio/example.mp3
 ```
 
 ### Responses
 
-| Status | Description |
-| --- | --- |
-| `200 OK` | Returns the requested file. |
-| `204 No Content` | The requested file is not available. |
+| Status           | Description |
+|------------------| --- |
+| `200 OK`         | Returns the requested file. |
+| `4404 Not Found` | The requested file is not available. |
 
 ---
 
@@ -99,12 +99,12 @@ The `{resource}` value must not contain file separators.
 **Example:**
 
 ```text
-GET /api/v1/audio/example-resource/example.ts
+GET /api/v1/audio/example-resource/recorded.m3u8
 ```
 
 ### Responses
 
-| Status | Description |
-| --- | --- |
-| `200 OK` | Returns the requested file from the specified resource. |
-| `204 No Content` | The requested file is not available. |
+| Status          | Description |
+|-----------------| --- |
+| `200 OK`        | Returns the requested file from the specified resource. |
+| `404 Not Found` | The requested file is not available. |

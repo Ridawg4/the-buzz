@@ -4,6 +4,7 @@
 
 package com.teamyellow.thebuzz.Controllers;
 
+import com.teamyellow.thebuzz.Records.ContentTypes;
 import com.teamyellow.thebuzz.Resources.ResourcePaths;
 import com.teamyellow.thebuzz.Services.AudioProcessingService;
 import com.teamyellow.thebuzz.Services.FFMpegController;
@@ -48,12 +49,13 @@ public class AudioEncoderController {
         if(resourceOptional.isPresent()) {
             resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
             // HTTP standard indicate that .m3u8 files are returned with the type shown below
-            resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, "application/x-mpegURL");
+            resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, ContentTypes.M3U8);
 
         } else {
             resp = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        // Return the generated request
         return resp;
     }
 
@@ -61,15 +63,20 @@ public class AudioEncoderController {
     public ResponseEntity<Resource> getLiveAudioSegment(@PathVariable String filename) throws MalformedURLException {
         ResponseEntity<Resource> resp;
 
+        // Creates the Optional<T> received from local storage
         Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
                 ResourcePaths.LIVE_SEGMENTS_DIRECTORY, filename);
 
         if(resourceOptional.isPresent()) {
+            // If the Optional<T> is not empty, send the file contained inside
             resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
+            resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, ContentTypes.MP3);
+
         } else {
             resp = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        // Return the generated request
         return resp;
     }
 
@@ -77,14 +84,18 @@ public class AudioEncoderController {
     public ResponseEntity<Resource> getAudio(@PathVariable String filename, @PathVariable String resource) throws MalformedURLException {
         ResponseEntity<Resource> resp;
 
+        // Creates the Optional<T> received from local storage
         Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
                 ResourcePaths.TEMP_DIRECTORY + resource + ResourcePaths.SEPARATOR
-                        + "Segments", filename);
+                        + "Segments" + ResourcePaths.SEPARATOR, filename);
 
         if(resourceOptional.isPresent()) {
+            // If the Optional<T> is not empty, send those files
             resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
-            resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, "application/x-mpegURL");
+            // Required by HTTP HLS standard, clients deny loading the files without this tag
+            resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, ContentTypes.M3U8);
         } else {
+            // If file is not present, alert client of such
             resp = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 

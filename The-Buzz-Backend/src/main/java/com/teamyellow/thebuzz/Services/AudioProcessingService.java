@@ -6,31 +6,54 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public class AudioProcessingService {
-    public static void processPrerecordedAudioFiles(FFMpegController ffMpegController, String recordingName, MultipartFile file) throws IOException {
+    /**
+     * Processes all prerecorded audio clips
+     *
+     * @param ffMpegController The FFMpeg handler that will split all .mp3 files into segments
+     * @param resourcePath The name of the folder to place the files in
+     * @param file The file to split
+     * @throws IOException If the processing fails
+     */
+    public static void processPrerecordedAudioFiles(FFMpegController ffMpegController, String resourcePath, MultipartFile file) throws IOException {
         // Takes the received file and creates a file for it in local storage
-        String fileName = LocalStorage.addToAudioStorage(file, file.getOriginalFilename(), ResourcePaths.TEMP_DIRECTORY, recordingName);
+        String fileName = LocalStorage.addToAudioStorage(file, file.getOriginalFilename(), ResourcePaths.TEMP_DIRECTORY, resourcePath);
 
-        ffMpegController.splitAudioIntoSegments(ResourcePaths.TEMP_DIRECTORY + recordingName
+        // Splits the audio files into separate files based on the length and the value in lengthOfSegments
+        ffMpegController.splitAudioIntoSegments(ResourcePaths.TEMP_DIRECTORY + resourcePath
                         + ResourcePaths.SEPARATOR + fileName, 10,
-                ResourcePaths.TEMP_DIRECTORY + recordingName
+                ResourcePaths.TEMP_DIRECTORY + resourcePath
                         + ResourcePaths.SEPARATOR + "Segments" + ResourcePaths.SEPARATOR, false);
 
-        PlaylistBuilder.buildQueueFromFolder(ResourcePaths.TEMP_DIRECTORY + recordingName
+        // Builds the Playlist from the files present in the denoted directory
+        PlaylistBuilder.buildQueueFromFolder(ResourcePaths.TEMP_DIRECTORY + resourcePath
                 + ResourcePaths.SEPARATOR + "Segments" + ResourcePaths.SEPARATOR, "recorded.m3u8", false);
-        LocalStorage.removeFileFromLocalStorage(fileName, ResourcePaths.TEMP_DIRECTORY + recordingName);
+        // Removes the file that was uploaded
+        LocalStorage.removeFileFromLocalStorage(fileName, ResourcePaths.TEMP_DIRECTORY + resourcePath + ResourcePaths.SEPARATOR);
     }
 
+    /**
+     * Processes all live audio clips
+     *
+     * @param ffMpegController The FFMpeg handler that will split all .mp3 files into segments
+     * @param file The file to split
+     * @param filesToExcludeFromDeletion The files to not delete inside the live file path
+     * @return String[] The newest filenames not to delete - will contain max of 3 files
+     * @throws IOException If the process fails
+     */
     public static String[] processLiveAudioFiles(FFMpegController ffMpegController, MultipartFile file, String[] filesToExcludeFromDeletion) throws IOException {
         // Takes the received file and creates a file for it in local storage
         String fileName = LocalStorage.addToAudioStorage(file, file.getOriginalFilename(),ResourcePaths.LIVE_DIRECTORY);
+        // Clears the live clips in the directory except the ones denoted by filesToExcludeFromDeletion
         LocalStorage.removeFilesFromLocalStorage(ResourcePaths.LIVE_SEGMENTS_DIRECTORY, filesToExcludeFromDeletion);
 
-
+        // Splits the audio files into separate files based on the length and the value in lengthOfSegments
         String[] lastThreeFiles = ffMpegController.splitAudioIntoSegments(ResourcePaths.LIVE_DIRECTORY
                         + fileName, 10,
                 ResourcePaths.LIVE_SEGMENTS_DIRECTORY, true);
 
+        // Builds the Playlist from the files present in the live directory
         PlaylistBuilder.buildQueueFromFolder(ResourcePaths.LIVE_SEGMENTS_DIRECTORY, "live.m3u8", true);
+        // Removes the file that was uploaded
         LocalStorage.removeFileFromLocalStorage(fileName, ResourcePaths.LIVE_DIRECTORY);
 
         return lastThreeFiles;
