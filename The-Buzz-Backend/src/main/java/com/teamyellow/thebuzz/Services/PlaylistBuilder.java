@@ -24,10 +24,12 @@ public class PlaylistBuilder {
     private static AtomicBoolean killSig = null;
     private static int segments = 3;
     private static long indexOfPlaylist = 0;
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
 
     public static void init(AtomicBoolean killSignal) {
         killSig = killSignal;
-        generateM3U8(segments);
+//        generateM3U8(segments);
     }
 
     public static void addFileToQueue(String fileName) {
@@ -35,7 +37,7 @@ public class PlaylistBuilder {
     }
 
     public static void buildQueueFromFolder(String filePath) {
-        File directory = new File(ResourcePaths.TEMP_DIRECTORY + filePath);
+        File directory = new File(filePath);
         ArrayList<String> fileNamesAl = new ArrayList<>();
 
         if(directory.exists()) {
@@ -64,55 +66,24 @@ public class PlaylistBuilder {
 
         Queue<String> fileNames = new ConcurrentLinkedQueue<>(fileNamesAl);
         fileNames.add(filePath);
+        LOGGER.info(filePath);
         generateM3U8(fileNames);
 
     }
 
-    private static void generateM3U8(int totalSegments) {
-        Thread thread = new Thread(new Runnable() {
-            private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            @Override
-            public void run() {
-                while(!killSig.get()) {
-//                    LOGGER.info("queue length: " + uriToFiles.size());
-
-                    if(uriToFiles.size() == totalSegments) {
-                        String[] fileNames = new String[totalSegments];
-                        for(int i = 0; i < totalSegments; i++) {
-                            fileNames[i] = uriToFiles.poll();
-                        }
-                        MediaPlaylist playlist = M3U8Encoder.createPlaylist(fileNames, indexOfPlaylist, totalSegments);
-
-                        LocalStorage.addToLiveStorage(playlist, "Live.m3u8");
-                        indexOfPlaylist++;
-                    } else {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            }
-        });
-        thread.start();
-    }
-
     private static void generateM3U8(Queue<String> uriToFiles) {
         Thread thread = new Thread(new Runnable() {
-            private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
             @Override
             public void run() {
-//                LOGGER.info("queue length: " + uriToFiles.size());
                 int uriLength = uriToFiles.size();
                 String[] fileNames = new String[uriLength];
                 for (int i = 0; i < uriLength - 1; i++) {
                     fileNames[i] = uriToFiles.poll();
                 }
                 MediaPlaylist playlist = M3U8Encoder.createPlaylist(fileNames, 0, fileNames.length - 1);
+                String filePathReceived = uriToFiles.poll();
 
-                LocalStorage.addToStorage(playlist, "recorded.m3u8", "Temp" + ResourcePaths.SEPARATOR + uriToFiles.poll());
+                LocalStorage.addToAudioStorage(playlist, "recorded.m3u8", filePathReceived);
             }
         });
         thread.start();

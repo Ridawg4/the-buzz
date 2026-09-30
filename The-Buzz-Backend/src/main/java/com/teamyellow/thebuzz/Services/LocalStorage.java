@@ -8,8 +8,29 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 
 public class LocalStorage {
-    public static String addToTempStorage(MultipartFile file, String filename) {
-        File tempFile = new File(ResourcePaths.TEMP_DIRECTORY + filename);
+
+    public static String addToAudioStorage(MediaPlaylist mediaPlaylist, String filename, String filePath) {
+        File tempFile = new File(filePath + ResourcePaths.SEPARATOR + filename);
+        try {
+            tempFile.createNewFile();
+            FileOutputStream stream = new FileOutputStream(tempFile);
+            MediaPlaylistParser parser = new MediaPlaylistParser();
+
+            stream.write(parser.writePlaylistAsBytes(mediaPlaylist));
+            stream.close();
+        } catch (IOException e) {
+
+        }
+
+        return tempFile.getName();
+    }
+
+    public static String addToAudioStorage(MultipartFile file, String filename, String filePath) {
+        if(!new File(filePath).exists()) {
+            File dir = new File(filePath);
+            dir.mkdir();
+        }
+        File tempFile = new File(filePath + filename);
         try {
             tempFile.createNewFile();
             FileOutputStream stream = new FileOutputStream(tempFile);
@@ -22,71 +43,23 @@ public class LocalStorage {
         return tempFile.getName();
     }
 
-    public static String addToTempStorage(MultipartFile file, String filename, String folderToCreate) {
-        if(!new File(ResourcePaths.TEMP_DIRECTORY + folderToCreate + ResourcePaths.SEPARATOR).exists()) {
-            File dir = new File(ResourcePaths.TEMP_DIRECTORY
-                    + folderToCreate + ResourcePaths.SEPARATOR);
+    public static String addToAudioStorage(MultipartFile file, String filename, String filePath, String folderToCreate) {
+        File dir = new File(filePath
+                + folderToCreate + ResourcePaths.SEPARATOR);
+        if(!dir.exists()) {
             dir.mkdir();
         }
-        if(!new File(ResourcePaths.TEMP_DIRECTORY
-                + folderToCreate + ResourcePaths.SEPARATOR + "Segments" + ResourcePaths.SEPARATOR).exists()) {
-            File dir = new File(ResourcePaths.TEMP_DIRECTORY
-                    + folderToCreate + ResourcePaths.SEPARATOR + "Segments" + ResourcePaths.SEPARATOR);
+
+        dir = new File(filePath
+                + folderToCreate + ResourcePaths.SEPARATOR + "Segments" + ResourcePaths.SEPARATOR);
+        if(!dir.exists()) {
             dir.mkdir();
         }
-        File tempFile = new File(ResourcePaths.TEMP_DIRECTORY + folderToCreate + ResourcePaths.SEPARATOR + filename);
+        File tempFile = new File(filePath + folderToCreate + ResourcePaths.SEPARATOR + filename);
         try {
             tempFile.createNewFile();
             FileOutputStream stream = new FileOutputStream(tempFile);
             stream.write(file.getBytes());
-            stream.close();
-        } catch (IOException e) {
-
-        }
-
-        return tempFile.getName();
-    }
-
-    public static String addToTempStorage(MediaPlaylist mediaPlaylist, String filename) {
-        File tempFile = new File(ResourcePaths.TEMP_DIRECTORY + filename);
-        try {
-            tempFile.createNewFile();
-            FileOutputStream stream = new FileOutputStream(tempFile);
-            MediaPlaylistParser parser = new MediaPlaylistParser();
-
-            stream.write(parser.writePlaylistAsBytes(mediaPlaylist));
-            stream.close();
-        } catch (IOException e) {
-
-        }
-
-        return tempFile.getName();
-    }
-
-    public static String addToStorage(MediaPlaylist mediaPlaylist, String filename, String filePath) {
-        File tempFile = new File(ResourcePaths.WORKING_DIRECTORY + filePath + ResourcePaths.SEPARATOR + filename);
-        try {
-            tempFile.createNewFile();
-            FileOutputStream stream = new FileOutputStream(tempFile);
-            MediaPlaylistParser parser = new MediaPlaylistParser();
-
-            stream.write(parser.writePlaylistAsBytes(mediaPlaylist));
-            stream.close();
-        } catch (IOException e) {
-
-        }
-
-        return tempFile.getName();
-    }
-
-    public static String addToTempSegmentsStorage(MediaPlaylist mediaPlaylist, String filename) {
-        File tempFile = new File(ResourcePaths.TEMP_SEGMENTS_DIRECTORY + filename);
-        try {
-            tempFile.createNewFile();
-            FileOutputStream stream = new FileOutputStream(tempFile);
-            MediaPlaylistParser parser = new MediaPlaylistParser();
-
-            stream.write(parser.writePlaylistAsBytes(mediaPlaylist));
             stream.close();
         } catch (IOException e) {
 
@@ -113,22 +86,6 @@ public class LocalStorage {
         File file = new File(pathToFile);
 
         return file.exists();
-    }
-
-    public static String addToLiveStorage(MediaPlaylist mediaPlaylist, String filename) {
-        File tempFile = new File(ResourcePaths.LIVE_DIRECTORY + filename);
-        try {
-            tempFile.createNewFile();
-            FileOutputStream stream = new FileOutputStream(tempFile);
-            MediaPlaylistParser parser = new MediaPlaylistParser();
-
-            stream.write(parser.writePlaylistAsBytes(mediaPlaylist));
-            stream.close();
-        } catch (IOException e) {
-
-        }
-
-        return tempFile.getName();
     }
 
     public static boolean removeFileFromLocalStorage(String filename, String filePath) {

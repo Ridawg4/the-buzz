@@ -5,6 +5,8 @@
 package com.teamyellow.thebuzz.Controllers;
 
 import com.teamyellow.thebuzz.Resources.ResourcePaths;
+import com.teamyellow.thebuzz.Services.AudioProcessingService;
+import com.teamyellow.thebuzz.Services.FFMpegController;
 import com.teamyellow.thebuzz.Services.LocalStorage;
 import com.teamyellow.thebuzz.Services.PlaylistBuilder;
 import org.springframework.core.io.Resource;
@@ -28,25 +30,6 @@ public class AudioEncoderController {
     static {
         PlaylistBuilder.init(killSig);
     }
-
-
-    @PostMapping("/live")
-    public ResponseEntity<String> uploadLiveAudioClip(@RequestParam("file") MultipartFile file) throws IOException {
-            // Takes the received file and creates a file for it in local storage
-            String fileName = LocalStorage.addToTempStorage(file, file.getOriginalFilename());
-
-            // Adds the newly created file into the queue to create the playlist with
-            FFMpegController ffMpegController = new FFMpegController();
-
-            ffMpegController.splitAudioIntoSegments(ResourcePaths.LIVE_DIRECTORY + fileName, 10,
-                    ResourcePaths.LIVE_SEGMENTS_DIRECTORY + fileName);
-
-            PlaylistBuilder.buildQueueFromFolder(ResourcePaths.LIVE_DIRECTORY +
-                    ResourcePaths.SEPARATOR + "Segments" + ResourcePaths.SEPARATOR);
-            ResponseEntity<String> resp = new ResponseEntity<>(HttpStatus.ACCEPTED);
-
-            return resp;
-        }
 
     @GetMapping("/live")
     public ResponseEntity<Resource> getAudio() throws MalformedURLException {
@@ -97,23 +80,20 @@ public class AudioEncoderController {
         return resp;
     }
 
-    @PostMapping("/recorded")
-    public ResponseEntity<String> uploadRecordedAudio(@RequestParam("file") MultipartFile file,
-                                                      @RequestParam String recordingName) throws IOException {
-        // Takes the received file and creates a file for it in local storage
-        String fileName = LocalStorage.addToTempStorage(file, file.getOriginalFilename(), recordingName);
-
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadRecordedAudio
+            (@RequestParam("file") MultipartFile file,
+             @RequestParam("recordingName") String recordingName,
+             @RequestParam("isLive") boolean isLive) throws IOException {
         // Adds the newly created file into the queue to create the playlist with
         FFMpegController ffMpegController = new FFMpegController();
 
-        ffMpegController.splitAudioIntoSegments(ResourcePaths.TEMP_DIRECTORY + recordingName
-                + ResourcePaths.SEPARATOR + fileName, 10,
-                ResourcePaths.TEMP_DIRECTORY + recordingName
-                        + ResourcePaths.SEPARATOR + "Segments");
+        if(isLive) {
+            AudioProcessingService.processLiveAudioFiles(ffMpegController, file);
+        } else {
+            AudioProcessingService.processPrerecordedAudioFiles(ffMpegController, recordingName, file);
+        }
 
-        PlaylistBuilder.buildQueueFromFolder(recordingName
-                + ResourcePaths.SEPARATOR + "Segments" + ResourcePaths.SEPARATOR);
-        LocalStorage.removeFileFromLocalStorage(fileName, ResourcePaths.TEMP_DIRECTORY + recordingName);
         ResponseEntity<String> resp = new ResponseEntity<>(HttpStatus.ACCEPTED);
 
         return resp;

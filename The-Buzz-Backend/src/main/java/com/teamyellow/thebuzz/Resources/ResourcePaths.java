@@ -9,7 +9,7 @@ public class ResourcePaths {
     public static final String SEPARATOR = File.separator;
 
     // The global directory that the executable is operating inside
-    public static final String WORKING_DIRECTORY = System.getenv("PWD") + SEPARATOR;
+    public static final String WORKING_DIRECTORY = System.getenv("PWD") + SEPARATOR + "The-Buzz-Backend" + SEPARATOR;
 
     // The local installation to FFMpeg
     public static final String FFMPEG_INSTALL = "/opt/homebrew/bin/ffmpeg";
