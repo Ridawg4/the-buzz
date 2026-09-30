@@ -1,0 +1,92 @@
+package com.teamyellow.thebuzz.model;
+
+import java.sql.Timestamp;
+import java.util.UUID;
+
+public class Permission {
+
+    private int permissionId;
+    private boolean isAdmin;
+    private boolean isModerator;
+    private boolean isDj;
+    private boolean isCustomPermissions;
+    private String permissions;
+    private UUID createdBy;
+    private Timestamp createdAt;
+    private String permissionDesc;
+
+    public Permission() {
+    }
+
+    public int getPermissionId() {
+        return permissionId;
+    }
+
+    public void setPermissionId(int permissionId) {
+        this.permissionId = permissionId;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
+    public boolean isModerator() {
+        return isModerator;
+    }
+
+    public void setModerator(boolean moderator) {
+        isModerator = moderator;
+    }
+
+    public boolean isDj() {
+        return isDj;
+    }
+
+    public void setDj(boolean dj) {
+        isDj = dj;
+    }
+
+    public boolean isCustomPermissions() {
+        return isCustomPermissions;
+    }
+
+    public void setCustomPermissions(boolean customPermissions) {
+        isCustomPermissions = customPermissions;
+    }
+
+    public String getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(String permissions) {
+        this.permissions = permissions;
+    }
+
+    public UUID getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UUID createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getPermissionDesc() {
+        return permissionDesc;
+    }
+
+    public void setPermissionDesc(String permissionDesc) {
+        this.permissionDesc = permissionDesc;
+    }
+}
