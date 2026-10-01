@@ -9,19 +9,14 @@ import com.teamyellow.thebuzz.Resources.ResourcePaths;
 import com.teamyellow.thebuzz.Services.AudioProcessingService;
 import com.teamyellow.thebuzz.Services.FFMpegController;
 import com.teamyellow.thebuzz.Services.LocalStorage;
-import com.teamyellow.thebuzz.Services.PlaylistBuilder;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -112,16 +107,6 @@ public class AudioEncoderController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-
-        // @TODO Abstract this method call to either a SpringBoot job handler
-        // or implement a job handler class
-        /* For long running tasks, it is necessary to create a new Thread to run the tasks
-           Otherwise, further code will not be sent until the tasks are completed,
-           which can cause users to believe something is broken
-
-           Creating a new Thread solves this problem, as it allows the current thread to
-           finish execution and the new Thread will run the tasks separately as called.
-         */
         if(isLive) {
             createdFileName = LocalStorage.addToAudioStorage(file, file.getOriginalFilename(), ResourcePaths.LIVE_DIRECTORY);
         } else {
@@ -129,6 +114,16 @@ public class AudioEncoderController {
         }
 
         final String fileName = createdFileName;
+        /* For long-running tasks, it is necessary to create a new Thread to run the tasks
+           Otherwise, further code will not be sent until the tasks are completed,
+           which can cause users to believe something is broken
+
+           Creating a new Thread solves this problem, as it allows the current thread to
+           finish execution and the new Thread will run the tasks separately as called.
+
+           Be careful when using this technique for requests that have received data,
+           make sure that data is saved elsewhere first, or else when the request finishes,
+           the data will be removed */
         Executors.defaultThreadFactory().newThread(new Runnable() {
             @Override
             public void run() {
