@@ -88,7 +88,7 @@ public class PlaylistBuilder {
                         playlist = M3U8Encoder.createPlaylist(uriToFiles, uriToFiles.length, true);
                         indexOfPlaylist.getAndIncrement();
                     } else {
-                        playlist = M3U8Encoder.createPlaylist(uriToFiles, 0, false);
+                        playlist = M3U8Encoder.createPlaylist(uriToFiles, uriToFiles.length, false);
                     }
                 } catch (NoFilesToEncodeInPlaylist noFiles) {
                     throw new RuntimeException(noFiles.getMessage());

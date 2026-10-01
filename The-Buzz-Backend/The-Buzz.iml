@@ -4,9 +4,13 @@
     <content url="file://$MODULE_DIR$" dumb="true">
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/inspectionProfiles" />
+      <excludeFolder url="file://$MODULE_DIR$/Live" />
       <excludeFolder url="file://$MODULE_DIR$/Live/Segments" />
+      <excludeFolder url="file://$MODULE_DIR$/Temp" />
       <excludeFolder url="file://$MODULE_DIR$/Temp/test1" />
       <excludeFolder url="file://$MODULE_DIR$/Temp/test2" />
+      <excludeFolder url="file://$MODULE_DIR$/Temp/test3" />
+      <excludeFolder url="file://$MODULE_DIR$/Temp/test4" />
     </content>
   </component>
 </module>

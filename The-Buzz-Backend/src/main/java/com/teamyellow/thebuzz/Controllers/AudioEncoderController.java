@@ -101,10 +101,17 @@ public class AudioEncoderController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadRecordedAudio
             (@RequestParam("file") MultipartFile file,
-             @RequestParam("recordingName") String recordingName,
+             @RequestParam("resourcePath") String resourcePath,
              @RequestParam("isLive") boolean isLive) throws IOException {
         // Adds the newly created file into the queue to create the playlist with
         FFMpegController ffMpegController = new FFMpegController();
+        Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(String.valueOf(file.getBytes().length));
+        String createdFileName;
+
+        if(file.getBytes().length == 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
 
         // @TODO Abstract this method call to either a SpringBoot job handler
         // or implement a job handler class
@@ -115,6 +122,13 @@ public class AudioEncoderController {
            Creating a new Thread solves this problem, as it allows the current thread to
            finish execution and the new Thread will run the tasks separately as called.
          */
+        if(isLive) {
+            createdFileName = LocalStorage.addToAudioStorage(file, file.getOriginalFilename(), ResourcePaths.LIVE_DIRECTORY);
+        } else {
+            createdFileName = LocalStorage.addToAudioStorage(file, file.getOriginalFilename(), ResourcePaths.TEMP_DIRECTORY, resourcePath);
+        }
+
+        final String fileName = createdFileName;
         Executors.defaultThreadFactory().newThread(new Runnable() {
             @Override
             public void run() {
@@ -126,11 +140,11 @@ public class AudioEncoderController {
                      where to start */
                         lastThreeLiveSegmentFiles =
                                 AudioProcessingService.processLiveAudioFiles(ffMpegController,
-                                        file, lastThreeLiveSegmentFiles);
+                                        fileName, lastThreeLiveSegmentFiles);
                     } else {
                         // Doesn't need to preserve any files upon processing
                         AudioProcessingService.processPrerecordedAudioFiles(ffMpegController,
-                                recordingName, file);
+                                resourcePath, fileName);
                     }
                 } catch (IOException e) {
                     // In the case the thread encounters an error

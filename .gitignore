@@ -8,8 +8,15 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+# Intellij Idea files
 The-Buzz-Backend/.idea/*
+# MacOS folder information files
 .DS_Store
+# Temporary file scematic until I create a script to setup automatically
 The-Buzz-Backend/Temp/*
+# Temporary file scematic until I create a script to setup automatically
 The-Buzz-Backend/Live/*
+# Intellij Idea files
 .idea
+# Where locally run builds compile to
+/The-Buzz-Backend/target/

@@ -11,13 +11,10 @@ public class AudioProcessingService {
      *
      * @param ffMpegController The FFMpeg handler that will split all .mp3 files into segments
      * @param resourcePath The name of the folder to place the files in
-     * @param file The file to split
+     * @param fileName The name of the file to split
      * @throws IOException If the processing fails
      */
-    public static void processPrerecordedAudioFiles(FFMpegController ffMpegController, String resourcePath, MultipartFile file) throws IOException {
-        // Takes the received file and creates a file for it in local storage
-        String fileName = LocalStorage.addToAudioStorage(file, file.getOriginalFilename(), ResourcePaths.TEMP_DIRECTORY, resourcePath);
-
+    public static void processPrerecordedAudioFiles(FFMpegController ffMpegController, String resourcePath, String fileName) throws IOException {
         // Splits the audio files into separate files based on the length and the value in lengthOfSegments
         ffMpegController.splitAudioIntoSegments(ResourcePaths.TEMP_DIRECTORY + resourcePath
                         + ResourcePaths.SEPARATOR + fileName, 10,
@@ -35,14 +32,12 @@ public class AudioProcessingService {
      * Processes all live audio clips
      *
      * @param ffMpegController The FFMpeg handler that will split all .mp3 files into segments
-     * @param file The file to split
+     * @param fileName The name of the file to split
      * @param filesToExcludeFromDeletion The files to not delete inside the live file path
      * @return String[] The newest filenames not to delete - will contain max of 3 files
      * @throws IOException If the process fails
      */
-    public static String[] processLiveAudioFiles(FFMpegController ffMpegController, MultipartFile file, String[] filesToExcludeFromDeletion) throws IOException {
-        // Takes the received file and creates a file for it in local storage
-        String fileName = LocalStorage.addToAudioStorage(file, file.getOriginalFilename(),ResourcePaths.LIVE_DIRECTORY);
+    public static String[] processLiveAudioFiles(FFMpegController ffMpegController, String fileName, String[] filesToExcludeFromDeletion) throws IOException {
         // Clears the live clips in the directory except the ones denoted by filesToExcludeFromDeletion
         LocalStorage.removeFilesFromLocalStorage(ResourcePaths.LIVE_SEGMENTS_DIRECTORY, filesToExcludeFromDeletion);
 

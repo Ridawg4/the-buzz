@@ -77,7 +77,7 @@ public class LocalStorage {
             stream.write(file.getBytes());
             stream.close();
         } catch (IOException e) {
-
+            Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).warning(e.getMessage());
         }
 
         return tempFile.getName();
@@ -117,7 +117,7 @@ public class LocalStorage {
             stream.write(file.getBytes());
             stream.close();
         } catch (IOException e) {
-
+            Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).warning(e.getMessage());
         }
 
         return tempFile.getName();

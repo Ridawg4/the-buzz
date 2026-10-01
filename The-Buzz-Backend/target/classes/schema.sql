@@ -81,8 +81,9 @@ CREATE TABLE comments (
 
     FOREIGN KEY (user_id)
         REFERENCES users(user_id),
-
-    FOREIGN KEY (reply_id)
+    
+#self referencing itslef allowing one comment to reply to another comment 
+    FOREIGN KEY (reply_id) 
         REFERENCES comments(comment_id)
 );
 

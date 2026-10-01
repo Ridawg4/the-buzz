@@ -10,7 +10,7 @@ public class M3U8Encoder {
     public static MediaPlaylist createPlaylist(String[] fileNames,
                                                int totalSegments, boolean isLive) throws NoFilesToEncodeInPlaylist {
         // If there is 0 or less totalSegments, then there is nothing to generate from
-        if(totalSegments <=0) {
+        if(fileNames.length == 0) {
             throw new NoFilesToEncodeInPlaylist("Attempted to encode files into a Playlist, but was provided "
             + Arrays.toString(fileNames) + " as files");
         }
