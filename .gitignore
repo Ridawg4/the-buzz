@@ -25,6 +25,7 @@ The-Buzz-Backend/Live/*
 /The-Buzz-Backend/.factorypath
 /The-Buzz-Backend/.settings/
 /The-Buzz-Backend/bin/
+/The-Buzz-Backend/.mvn/
 
-.project
+/.project
 
