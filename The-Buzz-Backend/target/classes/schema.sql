@@ -17,7 +17,7 @@ CREATE TABLE users (
     user_desc VARCHAR(255),
     full_name VARCHAR(255),
     user_pfp_location VARCHAR(255),
-    email VARCHAR(255),
+    email VARCHAR(255) NOT NULL,
     favorites JSON,
     volume_settings JSON,
     notification_settings JSON,

@@ -20,3 +20,11 @@ The-Buzz-Backend/Live/*
 .idea
 # Where locally run builds compile to
 /The-Buzz-Backend/target/
+/The-Buzz-Backend/.project
+/The-Buzz-Backend/.classpath
+/The-Buzz-Backend/.factorypath
+/The-Buzz-Backend/.settings/
+/The-Buzz-Backend/bin/
+
+.project
+
