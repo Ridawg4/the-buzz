@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api/v1/audio")
 public class AudioEncoderController {
-    private static final AtomicBoolean killSig = new AtomicBoolean(false);
     private static String[] lastThreeLiveSegmentFiles =  {"", "", ""};
 
     @GetMapping("/live")

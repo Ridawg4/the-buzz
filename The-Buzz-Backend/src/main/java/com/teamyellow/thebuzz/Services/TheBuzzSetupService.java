@@ -5,7 +5,7 @@ import com.teamyellow.thebuzz.Resources.ResourcePaths;
 
 import java.io.File;
 
-public class TheBuzzSetupController {
+public class TheBuzzSetupService {
 
     /**
      * Sets up all the directories the application will expect to exist

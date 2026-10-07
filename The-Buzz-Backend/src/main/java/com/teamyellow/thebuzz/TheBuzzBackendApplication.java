@@ -1,7 +1,7 @@
 package com.teamyellow.thebuzz;
 
 import com.teamyellow.thebuzz.Exceptions.SetupFailureException;
-import com.teamyellow.thebuzz.Services.TheBuzzSetupController;
+import com.teamyellow.thebuzz.Services.TheBuzzSetupService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -13,7 +13,7 @@ public class TheBuzzBackendApplication {
     public static void main(String[] args) {
         try {
             // Sets up the reqired files and directories for the application
-            TheBuzzSetupController.setupApplication();
+            TheBuzzSetupService.setupApplication();
         } catch (SetupFailureException setupFailure) {
             // If the setup fails, throw a severe log message and exit the application
             Logger.getGlobal().severe(setupFailure.getMessage());

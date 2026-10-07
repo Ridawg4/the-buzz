@@ -2,11 +2,6 @@ $kind: http-request
 description: ""
 url: http://localhost:8080/api/v1/audio/upload
 method: POST
-queryParams:
-  - key: file
-    value: null
-    disabled: true
-    description: ""
 body:
   type: formdata
   content:
@@ -18,12 +13,12 @@ body:
       disabled: false
     - type: text
       key: isLive
-      value: "false"
+      value: "true"
       description: ""
       disabled: false
     - type: text
       key: resourcePath
-      value: test4
+      value: test1
       description: ""
       disabled: false
 order: 2287838400119555
