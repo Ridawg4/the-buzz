@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test - listen</title>
+</head>
+<body>
+    <label> Set Resource:
+        <input id="resource">
+    </label>
+    <button id="set">Set Resource</button>
+    <div id="audioContainer">
+        <audio controls preload="auto" id="audio">
+            <source src="" id="audioSource"/>
+        </audio>
+        <p id="errorText"></p>
+        <label>
+            <audio controls preload="auto">
+                <source src="../api/v1/audio/live"/>
+            </audio>
+        </label>
+    </div>
+</body>
+<script>
+    audioSource = document.getElementById("audioSource")
+    audio = document.getElementById("audio")
+    audioContainer = document.getElementById("audioContainer")
+    errorText = document.getElementById("errorText")
+    submit = document.getElementById("set")
+
+    submit.addEventListener("click", setResource)
+
+    function setResource(e) {
+        e.preventDefault()
+        let resource = document.getElementById("resource")
+
+        fetch("../api/v1/audio/" + resource.value + "/recorded.m3u8").then((resp) => {
+            if(resp.status === 404) {
+                audio.removeAttribute("controls")
+                errorText.textContent = "Requested resource is not available"
+            } else {
+                audio.setAttribute("controls", "controls")
+                errorText.textContent = ""
+
+
+                audioSource.setAttribute("src", "../api/v1/audio/" + resource.value + "/recorded.m3u8")
+                audio.load()
+            }
+        })
+        audio.load()
+    }
+</script>
+</html>
