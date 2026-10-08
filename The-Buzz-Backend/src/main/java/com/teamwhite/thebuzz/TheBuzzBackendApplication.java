@@ -1,10 +1,9 @@
 package com.teamwhite.thebuzz;
 
 import com.teamwhite.thebuzz.Exceptions.SetupFailureException;
-import com.teamwhite.thebuzz.Services.TheBuzzSetupService;
+import com.teamwhite.thebuzz.Services.Setup.TheBuzzSetupService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.logging.Logger;
 
