@@ -1,4 +1,4 @@
-package com.teamwhite.thebuzz.Services;
+package com.teamwhite.thebuzz.Services.Setup;
 
 import com.teamwhite.thebuzz.Exceptions.SetupFailureException;
 import com.teamwhite.thebuzz.Resources.ResourcePaths;

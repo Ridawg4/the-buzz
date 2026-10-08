@@ -1,7 +1,8 @@
-package com.teamwhite.thebuzz.Services;
+package com.teamwhite.thebuzz.Services.Audio;
 
 import com.teamwhite.thebuzz.Exceptions.FilePathEmptyException;
 import com.teamwhite.thebuzz.Exceptions.NoFilesToEncodeInPlaylist;
+import com.teamwhite.thebuzz.Services.LocalStorage;
 import io.lindstrom.m3u8.model.MediaPlaylist;
 
 import java.io.File;

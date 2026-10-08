@@ -1,6 +1,7 @@
-package com.teamwhite.thebuzz.Services;
+package com.teamwhite.thebuzz.Services.Audio;
 
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
+import com.teamwhite.thebuzz.Services.LocalStorage;
 
 import java.io.IOException;
 

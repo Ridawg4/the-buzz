@@ -1,4 +1,4 @@
-package com.teamwhite.thebuzz.Services;
+package com.teamwhite.thebuzz.Services.Users;
 
 import com.teamwhite.thebuzz.Repositories.UserRepository;
 import com.teamwhite.thebuzz.model.User;

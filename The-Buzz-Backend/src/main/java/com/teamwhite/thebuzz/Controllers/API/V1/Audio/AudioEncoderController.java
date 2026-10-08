@@ -2,12 +2,12 @@
  * Audio Encoder Endpoint
  */
 
-package com.teamwhite.thebuzz.Controllers;
+package com.teamwhite.thebuzz.Controllers.API.V1.Audio;
 
 import com.teamwhite.thebuzz.Records.ContentTypes;
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
-import com.teamwhite.thebuzz.Services.AudioProcessingService;
-import com.teamwhite.thebuzz.Services.FFMpegController;
+import com.teamwhite.thebuzz.Services.Audio.AudioProcessingService;
+import com.teamwhite.thebuzz.Services.Audio.FFMpegController;
 import com.teamwhite.thebuzz.Services.LocalStorage;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;

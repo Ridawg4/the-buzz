@@ -1,4 +1,4 @@
-package com.teamwhite.thebuzz.Services;
+package com.teamwhite.thebuzz.Services.Audio;
 
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
 import net.bramp.ffmpeg.FFmpeg;

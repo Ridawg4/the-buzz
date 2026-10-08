@@ -1,4 +1,4 @@
-package com.teamwhite.thebuzz.Services;
+package com.teamwhite.thebuzz.Services.Audio;
 
 import com.teamwhite.thebuzz.Exceptions.NoFilesToEncodeInPlaylist;
 import io.lindstrom.m3u8.model.MediaPlaylist;
