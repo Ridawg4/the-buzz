@@ -1,0 +1,49 @@
+$kind: http-example
+request:
+  url: http://localhost:8080/api/v1/audio/upload
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: file
+        key: file
+        src:
+          - /Users/fazcreativity/Downloads/andriih-elevator-elevator-music-599228.mp3
+        description: ""
+        disabled: false
+      - type: text
+        key: isLive
+        value: "true"
+        description: ""
+        disabled: false
+      - type: text
+        key: resourcePath
+        value: test1
+        description: ""
+        disabled: false
+response:
+  statusCode: 403
+  statusText: ""
+  headers:
+    x-content-type-options: nosniff
+    x-xss-protection: "0"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    pragma: no-cache
+    expires: "0"
+    x-frame-options: DENY
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Thu, 08 Oct 2026 00:43:16 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "timestamp": "2026-10-08T00:43:16.516Z",
+        "status": 403,
+        "error": "Forbidden",
+        "message": "Forbidden",
+        "path": "/api/v1/audio/upload"
+      }
+order: 1791420212798

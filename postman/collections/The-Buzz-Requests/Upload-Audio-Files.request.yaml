@@ -21,4 +21,7 @@ body:
       value: test1
       description: ""
       disabled: false
+auth:
+  type: apikey
+examples: .resources/Upload-Audio-Files.resources/examples
 order: 2287838400119555
