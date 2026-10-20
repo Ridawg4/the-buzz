@@ -1,43 +1,62 @@
-//package com.teamwhite.thebuzz.Contexts;
-//
-//import com.teamwhite.thebuzz.Services.BuzzUserDetailsManager;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//import org.springframework.security.core.userdetails.User;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.web.SecurityFilterChain;
-//import javax.sql.DataSource;
-//
-//@Configuration
-//@EnableWebSecurity
-//class SecurityConfiguration {
-//
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-//        httpSecurity.authorizeHttpRequests((authorize)
-//                -> authorize.anyRequest().permitAll())
-//                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
-//
-//        return httpSecurity.build();
-//    }
-//
-//    @Bean
-//    BuzzUserDetailsManager users(DataSource dataSource) {
-//        UserDetails user = User.builder()
-//                .username("user")
-//                .password("{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW")
-//                .roles("USER")
-//                .build();
-//        UserDetails admin = User.builder()
-//                .username("admin")
-//                .password("{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW")
-//                .roles("USER", "ADMIN")
-//                .build();
-//        BuzzUserDetailsManager users = new BuzzUserDetailsManager();
-//        users.createUser(user);
-//        users.createUser(admin);
-//        return users;
-//    }
-//}
+package com.teamwhite.thebuzz.Contexts;
+
+import com.teamwhite.thebuzz.Services.BuzzUserDetailsManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity(debug=false)
+class SecurityConfiguration {
+    private final BuzzUserDetailsManager buzzUserDetailsManager;
+    private final PasswordEncoder passwordEncoder;
+
+    public SecurityConfiguration(BuzzUserDetailsManager buzzUserDetailsManager, PasswordEncoder passwordEncoder) {
+        this.buzzUserDetailsManager = buzzUserDetailsManager;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+        httpSecurity.sessionManagement(httpSecuritySessionManagementConfigurer -> {
+                    httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+                })
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> {
+                    auth.dispatcherTypeMatchers().permitAll()
+                    .requestMatchers("/api/v1/**", "/login.html", "/signup.html")
+                            .permitAll()
+                            .requestMatchers("/upload.html")
+                            .hasAnyAuthority("CAN_UPLOAD_LIVE_STREAM_SEGMENTS", "CAN_UPLOAD_PRERECORDED_SHOW_AUDIO")
+                    .anyRequest().authenticated();
+                }).authenticationManager(authenticationManager(httpSecurity))
+                .formLogin((formLogin) -> {
+                    formLogin.loginPage("/login.html")
+                            .loginProcessingUrl("/api/v1/login")
+                            .defaultSuccessUrl("/upload.html")
+                            .permitAll();
+                })
+                .logout(logout -> {
+                    logout.clearAuthentication(true)
+                            .deleteCookies("SESSION", "JSESSIONID")
+                            .logoutUrl("/api/v1/logout")
+                            .logoutSuccessUrl("/loginPage.html")
+                            .permitAll();
+                });
+
+        return httpSecurity.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.userDetailsService(buzzUserDetailsManager).passwordEncoder(passwordEncoder);
+        return authenticationManagerBuilder.build();
+    }
+}

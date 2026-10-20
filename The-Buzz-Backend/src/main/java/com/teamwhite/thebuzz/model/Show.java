@@ -1,4 +1,4 @@
-package com.teamyellow.thebuzz.model;
+package com.teamwhite.thebuzz.model;
 
 import java.sql.Date;
 import java.sql.Timestamp;

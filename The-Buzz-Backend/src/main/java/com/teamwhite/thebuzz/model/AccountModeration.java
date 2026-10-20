@@ -1,5 +1,4 @@
-package com.teamyellow.thebuzz.model;
-
+package com.teamwhite.thebuzz.model;
 import java.sql.Timestamp;
 import java.util.UUID;
 

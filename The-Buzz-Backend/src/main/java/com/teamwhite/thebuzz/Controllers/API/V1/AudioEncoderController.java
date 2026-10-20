@@ -2,17 +2,22 @@
  * Audio Encoder Endpoint
  */
 
-package com.teamwhite.thebuzz.Controllers.API.V1.Audio;
+package com.teamwhite.thebuzz.Controllers.API.V1;
 
 import com.teamwhite.thebuzz.Records.ContentTypes;
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
-import com.teamwhite.thebuzz.Services.Audio.AudioProcessingService;
-import com.teamwhite.thebuzz.Services.Audio.FFMpegController;
+import com.teamwhite.thebuzz.Services.AudioProcessingService;
+import com.teamwhite.thebuzz.Services.FFMpegController;
 import com.teamwhite.thebuzz.Services.LocalStorage;
+import org.springframework.boot.actuate.web.exchanges.HttpExchange;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -23,6 +28,7 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/audio")
+@EnableMethodSecurity
 public class AudioEncoderController {
     private static String[] lastThreeLiveSegmentFiles =  {"", "", ""};
 
@@ -95,11 +101,13 @@ public class AudioEncoderController {
     public ResponseEntity<String> uploadRecordedAudio
             (@RequestParam("file") MultipartFile file,
              @RequestParam("resourcePath") String resourcePath,
-             @RequestParam("isLive") boolean isLive) throws IOException {
+             @RequestParam("isLive") boolean isLive,
+             HttpExchange.Principal principal) throws IOException {
         // Adds the newly created file into the queue to create the playlist with
         FFMpegController ffMpegController = new FFMpegController();
         Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(String.valueOf(file.getBytes().length));
         String createdFileName;
+        Logger.getGlobal().info(SecurityContextHolder.getContext().getAuthentication().getDetails().toString());
 
         if(file.getBytes().length == 0) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -69,5 +69,21 @@ public class TheBuzzSetupService {
             throw new SetupFailureException("Failed to create directory '/The-Buzz/Live/Segments': "
                     + securityException.getMessage());
         }
+
+        // Sets up a file reference to the directory listed | PWD/The-Buzz/Defaults
+        dir = new File(ResourcePaths.DEFAULTS_DIRECTORY);
+
+        try {
+            // If the directory doesn't exist, create the directory
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+        } catch (SecurityException securityException) {
+            // If the directory cannot be created due to a security rule, throw a SetupFailure
+            throw new SetupFailureException("Failed to create directory '/The-Buzz/Defaults': "
+                    + securityException.getMessage());
+        }
+
+        // @TODO LOAD USERPERMISSIONSDEFAULT INTO DIRECTORY
     }
 }

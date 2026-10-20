@@ -22,6 +22,5 @@ body:
       description: ""
       disabled: false
 auth:
-  type: apikey
-examples: .resources/Upload-Audio-Files.resources/examples
+  type: noauth
 order: 2287838400119555

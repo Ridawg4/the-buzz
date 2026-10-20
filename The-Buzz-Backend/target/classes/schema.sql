@@ -6,11 +6,10 @@
 
 CREATE DATABASE development;
 
-
 USE development;
 
 CREATE TABLE IF NOT EXISTS  users (
-    user_id BINARY(16) PRIMARY KEY,
+    user_id BINARY(16) NOT NULL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     oauth_key VARCHAR(255),
@@ -18,22 +17,23 @@ CREATE TABLE IF NOT EXISTS  users (
     user_desc VARCHAR(255),
     full_name VARCHAR(255),
     user_pfp_location VARCHAR(255),
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     favorites JSON,
     volume_settings JSON,
     notification_settings JSON,
     permission_data JSON
+
 );
+
+CREATE INDEX index_email ON development.users(email);
+
 CREATE TABLE IF NOT EXISTS  permissions (
-    permission_id INTEGER PRIMARY KEY,
-    is_admin BOOLEAN NOT NULL,
-    is_moderator BOOLEAN NOT NULL,
-    is_dj BOOLEAN NOT NULL,
-    is_custom_permissions BOOLEAN NOT NULL,
-    permissions JSON,
-    created_by BINARY(16),
-    created_at TIMESTAMP,
+    permission_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    permissions_name VARCHAR(50) NOT NULL,
     permission_desc VARCHAR(255),
+    permissions JSON NOT NULL,
+    created_by BINARY(16) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
 
     FOREIGN KEY (created_by)
         REFERENCES users(user_id)
@@ -86,6 +86,14 @@ CREATE TABLE IF NOT EXISTS  comments (
 
     FOREIGN KEY (reply_id)
         REFERENCES comments(comment_id)
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+    session_id BINARY(16) PRIMARY KEY NOT NULL UNIQUE,
+    creation_time TIMESTAMP NOT NULL,
+    expiry_time TIMESTAMP NOT NULL,
+    permissions JSON,
+    attributes JSON
 );
 
 CREATE USER "credentialsReader"@"localhost" IDENTIFIED BY "testingpassword";

@@ -1,0 +1,22 @@
+$kind: http-request
+url: localhost:8080/api/v1/signup
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: username
+      value: usertest2
+      description: ""
+      disabled: false
+    - type: text
+      key: password
+      value: password
+      description: ""
+      disabled: false
+    - type: text
+      key: email
+      value: email@a.b
+      description: ""
+      disabled: false
+order: 4460912557685894

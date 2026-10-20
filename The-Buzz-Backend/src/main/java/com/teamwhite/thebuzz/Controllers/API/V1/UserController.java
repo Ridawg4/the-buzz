@@ -1,6 +1,6 @@
 package com.teamwhite.thebuzz.Controllers.API.V1;
 
-import com.teamwhite.thebuzz.Services.Users.UserService;
+import com.teamwhite.thebuzz.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,14 +22,15 @@ public class UserController {
 
     @GetMapping("/user")
     public String testUserEndpoint() {
-        return "User.java endpoint is working!";
+        return "BuzzUser.java endpoint is working!";
     }
 
     /**
-     * TIME SPENT GETTING AUTHENTICATION WORKING SO FAR: 5 HOURS
+     * TIME SPENT GETTING AUTHENTICATION WORKING SO FAR:  22 HOURS 39 MINUTES 1:50 -> 3:48 && 4:38 -> 6:00  && 9:38 ->
+     * ALMOST DONE AT 20 HOURS 18 MINUTES
      */
     @GetMapping("/queryDB")
     public void getUrl() {
-        Logger.getGlobal().info(userService.getUserRecordByUsername("testUser").toString());
+        Logger.getGlobal().info(userService.getUserRecordByEmail("a@a.c").toString());
     }
 }

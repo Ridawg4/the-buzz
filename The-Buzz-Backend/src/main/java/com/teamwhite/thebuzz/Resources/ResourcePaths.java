@@ -23,6 +23,11 @@ public class ResourcePaths {
     /** The local installation to FProbe */
     public static final String FPROBE_INSTALL = "/opt/homebrew/bin/ffprobe";
 
+    /** Reference to the Default User Permissions to set upon account creation
+     * Will be changed when management portal is created */
+    // @TODO FIX DIRECTORY
+    public static final String DEFAULT_USER_PERMISSIONS_LOCATION = "/Users/fazcreativity/Documents/Java-Projects/the-buzz/The-Buzz-Backend/src/main/java/com/teamwhite/thebuzz/Defaults/Permissions/UserPermissionsDefault.json";
+
     /** The reference to the Temp directory inside the local file system
      * Ends with a file separator */
     public static final String TEMP_DIRECTORY = APPLICATION_DIRECTORY + "Temp" + SEPARATOR;
@@ -34,4 +39,8 @@ public class ResourcePaths {
     /** A reference to the Live Segments directory inside the local file system
      * Ends with a file separator */
     public static final String LIVE_SEGMENTS_DIRECTORY = APPLICATION_DIRECTORY + "Live" + SEPARATOR + "Segments" + SEPARATOR;
+
+    /** A reference to the Defaults directory inside the local file system
+     * Ends with a file separator */
+    public static final String DEFAULTS_DIRECTORY = APPLICATION_DIRECTORY + "Defaults" + SEPARATOR;
 }
