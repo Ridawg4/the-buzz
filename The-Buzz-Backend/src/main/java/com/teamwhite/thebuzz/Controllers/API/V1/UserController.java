@@ -26,8 +26,9 @@ public class UserController {
     }
 
     /**
-     * TIME SPENT GETTING AUTHENTICATION WORKING SO FAR:  22 HOURS 39 MINUTES 1:50 -> 3:48 && 4:38 -> 6:00  && 9:38 ->
+     * TIME SPENT GETTING AUTHENTICATION WORKING SO FAR:  32 HOURS 15 MINUTES
      * ALMOST DONE AT 20 HOURS 18 MINUTES
+     * ACTUALLY ALMOST DONE 32 HOURS 15 MINUTES
      */
     @GetMapping("/queryDB")
     public void getUrl() {

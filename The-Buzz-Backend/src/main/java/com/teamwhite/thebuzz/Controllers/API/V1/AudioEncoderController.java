@@ -107,6 +107,7 @@ public class AudioEncoderController {
         FFMpegController ffMpegController = new FFMpegController();
         Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(String.valueOf(file.getBytes().length));
         String createdFileName;
+        // @TODO DATA VALIDATION
         Logger.getGlobal().info(SecurityContextHolder.getContext().getAuthentication().getDetails().toString());
 
         if(file.getBytes().length == 0) {
