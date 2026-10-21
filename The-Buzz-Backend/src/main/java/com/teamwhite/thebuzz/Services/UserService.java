@@ -41,7 +41,10 @@ public class UserService {
      * @param email String used for finding a specific table entry
      * @return BuzzUser user as represented in the database
      */
-    public BuzzUser getUserRecordByEmail(String email) {
+    public BuzzUser getUserRecordByEmail(String email) throws IllegalArgumentException{
+        if(email == null) {
+            throw new IllegalArgumentException("email provided is null");
+        }
         BuzzUser user;
         /** Gets the values from the request in the following format:
          * List<T> Rows in the table, analagous to entries
@@ -50,12 +53,12 @@ public class UserService {
         List<Object[]> returnedValues = repository.getUserRecordByEmail(email);
 
         // If no values were returned, no users exist with that email
-        if(returnedValues == null) {
-            throw new RuntimeException("results are null from getUserRecordByEmail");
+        if(returnedValues == null) { //@TODO CHANGE EXCEPTION
+            throw new RuntimeException("results are null when expected results at getUserRecordByEmail()");
         }
         // If more than one record was returned, we can't know which user they are referring to
         // This also indicates a database failure, as schema denotes unique emails
-        if(returnedValues.size() > 1) {
+        if(returnedValues.size() > 1) { //@TODO CHANGE EXCEPTION
             throw new RuntimeException("results are more than one");
         }
 
@@ -124,9 +127,19 @@ public class UserService {
      * @param username String username
      * @param email String email, MUST NOT EXIST IN DATABASE
      * @param unHashedPassword String unhashed password, hashing happens in BuzzUser constructor
-     * @throws NoUserProvidedException @TODO CHANGE EXCEPTION THROWN
+     * @throws IllegalArgumentException If any fields are null
      */
-    public void createUser(String username, String email, String unHashedPassword) throws NoUserProvidedException {
+    public void createUser(String username, String email, String unHashedPassword) throws IllegalArgumentException {
+        if(username == null) {
+            throw new IllegalArgumentException("username provided is null");
+        }
+        if(unHashedPassword == null) {
+            throw new IllegalArgumentException("unHashedPassword provided is null");
+        }
+        if(email == null) {
+            throw new IllegalArgumentException("Email provided is null");
+        }
+
         BuzzUser user = new BuzzUser(username, passwordEncoder.encode(unHashedPassword), email);
 
         // Required to catch any SQLExceptions, as they will silently fail otherwise
@@ -156,11 +169,11 @@ public class UserService {
     /**
      * Deletes a user entry in the database permanently
      * @param email String used for finding a specific table entry
-     * @throws NoUserProvidedException @TODO REPLACE EXCEPTION
+     * @throws IllegalArgumentException
      */
-    public void deleteUser(String email) throws NoUserProvidedException {
+    public void deleteUser(String email) throws IllegalArgumentException {
         if(email == null) {
-            throw new NoUserProvidedException("User provided in UserService.createUser() is null");
+            throw new IllegalArgumentException("Email provided is null");
         }
 
         try {
@@ -175,11 +188,17 @@ public class UserService {
      * @param email String used for finding a specific table entry
      * @param oldPasswordHash String old password hash to verify upon request
      * @param newPasswordHash String new password hash to replace old password hash
-     * @throws NoUserProvidedException @TODO REPLACE EXCEPTION @TODO IMPLEMENT
+     * @throws IllegalArgumentException If any field is null
      */
-    public void updateUserPasswordHash(String email, String oldPasswordHash, String newPasswordHash) throws NoUserProvidedException {
+    public void updateUserPasswordHash(String email, String oldPasswordHash, String newPasswordHash) throws IllegalArgumentException {
         if(email == null) {
-            throw new NoUserProvidedException("User provided in UserService.createUser() is null");
+            throw new IllegalArgumentException("Email provided is null");
+        }
+        if(oldPasswordHash == null) {
+            throw new IllegalArgumentException("oldPasswordHash provided is null");
+        }
+        if(newPasswordHash == null) {
+            throw new IllegalArgumentException("newPasswordHash provided is null");
         }
 
         try {
@@ -193,11 +212,11 @@ public class UserService {
      * Checks to see if an email is present in the database
      * @param email String used for finding a specific table entry
      * @return boolean If the email exists in the database
-     * @throws NoUserProvidedException @TODO REPLACE EXCEPTION
+     * @throws IllegalArgumentException If the email is null
      */
-    public boolean doesUserExist(String email) throws NoUserProvidedException {
+    public boolean doesUserExist(String email) throws IllegalArgumentException {
         if(email == null) {
-            throw new NoUserProvidedException("User provided in UserService.createUser() is null");
+            throw new IllegalArgumentException("Email provided is null");
         }
 
         try {

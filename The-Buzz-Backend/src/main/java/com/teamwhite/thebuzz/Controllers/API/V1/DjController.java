@@ -46,6 +46,7 @@ public class DjController {
                 !authentication.isAuthenticated() ||
                 !(authentication.getPrincipal() instanceof BuzzUser)) {
 
+            // Endpoint is secured by default, user would be redirected if authentication failed
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body("You must be logged in.");
@@ -67,6 +68,7 @@ public class DjController {
         }
 
         // Convert the authenticated user's ID into a UUID
+        // This could be done within the method call below
         UUID userId = UUID.fromString(user.getUserId());
 
         try {
@@ -79,6 +81,7 @@ public class DjController {
             );
 
             if (!updated) {
+                // This could be false and not because of a missing profile, (ex. SQL query failed)
                 return ResponseEntity
                         .status(HttpStatus.NOT_FOUND)
                         .body("DJ profile not found.");

@@ -63,6 +63,7 @@ public class DjService {
         }
 
         // Call the repository to update MySQL
+        // This could throw an Exception at runtime
         int updatedRows = djRepository.updateDJProfile(
             userId.toString(),
             djName,

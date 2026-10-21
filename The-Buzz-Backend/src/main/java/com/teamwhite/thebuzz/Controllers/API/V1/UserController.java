@@ -30,4 +30,6 @@ public class UserController {
      * ALMOST DONE AT 20 HOURS 18 MINUTES
      * ACTUALLY ALMOST DONE 32 HOURS 15 MINUTES
      */
+
+    // @TODO implement account modification and accessing endpoints
 }

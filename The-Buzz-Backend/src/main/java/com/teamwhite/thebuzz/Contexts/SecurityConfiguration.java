@@ -94,6 +94,7 @@ class SecurityConfiguration {
                 // clear the Authentication object, and redirect to the login url
                 .logout(logout -> {
                     logout.clearAuthentication(true)
+                            // @TODO MAKE INVALIDATING COOKIES WORK
                             .deleteCookies("SESSION", "JSESSIONID")
                             .logoutUrl("/api/v1/logout")
                             .logoutSuccessUrl("/loginPage.html")
