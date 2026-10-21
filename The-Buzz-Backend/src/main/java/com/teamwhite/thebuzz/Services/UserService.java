@@ -203,8 +203,8 @@ public class UserService {
         try {
             List<Object[]> results = repository.doesUserExist(email);
 
-            // results will be null if no entries can be found by the database
-            return (results == null);
+            // results will be empty if no entries can be found by the database
+            return (!results.isEmpty());
         } catch (Exception e) {
             Logger.getGlobal().warning(e.getMessage());
         }
