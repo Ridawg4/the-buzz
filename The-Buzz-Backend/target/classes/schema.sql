@@ -8,8 +8,8 @@ CREATE DATABASE development;
 
 USE development;
 
-CREATE TABLE users (
-    user_id BINARY(16) PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS  users (
+    user_id BINARY(16) NOT NULL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     oauth_key VARCHAR(255),
@@ -17,27 +17,28 @@ CREATE TABLE users (
     user_desc VARCHAR(255),
     full_name VARCHAR(255),
     user_pfp_location VARCHAR(255),
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     favorites JSON,
     volume_settings JSON,
     notification_settings JSON,
     permission_data JSON
+
 );
-CREATE TABLE permissions (
-    permission_id INTEGER PRIMARY KEY,
-    is_admin BOOLEAN NOT NULL,
-    is_moderator BOOLEAN NOT NULL,
-    is_dj BOOLEAN NOT NULL,
-    is_custom_permissions BOOLEAN NOT NULL,
-    permissions JSON,
-    created_by BINARY(16),
-    created_at TIMESTAMP,
+
+CREATE INDEX index_email ON development.users(email);
+
+CREATE TABLE IF NOT EXISTS  permissions (
+    permission_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    permissions_name VARCHAR(50) NOT NULL,
     permission_desc VARCHAR(255),
+    permissions JSON NOT NULL,
+    created_by BINARY(16) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
 
     FOREIGN KEY (created_by)
         REFERENCES users(user_id)
 );
-CREATE TABLE djs (
+CREATE TABLE IF NOT EXISTS  djs (
     dj_id BINARY(16) PRIMARY KEY,
     user_id BINARY(16) NOT NULL,
     dj_name VARCHAR(255) NOT NULL,
@@ -47,7 +48,7 @@ CREATE TABLE djs (
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)
 );
-CREATE TABLE shows (
+CREATE TABLE IF NOT EXISTS  shows (
     show_id BINARY(16) PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description VARCHAR(1000),
@@ -59,7 +60,7 @@ CREATE TABLE shows (
     FOREIGN KEY (dj_id)
         REFERENCES djs(dj_id)
 );
-CREATE TABLE account_moderation (
+CREATE TABLE IF NOT EXISTS account_moderation (
     user_id BINARY(16) NOT NULL,
     moderation_desc VARCHAR(255),
     date_applied TIMESTAMP,
@@ -70,7 +71,8 @@ CREATE TABLE account_moderation (
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)
 );
-CREATE TABLE comments (
+#self referencing itself allowing one comment to reply to another comment
+CREATE TABLE IF NOT EXISTS  comments (
     comment_id INTEGER PRIMARY KEY,
     user_id BINARY(16) NOT NULL,
     post_id INTEGER NOT NULL,
@@ -81,10 +83,17 @@ CREATE TABLE comments (
 
     FOREIGN KEY (user_id)
         REFERENCES users(user_id),
-    
-#self referencing itslef allowing one comment to reply to another comment 
-    FOREIGN KEY (reply_id) 
+
+    FOREIGN KEY (reply_id)
         REFERENCES comments(comment_id)
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+    session_id BINARY(16) PRIMARY KEY NOT NULL UNIQUE,
+    creation_time TIMESTAMP NOT NULL,
+    expiry_time TIMESTAMP NOT NULL,
+    permissions JSON,
+    attributes JSON
 );
 
 CREATE USER "credentialsReader"@"localhost" IDENTIFIED BY "testingpassword";

@@ -21,4 +21,6 @@ body:
       value: test1
       description: ""
       disabled: false
+auth:
+  type: noauth
 order: 2287838400119555
