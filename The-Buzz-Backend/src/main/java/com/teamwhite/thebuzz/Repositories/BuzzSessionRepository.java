@@ -25,6 +25,11 @@ public interface BuzzSessionRepository extends CrudRepository<BuzzUser, UUID> {
 
     @Modifying
     @Transactional
+    @Query(value="UPDATE development.sessions SET session_id = UUID_TO_BIN(?1), creation_time = ?2, expiry_time = ?3, permissions = ?4, attributes = ?5 WHERE session_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    public void updateSession(String id, Timestamp creationTime, Timestamp lastAccessedTime, String permissions, String attributes);
+
+    @Modifying
+    @Transactional
     @Query(value="DELETE FROM development.sessions WHERE session_id = UUID_TO_BIN(?1)", nativeQuery = true)
     public void deleteSession(String id);
 }

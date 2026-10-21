@@ -14,5 +14,8 @@ be unable to parse the file.
 ex.) "CAN_READ":true, "CAN_WRITE":false, ...}
 }
 
-Permissions JSON Representation:
+permissions_id = The ID of the permissions in the permissions table
+permission_data = the actual permission data
+
+The default is provided under ../Defaults/Permissions/UserPermissionsDefault.json as a working model
 

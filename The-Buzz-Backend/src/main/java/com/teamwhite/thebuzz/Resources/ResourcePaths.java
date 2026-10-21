@@ -25,8 +25,7 @@ public class ResourcePaths {
 
     /** Reference to the Default User Permissions to set upon account creation
      * Will be changed when management portal is created */
-    // @TODO FIX DIRECTORY
-    public static final String DEFAULT_USER_PERMISSIONS_LOCATION = "/Users/fazcreativity/Documents/Java-Projects/the-buzz/The-Buzz-Backend/src/main/java/com/teamwhite/thebuzz/Defaults/Permissions/UserPermissionsDefault.json";
+    public static final String DEFAULT_USER_PERMISSIONS_LOCATION = WORKING_DIRECTORY + "The-Buzz-Backend/src/main/java/com/teamwhite/thebuzz/Defaults/Permissions/UserPermissionsDefault.json";
 
     /** The reference to the Temp directory inside the local file system
      * Ends with a file separator */

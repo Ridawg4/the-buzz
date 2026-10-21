@@ -108,6 +108,7 @@ public class AudioEncoderController {
         Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(String.valueOf(file.getBytes().length));
         String createdFileName;
         // @TODO DATA VALIDATION
+        // Call will log the userId UUID in string format
         Logger.getGlobal().info(SecurityContextHolder.getContext().getAuthentication().getDetails().toString());
 
         if(file.getBytes().length == 0) {

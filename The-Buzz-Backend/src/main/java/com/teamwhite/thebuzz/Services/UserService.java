@@ -16,77 +16,120 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * Service for handling all User tasks
+ */
 @Service
 public class UserService {
+    // Repository for all user records
     private final UserRepository repository;
+    // BCrypt Password Encoder
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * For autowiring values
+     * @param repository User repository
+     * @param passwordEncoder BCrypt password encoder
+     */
     public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Gets a specific user with a given email
+     * @param email String used for finding a specific table entry
+     * @return BuzzUser user as represented in the database
+     */
     public BuzzUser getUserRecordByEmail(String email) {
-        BuzzUser user = null;
-        try {
-            List<Object[]> returnedValues = repository.getUserRecordByEmail(email);
-            if(returnedValues == null) {
-                throw new RuntimeException("results are null from getUserRecordByEmail");
-            }
-            if(returnedValues.size() > 1) {
-                throw new RuntimeException("results are more than one");
-            }
-            // @TODO ERROR STRING IS INCORRECT
-            Object[] objFromQuery = returnedValues.get(0);
-            user = new BuzzUser( (String) objFromQuery[0], (String) objFromQuery[1],
-                    (String) objFromQuery[2], (String) objFromQuery[3], Timestamp.valueOf((LocalDateTime) objFromQuery[4]),
-                    (String) objFromQuery[5], (String) objFromQuery[6], (String) objFromQuery[7],
-                    (String) objFromQuery[8], (String) objFromQuery[9], (String) objFromQuery[10],
-                    (String) objFromQuery[11], (String) objFromQuery[12]);
+        BuzzUser user;
+        /** Gets the values from the request in the following format:
+         * List<T> Rows in the table, analagous to entries
+         * Object[] Columns in the table, the values in each row
+         */
+        List<Object[]> returnedValues = repository.getUserRecordByEmail(email);
 
-        } catch(Exception e) {
-            throw new RuntimeException("Error handling ResultSet " + e.getMessage());
+        // If no values were returned, no users exist with that email
+        if(returnedValues == null) {
+            throw new RuntimeException("results are null from getUserRecordByEmail");
         }
+        // If more than one record was returned, we can't know which user they are referring to
+        // This also indicates a database failure, as schema denotes unique emails
+        if(returnedValues.size() > 1) {
+            throw new RuntimeException("results are more than one");
+        }
+
+        // Magic number, but List<T> does not have getFirst() method, this recreates that result
+        Object[] objFromQuery = returnedValues.get(0);
+        /**
+         * This looks disgusting, but is the most efficient way to map them explicitly, as the
+         * deserializer cannot map Timestamp, JsonObject, or UUID values automatically
+         */
+        user = new BuzzUser( (String) objFromQuery[0], (String) objFromQuery[1],
+                (String) objFromQuery[2], (String) objFromQuery[3],
+                Timestamp.valueOf((LocalDateTime) objFromQuery[4]), (String) objFromQuery[5],
+                (String) objFromQuery[6], (String) objFromQuery[7], (String) objFromQuery[8],
+                (String) objFromQuery[9], (String) objFromQuery[10], (String) objFromQuery[11],
+                (String) objFromQuery[12]);
         return user;
     }
 
+    /**
+     * Gets all users as a list of users
+     * @return List<BuzzUser> List of users
+     */
     public List<BuzzUser> getAllUsers() {
         List<BuzzUser> list = new ArrayList<BuzzUser>();
+        List<Object[]> dbResults = repository.getAllUsers();
 
-        try {
-            ResultSet results = repository.getAllUsers();
-            if(results == null) {
-                throw new RuntimeException("results are null from getUserRecordByEmail");
-            }
-
-            while(results.next()) {
-                list.add(new BuzzUser(results.getString(1), results.getString(2),
-                        results.getString(3), results.getString(4),
-                        results.getTimestamp(5), results.getString(6),
-                        results.getString(7), results.getString(8),
-                        results.getString(9), results.getString(10),
-                        results.getString(11), results.getString(12),
-                        results.getString(13)));
-            }
-
-        } catch(Exception e) {
-            throw new RuntimeException("Error handling ResultSet " + e.getMessage());
+        for(int i = 0; i < dbResults.size(); i++) {
+            Object[] objFromQuery = dbResults.get(i);
+            /**
+             * This looks disgusting, but is the most efficient way to map them explicitly, as the
+             * deserializer cannot map Timestamp, JsonObject, or UUID values automatically
+             */
+            list.add(new BuzzUser((String) objFromQuery[0], (String) objFromQuery[1],
+                    (String) objFromQuery[2], (String) objFromQuery[3],
+                    Timestamp.valueOf((LocalDateTime) objFromQuery[4]), (String) objFromQuery[5],
+                    (String) objFromQuery[6], (String) objFromQuery[7], (String) objFromQuery[8],
+                    (String) objFromQuery[9], (String) objFromQuery[10], (String) objFromQuery[11],
+                    (String) objFromQuery[12]));
         }
-
         return list;
     }
 
-    public void createUser(@Nonnull BuzzUser user) throws NoUserProvidedException {
-        repository.createUser(user.getUserId(), user.getUsername(), user.getPasswordHash(),
-                user.getOauthKey(), user.getJoinDate(), user.getUserDesc(), user.getFullName(),
-                user.getUserPfpLocation(), user.getEmail(), user.getFavorites().toString(),
-                user.getVolumeSettings().toString(), user.getNotificationSettings().toString(),
-                user.getPermissions().asJsonObject().toString());
+    /**
+     * Creates the database entry for a user based on a populated BuzzUser object
+     * @param user BuzzUser object to place in the database
+     * @throws NoUserProvidedException If the user provided is null
+     */
+    public void createUser(BuzzUser user) throws NoUserProvidedException {
+        if(user == null) {
+            throw new NoUserProvidedException("Expected BuzzUser, received: null");
+        }
+        // Required to catch any SQLExceptions, as they will silently fail otherwise
+        try {
+            repository.createUser(user.getUserId(), user.getUsername(), user.getPasswordHash(),
+                    user.getOauthKey(), user.getJoinDate(), user.getUserDesc(), user.getFullName(),
+                    user.getUserPfpLocation(), user.getEmail(), user.getFavorites().toString(),
+                    user.getVolumeSettings().toString(), user.getNotificationSettings().toString(),
+                    user.getPermissions().asJsonObject().toString());
+        } catch (Exception e) {
+            Logger.getGlobal().warning(e.getMessage());
+        }
     }
 
-    public void createUser(@Nonnull String username, @Nonnull String email, @Nonnull String unHashedPassword) throws NoUserProvidedException {
+    /**
+     * Creates a database entry with a user generated with a username, email, and password to hash
+     * @param username String username
+     * @param email String email, MUST NOT EXIST IN DATABASE
+     * @param unHashedPassword String unhashed password, hashing happens in BuzzUser constructor
+     * @throws NoUserProvidedException @TODO CHANGE EXCEPTION THROWN
+     */
+    public void createUser(String username, String email, String unHashedPassword) throws NoUserProvidedException {
         BuzzUser user = new BuzzUser(username, passwordEncoder.encode(unHashedPassword), email);
 
+        // Required to catch any SQLExceptions, as they will silently fail otherwise
         try {
             repository.createUser(user.getUserId(), user.getUsername(), user.getPasswordHash(),
                     user.getOauthKey(), user.getJoinDate(), user.getUserDesc(), user.getFullName(),
@@ -110,35 +153,62 @@ public class UserService {
 //                user.getNotificationSettings(), user.getPermissionData());
     }
 
+    /**
+     * Deletes a user entry in the database permanently
+     * @param email String used for finding a specific table entry
+     * @throws NoUserProvidedException @TODO REPLACE EXCEPTION
+     */
     public void deleteUser(String email) throws NoUserProvidedException {
         if(email == null) {
             throw new NoUserProvidedException("User provided in UserService.createUser() is null");
         }
 
-        repository.removeUserByEmail(email);
+        try {
+            repository.removeUserByEmail(email);
+        } catch(Exception e) {
+            Logger.getGlobal().warning(e.getMessage());
+        }
     }
 
-    // @TODO IMPLEMENT
+    /**
+     * Update a users stored password
+     * @param email String used for finding a specific table entry
+     * @param oldPasswordHash String old password hash to verify upon request
+     * @param newPasswordHash String new password hash to replace old password hash
+     * @throws NoUserProvidedException @TODO REPLACE EXCEPTION @TODO IMPLEMENT
+     */
     public void updateUserPasswordHash(String email, String oldPasswordHash, String newPasswordHash) throws NoUserProvidedException {
         if(email == null) {
             throw new NoUserProvidedException("User provided in UserService.createUser() is null");
         }
 
-        repository.updateUserPasswordHashByEmail(email, newPasswordHash);
+        try {
+            repository.updateUserPasswordHashByEmail(email, newPasswordHash);
+        } catch (Exception e) {
+            Logger.getGlobal().warning(e.getMessage());
+        }
     }
 
+    /**
+     * Checks to see if an email is present in the database
+     * @param email String used for finding a specific table entry
+     * @return boolean If the email exists in the database
+     * @throws NoUserProvidedException @TODO REPLACE EXCEPTION
+     */
     public boolean doesUserExist(String email) throws NoUserProvidedException {
-        int resultCounter = 0;
-
         if(email == null) {
             throw new NoUserProvidedException("User provided in UserService.createUser() is null");
         }
 
-        ResultSet results = repository.doesUserExist(email);
+        try {
+            List<Object[]> results = repository.doesUserExist(email);
 
-        if(results == null) {
-            return false;
+            // results will be null if no entries can be found by the database
+            return (results == null);
+        } catch (Exception e) {
+            Logger.getGlobal().warning(e.getMessage());
         }
+        // For now, force any errors to tell the system that an email exists
         return true;
     }
 }

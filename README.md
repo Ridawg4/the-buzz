@@ -1,6 +1,8 @@
 # the-buzz
 WSBU 88.3 The Buzz - Software Engineering Project
 
+This application is built using Spring Boot
+
 ALL FUNCTIONALITIES:
 ALL USERS CAN:
 - Play live stream

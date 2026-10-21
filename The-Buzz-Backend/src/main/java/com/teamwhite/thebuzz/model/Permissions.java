@@ -1,13 +1,11 @@
 package com.teamwhite.thebuzz.model;
 
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
-
 import java.sql.Timestamp;
 import java.util.UUID;
 
 public class Permissions extends SessionPermissions{
 
+    // @TODO IMPLEMENT LATER WHEN ADDING PERMISSION GROUPS
     private String permissionsName;
     private UUID createdBy;
     private Timestamp createdAt;

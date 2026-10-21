@@ -9,6 +9,11 @@ import org.springframework.session.config.annotation.web.http.EnableSpringHttpSe
 @EnableSpringHttpSession
 public class SessionConfiguration {
 
+    /**
+     * Tells Spring Session to use the custom BuzzUserSessionRepository
+     * @param sessionRepository Autowired
+     * @return BuzzUserSessionRepository session repository
+     */
     @Bean
     public BuzzUserSessionRepository sessionRepository(BuzzSessionRepository sessionRepository) {
         return new BuzzUserSessionRepository(sessionRepository);
