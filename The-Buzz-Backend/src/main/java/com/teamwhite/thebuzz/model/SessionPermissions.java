@@ -1,6 +1,7 @@
 package com.teamwhite.thebuzz.model;
 
 import com.teamwhite.thebuzz.Exceptions.InvalidPermissionsObjectException;
+import com.teamwhite.thebuzz.Resources.PermissionValues;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;

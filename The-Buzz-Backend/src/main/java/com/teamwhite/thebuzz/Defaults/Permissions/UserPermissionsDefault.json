@@ -3,13 +3,14 @@
   "permission_data":
   {
     "CAN_ADD_FAVORITES": "allowed",
-    "CAN_REMOVE_FAVORITES": "conditional-if-owner",
+    "CAN_REMOVE_FAVORITES": "allowed",
     "CAN_LIKE_SHOWS": "allowed",
     "CAN_LIKE_COMMENTS": "allowed",
     "CAN_POST_COMMENTS": "allowed",
     "CAN_DELETE_COMMENTS": "conditional-if-owner",
     "CAN_MODIFY_ACCOUNT_INFO": "conditional-if-owner",
     "CAN_DELETE_ACCOUNT": "conditional-if-owner",
+    "CAN_SEE_ACCOUNT_INFO": "conditional-if-owner",
 
     "CAN_SEE_DJ_SYSTEM_PANELS": "denied",
     "CAN_CREATE_DJ_PROFILE": "denied",
@@ -36,6 +37,7 @@
     "CAN_CREATE_ACCOUNT_ACTION_ENTRY": "denied",
     "CAN_MODIFY_ACCOUNT_ACTION_ENTRY": "denied",
     "CAN_DELETE_ACCOUNT_ACTION_ENTRY": "denied",
+    "CAN_VIEW_ANY_ACCOUNT_INFO": "denied",
     "CAN_MODIFY_ANY_ACCOUNT_INFO": "denied",
     "CAN_DELETE_ANY_ACCOUNT_INFO": "denied",
     "CAN_CREATE_PERMISSION_GROUPS": "denied",
@@ -46,6 +48,7 @@
     "CAN_VIEW_SYSTEM_USAGE_STATISTICS": "denied",
     "CAN_DOWNLOAD_SYSTEM_USAGE_STATISTICS": "denied",
     "CAN_UPLOAD_LIVE_STREAM_SEGMENTS": "denied",
-    "CAN_SET_LIVE_STREAM_RECORDING": "denied"
+    "CAN_SET_LIVE_STREAM_RECORDING": "denied",
+    "CAN_DISABLE_LIVE_STREAM": "denied"
   }
 }

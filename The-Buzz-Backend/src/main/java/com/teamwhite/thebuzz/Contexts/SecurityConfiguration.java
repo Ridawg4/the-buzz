@@ -76,10 +76,10 @@ class SecurityConfiguration {
                  */
                 .authorizeHttpRequests(auth -> {
                     auth.dispatcherTypeMatchers().permitAll()
-                    .requestMatchers("/api/v1/**", "/login.html", "/signup.html")
+                    .requestMatchers("/login.html", "/signup.html", "/api/v1/signup")
                             .permitAll()
                             .requestMatchers("/upload.html")
-                            .hasAnyAuthority("CAN_UPLOAD_LIVE_STREAM_SEGMENTS", "CAN_UPLOAD_PRERECORDED_SHOW_AUDIO")
+                            .permitAll()
                     .anyRequest().authenticated();
                 }).authenticationManager(authenticationManager(httpSecurity))
                 // Maps our authentication pipeline to use Form Login, redirect after successful login,
@@ -97,7 +97,7 @@ class SecurityConfiguration {
                             // @TODO MAKE INVALIDATING COOKIES WORK
                             .deleteCookies("SESSION", "JSESSIONID")
                             .logoutUrl("/api/v1/logout")
-                            .logoutSuccessUrl("/loginPage.html")
+                            .logoutSuccessUrl("/login.html")
                             .permitAll();
                 });
         // Constructs the SecurityFilterChain

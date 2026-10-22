@@ -1,8 +1,6 @@
 package com.teamwhite.thebuzz.Resources;
 
 import java.io.File;
-import java.net.URI;
-import java.nio.file.Path;
 
 public class ResourcePaths {
     /** The system file separator character
