@@ -62,7 +62,7 @@ public class BuzzUserSessionRepository implements SessionRepository<BuzzUserSess
         if(!id.isEmpty()) {
             return repository.getSessionById(id);
         } else {
-            // @TODO Throw an error if id is null, not return empty
+            // @TODO Throw an error if id is null, not return null
             return null;
         }
     }

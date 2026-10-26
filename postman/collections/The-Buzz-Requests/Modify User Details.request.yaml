@@ -1,0 +1,30 @@
+$kind: http-request
+description: ""
+url: localhost:8080/api/v1/user/modify-user
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: username
+      value: ""
+      description: ""
+      disabled: false
+    - type: text
+      key: email
+      value: ""
+      description: ""
+      disabled: false
+    - type: text
+      key: full_name
+      value: John User
+      description: ""
+      disabled: false
+    - type: text
+      key: user_desc
+      value: ""
+      description: ""
+      disabled: false
+settings:
+  followRedirects: true
+order: 4497965809776542

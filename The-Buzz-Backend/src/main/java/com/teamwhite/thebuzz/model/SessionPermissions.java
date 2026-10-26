@@ -152,4 +152,14 @@ public class SessionPermissions implements GrantedAuthority {
     public @Nullable String getAuthority() {
         return null;
     }
+
+    public String getPermission(String permissionToCheckFor) {
+        try {
+            String value = permissions.get(permissionToCheckFor);
+
+            return PermissionValues.getStringAsPermissionValue(value);
+        } catch (NullPointerException nullValue) {
+            return PermissionValues.DENIED;
+        }
+    }
 }

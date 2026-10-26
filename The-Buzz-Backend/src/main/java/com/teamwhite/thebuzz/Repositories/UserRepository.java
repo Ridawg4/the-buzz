@@ -68,24 +68,34 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
                     String notificationSettings, String permissions);
 
     /**
-     * Updates a users username based off their old email
-     * @param email String email of the record to modify
+     * Updates a users username based off their old userId
+     * @param userId String userId of the record to modify
      * @param username String new username
      */
     @Modifying
     @Transactional
-    @Query(value="UPDATE development.users SET username = ?2 WHERE email = ?1", nativeQuery = true)
-    void updateUserUsernameByOldEmail(String email, String username);
+    @Query(value="UPDATE development.users SET username = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserUsernameByUserId(String userId, String username);
 
     /**
-     * Updates a users email based off their old email
-     * @param oldEmail String email of the record to modify
-     * @param newEmail String new email
+     * Updates a users email based off their userId
+     * @param userId String userId of the record to modify
+     * @param email String new email
      */
     @Modifying
     @Transactional
-    @Query(value="UPDATE development.users SET email = ?2 WHERE email = ?1", nativeQuery = true)
-    void updateUserEmailByOldEmail(String oldEmail, String newEmail);
+    @Query(value="UPDATE development.users SET email = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserEmailByUserId(String userId, String email);
+
+    /**
+     * Updates a users passwordHash based off their userId
+     * @param userId String userId of the record to modify
+     * @param passwordHash String new passwordHash
+     */
+    @Modifying
+    @Transactional
+    @Query(value="UPDATE development.users SET password_hash = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserPasswordHashByUserId(String userId, String passwordHash);
 
     /**
      * Updates a users passwordHash based off their email
@@ -98,74 +108,74 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
     void updateUserPasswordHashByEmail(String email, String passwordHash);
 
     /**
-     * Updates the OAuthKey with a new value based off the email
-     * @param email String email of the record to modify
+     * Updates the OAuthKey with a new value based off the userId
+     * @param userId String userId of the record to modify
      * @param oauthKey String new OAuthKey
      */
     @Modifying
     @Transactional
-    @Query(value="UPDATE development.users SET oauth_key = ?2 WHERE email = ?1", nativeQuery = true)
-    void updateUserOauthKeyByEmail(String email, String oauthKey);
+    @Query(value="UPDATE development.users SET oauth_key = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserOauthKeyByUserId(String userId, String oauthKey);
 
     /**
-     * Updates the userDesc with a new value based off the email
-     * @param email String email of the record to modify
+     * Updates the userDesc with a new value based off the userId
+     * @param userId String userId of the record to modify
      * @param userDesc String new description
      */
     @Modifying
     @Transactional
-    @Query(value="UPDATE development.users SET user_desc = ?2 WHERE email = ?1", nativeQuery = true)
-    void updateUserDescByEmail(String email, String userDesc);
+    @Query(value="UPDATE development.users SET user_desc = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserDescByUserId(String userId, String userDesc);
 
     /**
-     * Updates the full name with a new value based off the email
-     * @param email String email of the record to modify
+     * Updates the full name with a new value based off the userId
+     * @param userId String userId of the record to modify
      * @param fullName String new fullName
      */
     @Modifying
     @Transactional
-    @Query(value="UPDATE development.users SET full_name = ?2 WHERE email = ?1", nativeQuery = true)
-    void updateUserFullNameByEmail(String email, String fullName);
+    @Query(value="UPDATE development.users SET full_name = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserFullNameByUserId(String userId, String fullName);
 
     /**
-     * Updates the userPfpLocation based off the email
-     * @param email String email of the record to modify
+     * Updates the userPfpLocation based off the userId
+     * @param userId String userId of the record to modify
      * @param userPfpLocation String new userPfpLocation
      */
     @Modifying
     @Transactional
-    @Query(value="UPDATE development.users SET user_pfp_location = ?2 WHERE email = ?1", nativeQuery = true)
-    void updateUserPfpLocationByEmail(String email, String userPfpLocation);
+    @Query(value="UPDATE development.users SET user_pfp_location = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserPfpLocationByUserId(String userId, String userPfpLocation);
 
     /**
-     * Updates the users favorites list based off the email
-     * @param email String email of the record to modify
+     * Updates the users favorites list based off the userId
+     * @param userId String userId of the record to modify
      * @param favoritesList String new favoritesList
      */
     @Modifying
     @Transactional
-    @Query(value="UPDATE development.users SET favorites = ?2 WHERE email = ?1", nativeQuery = true)
-    void updateUserFavoritesListByEmail(String email, String favoritesList);
+    @Query(value="UPDATE development.users SET favorites = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserFavoritesListByUserId(String userId, String favoritesList);
 
     /**
-     * Updates the users volume settings based off the email
-     * @param email String email of the record to modify
+     * Updates the users volume settings based off the userId
+     * @param userId String userId of the record to modify
      * @param volumeSettings String new volumeSettings
      */
     @Modifying
     @Transactional
-    @Query(value="UPDATE development.users SET volume_settings = ?2 WHERE email = ?1", nativeQuery = true)
-    void updateUserVolumeSettingsByEmail(String email, String volumeSettings);
+    @Query(value="UPDATE development.users SET volume_settings = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserVolumeSettingsByUserId(String userId, String volumeSettings);
 
     /**
-     * Updates the users notification settings based off the email
-     * @param email String email of the record to modify
+     * Updates the users notification settings based off the userId
+     * @param userId String userId of the record to modify
      * @param notificationSettings String new notificationSettings
      */
     @Modifying
     @Transactional
-    @Query(value="UPDATE development.users SET notification_settings = ?2 WHERE email = ?1", nativeQuery = true)
-    void updateUserNotificationsSettingsByEmail(String email, String notificationSettings);
+    @Query(value="UPDATE development.users SET notification_settings = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserNotificationsSettingsByUserId(String userId, String notificationSettings);
 
     /**
      * Updates the users permissions based off the email
@@ -185,4 +195,13 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
     @Transactional
     @Query(value="DELETE FROM development.users WHERE email = ?1", nativeQuery = true)
     void removeUserByEmail(String email);
+
+    /**
+     * Removes permanently a user based off a userId
+     * @param userId String userId of the record to remove
+     */
+    @Modifying
+    @Transactional
+    @Query(value="DELETE FROM development.users WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void removeUserByUserId(String userId);
 }

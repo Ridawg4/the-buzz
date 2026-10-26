@@ -1,6 +1,7 @@
 package com.teamwhite.thebuzz.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.json.*;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -380,5 +381,22 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
     @Override
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
+    }
+
+    /**
+     * Gets all of an accounts details without getting settings, permisisons, or auth tokens
+     * and wraps it into a JsonObject
+     * @return JsonObject containing username, email, joinDate, fullName, and userDesc
+     */
+    public JsonObject getAccountDetailsWithoutSettings() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("username", username)
+                .add("email", email)
+                .add("join_date", joinDate.toString())
+                .add("full_name", fullName)
+                .add("user_desc", userDesc)
+                .add("pfpLocation", userPfpLocation);
+
+        return builder.build();
     }
 }

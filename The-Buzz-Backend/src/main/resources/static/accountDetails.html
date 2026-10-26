@@ -1,0 +1,56 @@
+<html>
+<head>
+
+</head>
+<body>
+<h3>
+    Account Details
+</h3>
+<ul id="account-details-ul">
+
+</ul>
+<p id="FailedToGetInfo">No values could be recovered from the server</p>
+</body>
+<style>
+    #FailedToGetInfo {
+        display: none;
+    }
+</style>
+<script>
+    const accDetailsUl = document.getElementById("account-details-ul")
+    let respBody = null
+
+    fetch("/api/v1/user/load-details").then((response) => {
+        if(response.status === 403) {
+            window.redirect("/login.html", 403)
+        }
+        return response.json()
+        }).then((json) => {
+
+        if(json === null) {
+            document.getElementById("FailedToGetInfo").style.display = "visible"
+        }
+
+        for(let key of Object.keys(json)) {
+            let newLi = document.createElement("li")
+
+            let label = document.createElement("label")
+            label.textContent = key
+            let value = document.createElement("p")
+            if(json[key] === "") {
+                value.textContent = "empty"
+            } else {
+                value.textContent = json[key]
+            }
+
+            newLi.appendChild(label)
+            newLi.appendChild(value)
+            accDetailsUl.appendChild(newLi)
+        }
+
+        console.log(json)
+    })
+
+
+</script>
+</html>

@@ -87,7 +87,7 @@ class SecurityConfiguration {
                 .formLogin((formLogin) -> {
                     formLogin.loginPage("/login.html")
                             .loginProcessingUrl("/api/v1/login")
-                            .defaultSuccessUrl("/upload.html")
+                            .defaultSuccessUrl("/accountDetails.html")
                             .permitAll();
                 })
                 // Maps the logout authentication to clear the cookies from the browser,

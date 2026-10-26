@@ -155,15 +155,28 @@ public class UserService {
     }
 
     // @TODO IMPLEMENT
-    public void updateUser(BuzzUser user) throws NoUserProvidedException {
-//        if(user == null) {
-//            throw new NoUserProvidedException("User provided in UserService.createUser() is null");
-//        }
+    public void modifyUser(String userId, String email, String username, String fullName, String userDesc) throws NoUserProvidedException {
+        // @TODO BATCH INTO GROUPS TO NOT POTENTIALLY CALL DB A GAZILLION TIMES
 
-//        repository.createUser(user.getUserId(), user.getUsername(), user.getPasswordHash(),
-//                user.getOauthKey(), user.getJoinDate(), user.getUserDesc(), user.getFullName(),
-//                user.getUserPfpLocation(), user.getEmail(), user.getFavorites(), user.getVolumeSettings(),
-//                user.getNotificationSettings(), user.getPermissionData());
+        try {
+            if (!email.isEmpty()) {
+                repository.updateUserEmailByUserId(userId, email);
+            }
+
+            if (!username.isEmpty()) {
+                repository.updateUserUsernameByUserId(userId, username);
+            }
+
+            if (!fullName.isEmpty()) {
+                repository.updateUserFullNameByUserId(userId, fullName);
+            }
+
+            if (!userDesc.isEmpty()) {
+                repository.updateUserDescByUserId(userId, userDesc);
+            }
+        } catch (Exception e) {
+            Logger.getGlobal().warning(e.getMessage());
+        }
     }
 
     /**

@@ -1,0 +1,5 @@
+$kind: http-request
+description: ""
+url: http://localhost:8080/api/v1/user/load-details
+method: GET
+order: 4487796561367374

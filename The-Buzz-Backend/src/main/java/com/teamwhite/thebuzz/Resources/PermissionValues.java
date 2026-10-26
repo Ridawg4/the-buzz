@@ -10,4 +10,17 @@ public class PermissionValues {
     /** The action is allowed, only if the user is within their creation limit */
     public static final String IF_NOT_EXCEEDED_LIMIT = "conditional-if-not-exceeded-limit";
     public static final String DENIED = "denied";
+
+    public static String getStringAsPermissionValue(String permission) {
+        switch(permission) {
+            case ALLOWED:
+                return ALLOWED;
+            case IF_OWNER:
+                return IF_OWNER;
+            case IF_NOT_EXCEEDED_LIMIT:
+                return IF_NOT_EXCEEDED_LIMIT;
+            default:
+                return DENIED;
+        }
+    }
 }
