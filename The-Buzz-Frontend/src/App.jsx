@@ -31,6 +31,7 @@ function App() {
 	      <Link to="/shows">Explore Shows</Link>
 	      <Link to="/authors">Explore Authors</Link>
 	      <Link to="/favorites">Favorites</Link>
+			<Link to="/login">Login</Link>
 	    </div>
 
 	  </nav>
