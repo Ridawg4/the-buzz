@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS account_moderation (
 );
 #self referencing itself allowing one comment to reply to another comment
 CREATE TABLE IF NOT EXISTS  comments (
-    comment_id INTEGER PRIMARY KEY,
+    comment_id INTEGER PRIMARY KEY AUTO_INCREMENT,
     user_id BINARY(16) NOT NULL,
     post_id INTEGER NOT NULL,
     reply_id INTEGER,
