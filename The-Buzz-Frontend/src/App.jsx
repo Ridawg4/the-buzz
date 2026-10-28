@@ -4,6 +4,7 @@ import logo from "./assets/wsbu-logo.png";
 import Home from "./pages/Home";
 import DJs from "./pages/DJs";
 import "./App.css";
+import Login from "./pages/Login.jsx";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/djs" element={<DJs />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
 
       </div>
