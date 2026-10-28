@@ -266,4 +266,52 @@
   .content-section {
     padding: 40px 20px;
   }
+  /* ========================================
+     DJs PAGE
+  ======================================== */
+
+  .djs-page {
+    background-color: #fff4e2;
+    min-height: 80vh;
+    padding: 60px 20px;
+    text-align: center;
+  }
+
+  .djs-page h1 {
+    color: #54210f;
+    font-size: 40px;
+    margin-bottom: 15px;
+  }
+
+  .djs-page > p {
+    color: #682b16;
+    font-size: 18px;
+  }
+
+  .dj-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 50px;
+  }
+
+  .dj-card {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    width: 280px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: left;
+  }
+
+  .dj-card h2 {
+    color: #54210f;
+    margin-bottom: 15px;
+  }
+
+  .dj-card p {
+    color: #682b16;
+    margin-bottom: 10px;
+  }
 }
