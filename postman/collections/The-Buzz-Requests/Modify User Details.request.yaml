@@ -7,7 +7,7 @@ body:
   content:
     - type: text
       key: username
-      value: ""
+      value: new username
       description: ""
       disabled: false
     - type: text
@@ -17,7 +17,7 @@ body:
       disabled: false
     - type: text
       key: full_name
-      value: John User
+      value: John User The 3rd
       description: ""
       disabled: false
     - type: text
