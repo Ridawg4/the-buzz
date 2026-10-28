@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS  permissions (
     FOREIGN KEY (created_by)
         REFERENCES users(user_id)
 );
+
 CREATE TABLE IF NOT EXISTS  djs (
     dj_id BINARY(16) PRIMARY KEY,
     user_id BINARY(16) NOT NULL,
@@ -48,6 +49,7 @@ CREATE TABLE IF NOT EXISTS  djs (
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)
 );
+
 CREATE TABLE IF NOT EXISTS  shows (
     show_id BINARY(16) PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -60,6 +62,7 @@ CREATE TABLE IF NOT EXISTS  shows (
     FOREIGN KEY (dj_id)
         REFERENCES djs(dj_id)
 );
+
 CREATE TABLE IF NOT EXISTS account_moderation (
     user_id BINARY(16) NOT NULL,
     moderation_desc VARCHAR(255),
@@ -94,6 +97,12 @@ CREATE TABLE IF NOT EXISTS sessions (
     expiry_time TIMESTAMP NOT NULL,
     permissions JSON,
     attributes JSON
+);
+
+CREATE TABLE IF NOT EXISTS session_info (
+    session_id BINARY(16) PRIMARY KEY NOT NULL UNIQUE,
+    owner_id BINARY(16),
+    needs_refresh BOOL NOT NULL DEFAULT FALSE
 );
 
 CREATE USER "credentialsReader"@"localhost" IDENTIFIED BY "testingpassword";

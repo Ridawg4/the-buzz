@@ -26,7 +26,7 @@ public class SessionPermissions implements GrantedAuthority {
      * @param jsonStringToConvert String permissions to use
      */
     public SessionPermissions(String jsonStringToConvert) {
-        JsonObject obj = Json.createReader(new StringReader(jsonStringToConvert)).readObject();
+        JsonObject obj = Json.createReader(new StringReader(jsonStringToConvert.trim())).readObject();
         parseJsonAsPermissionsMap(obj);
     }
 

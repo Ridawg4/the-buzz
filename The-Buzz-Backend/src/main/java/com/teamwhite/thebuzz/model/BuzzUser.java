@@ -399,4 +399,26 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
 
         return builder.build();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        BuzzUser otherUser;
+        try {
+            otherUser = (BuzzUser) obj;
+        } catch (ClassCastException classNot) {
+            return false;
+        }
+
+        String ourAccDetails = getAccountDetailsWithoutSettings().toString();
+        String theirAccDetails = otherUser.getAccountDetailsWithoutSettings().toString();
+        if (!ourAccDetails.equals(theirAccDetails)) {
+            return false;
+        }
+        String ourStringPermissions = getPermissions().asJsonObject().toString().trim();
+        String theirStringPermissions = otherUser.getPermissions().asJsonObject().toString().trim();
+        if (!ourStringPermissions.equals(theirStringPermissions)) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -1,13 +1,17 @@
 package com.teamwhite.thebuzz.Controllers.API.V1;
 
 
+import com.teamwhite.thebuzz.Contexts.BuzzSessionService;
 import com.teamwhite.thebuzz.Records.ContentTypes;
 import com.teamwhite.thebuzz.Resources.PermissionNames;
 import com.teamwhite.thebuzz.Resources.PermissionValues;
 import com.teamwhite.thebuzz.Services.UserService;
 import com.teamwhite.thebuzz.model.BuzzUser;
 import jakarta.json.JsonObject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.web.exchanges.HttpExchange;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
@@ -15,12 +19,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 import java.util.logging.Logger;
 
-import static org.springframework.security.authorization.AuthorityAuthorizationManager.hasAuthority;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -28,16 +31,19 @@ import static org.springframework.security.authorization.AuthorityAuthorizationM
 public class UserController {
 
     private final UserService userService;
+    private final BuzzSessionService sessionService;
 
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, BuzzSessionService sessionService) {
         this.userService = userService;
+        this.sessionService = sessionService;
     }
 
     @GetMapping("/load-details")
     @PreAuthorize("hasAuthority('CAN_SEE_ACCOUNT_INFO')")
-    public ResponseEntity<String> testUserEndpoint(Authentication userAuth) {
+    public ResponseEntity<String> loadUserDetails(Authentication userAuth) {
+
         BuzzUser user = null;
         if(userAuth.getPrincipal() instanceof BuzzUser) {
             user = (BuzzUser) userAuth.getPrincipal();
@@ -72,7 +78,9 @@ public class UserController {
                                                     @RequestParam("email") String email,
                                                     @RequestParam("full_name") String fullName,
                                                     @RequestParam("user_desc") String userDesc,
-                                                    Authentication userAuth) {
+                                                    Authentication userAuth,
+                                                    HttpServletRequest request,
+                                                    HttpServletResponse response) {
         BuzzUser user = null;
         if(userAuth.getPrincipal() instanceof BuzzUser) {
             user = (BuzzUser) userAuth.getPrincipal();
@@ -86,8 +94,12 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        // @TODO MAKES SESSION STALE, UPDATE SESSION AFTER CALLING
-        userService.modifyUser(user.getUserId(), username, email, fullName, userDesc);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        /**
+         * Fun Fact: If you swap the email and username field, it breaks things
+         */
+        userService.modifyUser(user.getUserId(), email, username, fullName, userDesc);
+        sessionService.renewAllSessionsForUser(user.getUserId(), userAuth, request, response);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

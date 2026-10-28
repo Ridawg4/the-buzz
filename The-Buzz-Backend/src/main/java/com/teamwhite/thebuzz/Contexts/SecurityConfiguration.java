@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.session.SessionManagementFilter;
 
 /**
  * The Security Configuration that all endpoints follow unless annotated separately
@@ -100,6 +102,7 @@ class SecurityConfiguration {
                             .logoutSuccessUrl("/login.html")
                             .permitAll();
                 });
+
         // Constructs the SecurityFilterChain
         return httpSecurity.build();
     }

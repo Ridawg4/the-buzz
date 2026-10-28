@@ -1,15 +1,18 @@
 package com.teamwhite.thebuzz.Services;
 
+import com.teamwhite.thebuzz.Contexts.BuzzSessionService;
 import com.teamwhite.thebuzz.Exceptions.NoUserProvidedException;
 import com.teamwhite.thebuzz.Repositories.UserRepository;
 import com.teamwhite.thebuzz.model.BuzzUser;
-import jakarta.annotation.Nonnull;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ public class UserService {
     private final UserRepository repository;
     // BCrypt Password Encoder
     private final PasswordEncoder passwordEncoder;
+    // Session Service
+//    private final BuzzSessionService sessionService;
 
     /**
      * For autowiring values
@@ -60,6 +65,9 @@ public class UserService {
         // This also indicates a database failure, as schema denotes unique emails
         if(returnedValues.size() > 1) { //@TODO CHANGE EXCEPTION
             throw new RuntimeException("results are more than one");
+        }
+        if(returnedValues.isEmpty()) { //@TODO CHANGE EXCEPTION
+            throw new RuntimeException("results are empty");
         }
 
         // Magic number, but List<T> does not have getFirst() method, this recreates that result
@@ -114,9 +122,9 @@ public class UserService {
         try {
             repository.createUser(user.getUserId(), user.getUsername(), user.getPasswordHash(),
                     user.getOauthKey(), user.getJoinDate(), user.getUserDesc(), user.getFullName(),
-                    user.getUserPfpLocation(), user.getEmail(), user.getFavorites().toString(),
-                    user.getVolumeSettings().toString(), user.getNotificationSettings().toString(),
-                    user.getPermissions().asJsonObject().toString());
+                    user.getUserPfpLocation(), user.getEmail(), user.getFavorites().toString().trim(),
+                    user.getVolumeSettings().toString().trim(), user.getNotificationSettings().toString().trim(),
+                    user.getPermissions().asJsonObject().toString().trim());
         } catch (Exception e) {
             Logger.getGlobal().warning(e.getMessage());
         }
@@ -146,9 +154,9 @@ public class UserService {
         try {
             repository.createUser(user.getUserId(), user.getUsername(), user.getPasswordHash(),
                     user.getOauthKey(), user.getJoinDate(), user.getUserDesc(), user.getFullName(),
-                    user.getUserPfpLocation(), user.getEmail(), user.getFavorites().toString(),
-                    user.getVolumeSettings().toString(), user.getNotificationSettings().toString(),
-                    user.getPermissions().asJsonObject().toString());
+                    user.getUserPfpLocation(), user.getEmail(), user.getFavorites().toString().trim(),
+                    user.getVolumeSettings().toString().trim(), user.getNotificationSettings().toString().trim(),
+                    user.getPermissions().asJsonObject().toString().trim());
         } catch (Exception e) {
             Logger.getGlobal().warning(e.getMessage());
         }
@@ -157,13 +165,16 @@ public class UserService {
     // @TODO IMPLEMENT
     public void modifyUser(String userId, String email, String username, String fullName, String userDesc) throws NoUserProvidedException {
         // @TODO BATCH INTO GROUPS TO NOT POTENTIALLY CALL DB A GAZILLION TIMES
+        Logger.getGlobal().info(userId + ", " + email + ", " + username + ", " + fullName + ", " + userDesc);
 
         try {
             if (!email.isEmpty()) {
+                Logger.getGlobal().info("Email isn't empty");
                 repository.updateUserEmailByUserId(userId, email);
             }
 
             if (!username.isEmpty()) {
+                Logger.getGlobal().info("username isn't empty");
                 repository.updateUserUsernameByUserId(userId, username);
             }
 
@@ -243,4 +254,8 @@ public class UserService {
         // For now, force any errors to tell the system that an email exists
         return true;
     }
+
+//    public void renewAuthentication(String email, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
+//        sessionService.renewSessionUser(email, auth, request, response);
+//    }
 }

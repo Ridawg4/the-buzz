@@ -51,6 +51,7 @@ public class BuzzUserSession implements Session {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "attributes")
     private JsonObject attributes;
+    @Column(name = "user_id")
 
     /**
      * Required to map BuzzUser into JSON that can be recreated into an SecurityContextHandler object
@@ -125,6 +126,8 @@ public class BuzzUserSession implements Session {
         this.creationTime = Timestamp.valueOf(creationTime);
         this.lastAccessedTime = Timestamp.valueOf(lastAccessedTime);
         this.attributes = Json.createReader(new StringReader(attributes)).readObject();
+//        this.ownerId = UUID.fromString(ownerId);
+//        this.needsRenewal = needsRenewal;
     }
 
     /**
