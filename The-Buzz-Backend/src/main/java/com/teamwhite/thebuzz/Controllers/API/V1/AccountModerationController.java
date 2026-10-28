@@ -24,9 +24,9 @@ public class AccountModerationController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<List<AccountModeration>> getModerationByUserId(
-            @PathVariable UUID userId) {
+            @PathVariable String userId) {
         List<AccountModeration> records =
-                moderationService.getModerationByUserId(userId);
+                moderationService.getModerationByUserId(UUID.fromString(userId));
 
         return ResponseEntity.ok(records);
     }
