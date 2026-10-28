@@ -11,6 +11,7 @@
 .navbar {
   background-color: #54210f;
   display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px minmax(0, 1fr);
   align-items: center;
   width: 100%;
   box-sizing: border-box;
@@ -36,32 +37,20 @@
   justify-content: flex-start;
 }
 
-.navbar-center-objects {
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  justify-content: space-evenly;
-  width: auto;
-  height: auto;
-  padding: 0;
-  margin: 0;
-}
-
 /* NAVIGATION LINKS */
 
-.navbar a,
-.navbar a {
+.navbar .nav-left a,
+.navbar .nav-right a {
   color: #ffffff;
   text-decoration: none;
   font-size: 18px;
   font-weight: bold;
   white-space: nowrap;
   transition: color 0.3s ease;
-  height: auto;
 }
 
-.navbar a:hover,
-.navbar a:hover {
+.navbar .nav-left a:hover,
+.navbar .nav-right a:hover {
   color: #f4b942;
 }
 
@@ -71,16 +60,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: auto;
-  height: auto;
+  width: 200px;
+  height: 200px;
   justify-self: center;
   text-decoration: none;
 }
 
 .navbar .nav-logo img {
   display: block;
-  width: 10%;
-  height: 10%;
+  width: 180px;
+  height: 180px;
+  max-width: 100%;
   object-fit: contain;
   transition: transform 0.3s ease;
 }
