@@ -5,20 +5,20 @@ This application is built using Spring Boot
 
 ALL FUNCTIONALITIES:
 ALL USERS CAN:
-- Play live stream
-- Play prerecorded streams
+- Play live stream - BACKEND BUILT
+- Play prerecorded streams - BACKEND BUILT
 - Add favorites
 - remove favorites
 - like shows
 - like comments
 - post comments
 - delete comments
-- modify account info
+- modify account info - BACKEND BUILT
 - delete account
 DJs CAN:
 - see DJ system panels
 - create DJ profile
-- modify DJ profile
+- modify DJ profile - BACKEND BUILT
 - delete DJ profile
 - create show listing
 - modify show listing
@@ -50,10 +50,10 @@ MODERATORS CAN:
 - view server runtime logs
 - view system usage statistics
 - download system usage statistics
-- upload stream audio
+- upload stream audio - BACKEND BUILT
 - set stream audio to record or not
 SYSTEM CAN:
-- remove sessions
-- add sessions
-- invalidate sessions
-- modify sessions
+- remove sessions - BACKEND BUILT
+- add sessions - BACKEND BUILT
+- invalidate sessions - BACKEND BUILT
+- modify sessions - BACKEND BUILT

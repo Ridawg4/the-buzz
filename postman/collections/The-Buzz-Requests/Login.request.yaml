@@ -6,7 +6,7 @@ body:
   content:
     - type: text
       key: username
-      value: email@a.e
+      value: email@a.a
       description: ""
       disabled: false
     - type: text

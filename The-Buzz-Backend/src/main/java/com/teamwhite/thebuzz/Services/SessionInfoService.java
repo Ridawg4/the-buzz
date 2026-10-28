@@ -4,6 +4,7 @@ import com.teamwhite.thebuzz.Repositories.SessionInfoRepository;
 import com.teamwhite.thebuzz.model.SessionInfo;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 public class SessionInfoService {
@@ -13,10 +14,21 @@ public class SessionInfoService {
         this.repository = repository;
     }
 
+    /**
+     * Updates a specific session's NeedsRefresh value
+     * Used for determining if an authentication object needs to be refreshed when loading a session
+     * @param sessionId String session ID to be updated
+     * @param needRefresh boolean new value
+     */
     public void updateNeedsRefreshBySessionId(String sessionId, boolean needRefresh) {
         repository.updateNeedsRefreshBySessionId(sessionId, needRefresh);
     }
 
+    /**
+     * Gets all sessions associated with a specific user
+     * @param ownerId String userID of the sessions we want
+     * @return SessionInfo[] All sessionInfo's associated with the ownerId
+     */
     public SessionInfo[] getAllSessionsInfoByOwnerId(String ownerId) {
         List<Object[]> returnedValues = repository.getAllSessionsInfoByOwnerId(ownerId);
 
@@ -31,6 +43,7 @@ public class SessionInfoService {
         SessionInfo[] sessionInfos = new SessionInfo[returnedValues.size()];
         int index = 0;
 
+        // I didn't want to rewrite as a real for loop, so added index on top out of spite
         for(Object[] objFromQuery : returnedValues) {
             SessionInfo info = new SessionInfo((String) objFromQuery[0], (String) objFromQuery[1],
                     (boolean) objFromQuery[2]);
@@ -41,6 +54,11 @@ public class SessionInfoService {
         return sessionInfos;
     }
 
+    /**
+     * Gets a specific SessionInfo by the sessionId
+     * @param sessionId String sessionId used to find a specific session
+     * @return SessionInfo
+     */
     public SessionInfo getSessionInfoBySessionId(String sessionId) {
         List<Object[]> returnedValues = repository.getSessionInfoBySessionId(sessionId);
 
@@ -69,10 +87,24 @@ public class SessionInfoService {
         return info;
     }
 
+    /**
+     * Adds a SessionInfo entry to the database
+     * @param sessionId The ID of the session we are adding
+     * @param ownerId The ID of the owner for that session
+     * @param needsRefresh If the session needs to be refreshed
+     */
     public void addSessionInfo(String sessionId, String ownerId, boolean needsRefresh) {
-        repository.addSessionInfo(sessionId, ownerId, needsRefresh);
+        try {
+            repository.addSessionInfo(sessionId, ownerId, needsRefresh);
+        } catch (Exception e) {
+            Logger.getGlobal().info("Error adding session info: " + e.getMessage());
+        }
     }
 
+    /**
+     * Deletes a SessionInfo entry with a given sessionId
+     * @param sessionId String sessionId
+     */
     public void deleteSessionInfo(String sessionId) {
         repository.deleteSessionInfoBySessionId(sessionId);
     }

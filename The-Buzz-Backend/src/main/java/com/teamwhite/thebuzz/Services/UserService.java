@@ -70,6 +70,52 @@ public class UserService {
             throw new RuntimeException("results are empty");
         }
 
+
+        // Magic number, but List<T> does not have getFirst() method, this recreates that result
+        Object[] objFromQuery = returnedValues.get(0);
+        /**
+         * This looks disgusting, but is the most efficient way to map them explicitly, as the
+         * deserializer cannot map Timestamp, JsonObject, or UUID values automatically
+         */
+        user = new BuzzUser( (String) objFromQuery[0], (String) objFromQuery[1],
+                (String) objFromQuery[2], (String) objFromQuery[3],
+                Timestamp.valueOf((LocalDateTime) objFromQuery[4]), (String) objFromQuery[5],
+                (String) objFromQuery[6], (String) objFromQuery[7], (String) objFromQuery[8],
+                (String) objFromQuery[9], (String) objFromQuery[10], (String) objFromQuery[11],
+                (String) objFromQuery[12]);
+        return user;
+    }
+
+    /**
+     * Gets a specific user with a given userId
+     * @param userId String used for finding a specific table entry
+     * @return BuzzUser user as represented in the database
+     */
+    public BuzzUser getUserRecordByUserId(String userId) throws IllegalArgumentException{
+        if(userId == null) {
+            throw new IllegalArgumentException("userId provided is null");
+        }
+        BuzzUser user;
+        /** Gets the values from the request in the following format:
+         * List<T> Rows in the table, analagous to entries
+         * Object[] Columns in the table, the values in each row
+         */
+        List<Object[]> returnedValues = repository.getUserRecordByUserId(userId);
+
+        // If no values were returned, no users exist with that email
+        if(returnedValues == null) { //@TODO CHANGE EXCEPTION
+            throw new RuntimeException("results are null when expected results at getUserRecordByEmail()");
+        }
+        // If more than one record was returned, we can't know which user they are referring to
+        // This also indicates a database failure, as schema denotes unique emails
+        if(returnedValues.size() > 1) { //@TODO CHANGE EXCEPTION
+            throw new RuntimeException("results are more than one");
+        }
+        if(returnedValues.isEmpty()) { //@TODO CHANGE EXCEPTION
+            throw new RuntimeException("results are empty");
+        }
+
+
         // Magic number, but List<T> does not have getFirst() method, this recreates that result
         Object[] objFromQuery = returnedValues.get(0);
         /**
@@ -162,10 +208,8 @@ public class UserService {
         }
     }
 
-    // @TODO IMPLEMENT
     public void modifyUser(String userId, String email, String username, String fullName, String userDesc) throws NoUserProvidedException {
         // @TODO BATCH INTO GROUPS TO NOT POTENTIALLY CALL DB A GAZILLION TIMES
-        Logger.getGlobal().info(userId + ", " + email + ", " + username + ", " + fullName + ", " + userDesc);
 
         try {
             if (!email.isEmpty()) {
@@ -254,8 +298,4 @@ public class UserService {
         // For now, force any errors to tell the system that an email exists
         return true;
     }
-
-//    public void renewAuthentication(String email, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
-//        sessionService.renewSessionUser(email, auth, request, response);
-//    }
 }
