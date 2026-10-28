@@ -82,14 +82,17 @@ public class UserController {
                                                     HttpServletRequest request,
                                                     HttpServletResponse response) {
         BuzzUser user = null;
+        // Checks if the authentication contains a version of our user
         if(userAuth.getPrincipal() instanceof BuzzUser) {
             user = (BuzzUser) userAuth.getPrincipal();
         }
 
+        // If the user is null, the user is not authenticated properly and therefore has a bad request
         if(user == null) {
             return ResponseEntity.badRequest().build();
         }
 
+        // If the user doesn't have the correct permissions, they are unauthorized
         if(!PermissionValues.IF_OWNER.equals(user.getPermissions().getPermission("CAN_MODIFY_ACCOUNT_INFO"))) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -97,8 +100,10 @@ public class UserController {
         /**
          * Fun Fact: If you swap the email and username field, it breaks things
          */
+        // Modifies the user in the database
         userService.modifyUser(user.getUserId(), email, username, fullName, userDesc);
-        sessionService.renewAllSessionsForUser(user.getUserId(), userAuth, request, response);
+        // Needs the request and response for some reason
+        sessionService.labelAllSessionsForUserToRenew(user.getUserId(), userAuth, request, response);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

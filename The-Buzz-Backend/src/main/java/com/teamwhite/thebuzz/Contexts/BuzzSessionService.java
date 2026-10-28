@@ -128,7 +128,7 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
 
                 }
 
-                renewSingleUserSession(userOnAuth.getEmail(), retrievedSession, context.getAuthentication(), request, response);
+                renewCurrentUserSession(userOnAuth.getEmail(), retrievedSession, context.getAuthentication(), request, response);
             }
             return retrievedSession;
         } else {
@@ -147,7 +147,14 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
         sessionInfoService.deleteSessionInfo(id);
     }
 
-    public void renewAllSessionsForUser(String userId, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
+    /**
+     * Labels all sessions for a given user that they need to renew authentication
+     * @param userId String userId we want to refresh sessions for
+     * @param auth Authentication the current authentication
+     * @param request HttpServletRequest autofilled
+     * @param response HttpServletResponse autofilled
+     */
+    public void labelAllSessionsForUserToRenew(String userId, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
         SessionInfo[] sessionInfos = sessionInfoService.getAllSessionsInfoByOwnerId(userId);
 
         if(sessionInfos != null) {
@@ -161,7 +168,15 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
         }
     }
 
-    public void renewSingleUserSession(String email, BuzzUserSession session, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
+    /**
+     * Renews the current session associated with a user
+     * @param email String the email associated with the user account
+     * @param session BuzzUserSession the current session
+     * @param auth Authentication the current authentication object
+     * @param request HttpServletRequest autofilled
+     * @param response HttpServletResponse autofilled
+     */
+    public void renewCurrentUserSession(String email, BuzzUserSession session, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
         BuzzUser updatedUser = userService.getUserRecordByEmail(email);
 
         Authentication renewedAuth;

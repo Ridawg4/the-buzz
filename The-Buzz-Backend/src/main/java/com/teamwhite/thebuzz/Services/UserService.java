@@ -162,10 +162,8 @@ public class UserService {
         }
     }
 
-    // @TODO IMPLEMENT
     public void modifyUser(String userId, String email, String username, String fullName, String userDesc) throws NoUserProvidedException {
         // @TODO BATCH INTO GROUPS TO NOT POTENTIALLY CALL DB A GAZILLION TIMES
-        Logger.getGlobal().info(userId + ", " + email + ", " + username + ", " + fullName + ", " + userDesc);
 
         try {
             if (!email.isEmpty()) {
@@ -254,8 +252,4 @@ public class UserService {
         // For now, force any errors to tell the system that an email exists
         return true;
     }
-
-//    public void renewAuthentication(String email, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
-//        sessionService.renewSessionUser(email, auth, request, response);
-//    }
 }
