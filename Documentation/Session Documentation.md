@@ -24,3 +24,13 @@ Our sessions also have external storage to track details about user sessions:
   - The owner of the session
 - NeedsRenewal: Boolean
   - Notifies the system if a session needs to be renewed after a change
+
+### How are Sessions created, modified, and deleted?
+
+Sessions are created on any authenticated request. If the session is not authenticated, the session is destroyed.
+> This approach does break redirecting back to a page after reauthenticating, which is also broken itself
+
+Sessions are modified by indicators listed in the SessionInfo class. Each session gets a SessionInfo.
+- NeedsRenewal recreates the Authentication object associated with the session. This updates the user object stored within the Authentication object, which allows the reduction of database calls for information about the callee
+
+Sessions and SessionInfos are destroyed upon logout alongside the client session tokens. These are per session, so logging out on one device will not log out other devices

@@ -70,8 +70,6 @@ public class UserController {
      * ACTUALLY ALMOST DONE 32 HOURS 15 MINUTES
      */
 
-    // @TODO implement account modification and accessing endpoints
-
     @PostMapping("/modify-user")
     @PreAuthorize("hasAuthority('CAN_MODIFY_ACCOUNT_INFO')")
     public ResponseEntity<String> modifyUserDetails(@RequestParam("username") String username,
@@ -107,4 +105,8 @@ public class UserController {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    // @TODO IMPLEMENT USER ACCOUNT DELETION
+
+    // @TODO IMPLEMENT USER PASSWORD CHANGING
 }

@@ -4,6 +4,7 @@ import com.teamwhite.thebuzz.Repositories.SessionInfoRepository;
 import com.teamwhite.thebuzz.model.SessionInfo;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 public class SessionInfoService {
@@ -93,7 +94,11 @@ public class SessionInfoService {
      * @param needsRefresh If the session needs to be refreshed
      */
     public void addSessionInfo(String sessionId, String ownerId, boolean needsRefresh) {
-        repository.addSessionInfo(sessionId, ownerId, needsRefresh);
+        try {
+            repository.addSessionInfo(sessionId, ownerId, needsRefresh);
+        } catch (Exception e) {
+            Logger.getGlobal().info("Error adding session info: " + e.getMessage());
+        }
     }
 
     /**

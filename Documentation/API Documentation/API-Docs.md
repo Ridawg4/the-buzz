@@ -108,3 +108,4 @@ GET /api/v1/audio/example-resource/recorded.m3u8
 |-----------------| --- |
 | `200 OK`        | Returns the requested file from the specified resource. |
 | `404 Not Found` | The requested file is not available. |
+

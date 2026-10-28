@@ -65,19 +65,28 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
     public void save(BuzzUserSession session) {
         if(repository.getSessionById(session.getId()) == null) {
             repository.addSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
+
+            // Sessions need to also create a SessionInfo for themselves, or else it breaks
             SecurityContextImpl context = null;
-
             try {
+                // Pulls the SecurityContextImpl from the session
                 context = session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
-            } catch (NullPointerException nullValue) {
-
+            } catch (NullPointerException exception) {
+//                Logger.getGlobal().info("Session does not have SecurityContextImpl");
             }
-            BuzzUser userOnAuth = null;
+            BuzzUser userAuth = null;
 
             try {
-                userOnAuth = (BuzzUser) context.getAuthentication().getPrincipal();
-                sessionInfoService.addSessionInfo(session.getId(), userOnAuth.getUserId(), false);
-            } catch (ClassCastException | NullPointerException classCast) {
+                userAuth = (BuzzUser) context.getAuthentication().getPrincipal();
+            } catch (ClassCastException | NullPointerException exception) {
+                // Delete any sessions that are generated that are not needed
+                // This does break redirects after auth, but those are broken right now anyway
+                deleteById(session.getId());
+            }
+
+            if(userAuth != null) {
+                // If the user exists, then userAuth.getId will always have a value
+                sessionInfoService.addSessionInfo(session.getId(), userAuth.getUserId(), true);
             }
         } else {
             repository.updateSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
@@ -97,38 +106,49 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
 
             SessionInfo info = sessionInfoService.getSessionInfoBySessionId(id);
 
-            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-
-            HttpServletRequest request;
-            HttpServletResponse response;
-            try {
-                request = attributes.getRequest();
-                response = attributes.getResponse();
-            } catch (NullPointerException nullPointer) {
-                return retrievedSession;
-            }
-
+            // If no SessionInfo exists, simply give the current session
             if(info == null) {
                 return retrievedSession;
             }
 
+            // If the SessionInfo declares it needs a refresh, grab information and refresh session
             if (info.isNeedsRefresh()) {
                 SecurityContextImpl context = null;
+                // Gets the HttpServletRequest and HttpServletResponse objects in the request
+                ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+                HttpServletRequest request;
+                HttpServletResponse response;
+
+                try {
+                    request = attributes.getRequest();
+                    response = attributes.getResponse();
+                } catch (NullPointerException exception) {
+                    // If no request or response exist, something weird happened
+                    Logger.getGlobal().warning("Session refresh has an error: " + exception.getMessage());
+                    return retrievedSession;
+                }
 
                 try {
                     context = retrievedSession.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
                 } catch (NullPointerException nullValue) {
-
+                    // If no SecurityContext exists in the session, simply return the session
+                    return retrievedSession;
                 }
                 BuzzUser userOnAuth = null;
 
                 try {
                     userOnAuth = (BuzzUser) context.getAuthentication().getPrincipal();
-                } catch (ClassCastException | NullPointerException classCast) {
-
+                } catch (ClassCastException | NullPointerException exception) {
+                    // If the principal is not a BuzzUser, then something weird happened here too
+                    Logger.getGlobal().warning("Session refreshing has an error: " + exception.getMessage());
+                    return retrievedSession;
                 }
 
-                renewCurrentUserSession(userOnAuth.getEmail(), retrievedSession, context.getAuthentication(), request, response);
+                // Refresh the current user's session
+                // We use userId, as the email can be changed, which can be why the refresh is needed
+                // Therefore, using the old email will return with a error
+                renewCurrentUserSession(userOnAuth.getUserId(), retrievedSession, context.getAuthentication(), request, response);
             }
             return retrievedSession;
         } else {
@@ -170,33 +190,37 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
 
     /**
      * Renews the current session associated with a user
-     * @param email String the email associated with the user account
+     * @param userId String the userId associated with the user account
      * @param session BuzzUserSession the current session
      * @param auth Authentication the current authentication object
      * @param request HttpServletRequest autofilled
      * @param response HttpServletResponse autofilled
      */
-    public void renewCurrentUserSession(String email, BuzzUserSession session, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
-        BuzzUser updatedUser = userService.getUserRecordByEmail(email);
+    public void renewCurrentUserSession(String userId, BuzzUserSession session, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
+        // Pulls the most up-to-date user from the database
+        BuzzUser updatedUser = userService.getUserRecordByUserId(userId);
 
         Authentication renewedAuth;
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
+        // This creates a new Authentication token, which is where our user object is stored
         renewedAuth = new UsernamePasswordAuthenticationToken(
                 updatedUser,
+                // Might create issues if these are updated as well
                 auth.getCredentials(),
                 updatedUser.getAuthorities()
         );
 
-        BuzzUser test = (BuzzUser) renewedAuth.getPrincipal();
+        // Sets our SecurityContext to the newly created Authentication token
         context.setAuthentication(renewedAuth);
+        // Puts our SecurityContext into the system's SystemContextHolder
         SecurityContextHolder.setContext(context);
 
-        /**
-         * This is ridiculous, why do i need to do this
-         */
+        // This is ridiculous, why do I need to do it this way
+        // Manually update the attribute in the session attribute with the new Authentication token
         session.setAttribute(HttpSessionSecurityContextRepository
                 .SPRING_SECURITY_CONTEXT_KEY, context);
+        // Tells the session it no longer needs to refresh in the database
         sessionInfoService.updateNeedsRefreshBySessionId(session.getId(), false);
     }
 }

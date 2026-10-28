@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
+import org.springframework.session.Session;
 
 /**
  * The Security Configuration that all endpoints follow unless annotated separately
@@ -96,8 +97,9 @@ class SecurityConfiguration {
                 // clear the Authentication object, and redirect to the login url
                 .logout(logout -> {
                     logout.clearAuthentication(true)
-                            // @TODO MAKE INVALIDATING COOKIES WORK
-                            .deleteCookies("SESSION", "JSESSIONID")
+                            // @TODO MAKE SURE COOKIES LEAVE
+                            .invalidateHttpSession(true)
+                            .deleteCookies("SESSION", "JSESSION")
                             .logoutUrl("/api/v1/logout")
                             .logoutSuccessUrl("/login.html")
                             .permitAll();

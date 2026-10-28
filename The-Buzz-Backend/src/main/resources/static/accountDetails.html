@@ -10,6 +10,7 @@
 
 </ul>
 <p id="FailedToGetInfo">No values could be recovered from the server</p>
+<button id="logoutButton">Logout</button>
 </body>
 <style>
     #FailedToGetInfo {
@@ -47,10 +48,14 @@
             newLi.appendChild(value)
             accDetailsUl.appendChild(newLi)
         }
-
-        console.log(json)
     })
 
+    const logout = document.getElementById("logoutButton")
+
+    logout.addEventListener('click', (event) => {
+        event.preventDefault()
+        window.location.replace("/api/v1/logout")
+    })
 
 </script>
 </html>

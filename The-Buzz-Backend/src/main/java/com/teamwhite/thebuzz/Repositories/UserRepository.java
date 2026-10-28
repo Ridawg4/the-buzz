@@ -26,6 +26,16 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
     @Query(value = "SELECT BIN_TO_UUID(user_id), username, password_hash, oauth_key, join_date, user_desc, full_name, user_pfp_location, email, favorites, volume_settings, notification_settings, permission_data FROM development.users WHERE email = ?1", nativeQuery = true)
     List<Object[]> getUserRecordByEmail(String email);
 
+    /**
+     * Gets all records in development.users table with a given userId
+     *
+     * List<Object[]> is returned over ResultSet, as Spring Boot does not like ResultSet for some reason
+     * @param userId String userId used for finding a specific table entry
+     * @return List<Object[]> List is the row entries, Object[] is the individual column values
+     */
+    @Query(value = "SELECT BIN_TO_UUID(user_id), username, password_hash, oauth_key, join_date, user_desc, full_name, user_pfp_location, email, favorites, volume_settings, notification_settings, permission_data FROM development.users WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    List<Object[]> getUserRecordByUserId(String userId);
+
 
     /**
      * Gets all records in development.users table
