@@ -10,25 +10,30 @@ function App() {
     <BrowserRouter>
       <div className="app">
 
-        {/* Navigation bar */}
-        <nav className="navbar">
+	  
+	  <nav className="navbar">
 
-          <div className="nav-left">
-            <Link to="/#listen">Listen Live</Link>
-            <Link to="/#schedule">Schedule</Link>
-          </div>
+	    {/* Left navigation */}
+	    <div className="nav-left">
+	      <Link to="/news">News</Link>
+	      <Link to="/schedule">Show Schedule</Link>
+	      <Link to="/djs">Explore DJs</Link>
+	    </div>
 
-          {/* Logo takes users to homepage */}
-          <Link to="/" className="nav-logo">
-            <img src={logo} alt="WSBU Home" />
-          </Link>
+	    {/* Center logo - Home */}
+	    <Link to="/" className="nav-logo">
+	      <img src={logo} alt="WSBU Home" />
+	    </Link>
 
-          <div className="nav-right">
-            <Link to="/djs">DJs</Link>
-            <Link to="/login">Login</Link>
-          </div>
+	    {/* Right navigation */}
+	    <div className="nav-right">
+	      <Link to="/shows">Explore Shows</Link>
+	      <Link to="/authors">Explore Authors</Link>
+	      <Link to="/favorites">Favorites</Link>
+	    </div>
 
-        </nav>
+	  </nav>
+
 
         {/* Page routes */}
         <Routes>

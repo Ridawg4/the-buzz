@@ -1,4 +1,9 @@
 
+
+/* 
+   WSBU 88.3 THE BUZZ - MAIN STYLING
+ */
+ 
 .app {
   min-height: 100vh;
   width: 100%;
@@ -11,12 +16,12 @@
 .navbar {
   background-color: #54210f;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 200px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 170px minmax(0, 1fr);
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  padding: 20px 5%;
-  gap: 25px;
+  padding: 15px 2%;
+  gap: 15px;
 }
 
 /* LEFT AND RIGHT NAVIGATION */
@@ -25,16 +30,18 @@
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 30px;
+  justify-content: space-evenly;
+  gap: 20px;
   min-width: 0;
+  width: 100%;
 }
 
 .nav-left {
-  justify-content: flex-end;
+  justify-content: space-evenly;
 }
 
 .nav-right {
-  justify-content: flex-start;
+  justify-content: space-evenly;
 }
 
 /* NAVIGATION LINKS */
@@ -43,7 +50,7 @@
 .navbar .nav-right a {
   color: #ffffff;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: bold;
   white-space: nowrap;
   transition: color 0.3s ease;
@@ -60,16 +67,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 200px;
-  height: 200px;
+  width: 170px;
+  height: 170px;
   justify-self: center;
   text-decoration: none;
 }
 
 .navbar .nav-logo img {
   display: block;
-  width: 180px;
-  height: 180px;
+  width: 160px;
+  height: 160px;
   max-width: 100%;
   object-fit: contain;
   transition: transform 0.3s ease;
@@ -82,7 +89,7 @@
 }
 
 /* ========================================
-   WELCOME SECTION
+   WELCOME / HERO SECTION
 ======================================== */
 
 .hero {
@@ -151,8 +158,12 @@
   background-color: #e5a62b;
 }
 
+.radio-player button:active {
+  transform: scale(0.97);
+}
+
 /* ========================================
-   SCHEDULE AND DJ SECTIONS
+   SCHEDULE AND OTHER SECTIONS
 ======================================== */
 
 .content-section {
@@ -177,35 +188,49 @@
 }
 
 /* ========================================
-   TABLET RESPONSIVENESS
+   ACCESSIBILITY
 ======================================== */
 
-@media (max-width: 900px) {
+.navbar a:focus-visible,
+.radio-player button:focus-visible {
+  outline: 3px solid #f4b942;
+  outline-offset: 5px;
+}
+
+/* ========================================
+   TABLET / SMALL DESKTOP
+======================================== */
+
+@media (max-width: 1250px) {
 
   .navbar {
-    grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+    grid-template-columns: 1fr;
     gap: 15px;
-    padding: 15px 3%;
+    padding: 20px 3%;
   }
 
   .nav-logo {
+    grid-row: 1;
+    justify-self: center;
+    width: 160px;
+    height: 160px;
+  }
+
+  .navbar .nav-logo img {
     width: 150px;
     height: 150px;
   }
 
-  .navbar .nav-logo img {
-    width: 140px;
-    height: 140px;
-  }
-
   .nav-left,
   .nav-right {
-    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 25px;
   }
 
   .navbar .nav-left a,
   .navbar .nav-right a {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 
@@ -216,13 +241,12 @@
 @media (max-width: 650px) {
 
   .navbar {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: 1fr;
     gap: 15px;
     padding: 20px 15px;
   }
 
   .nav-logo {
-    grid-column: 1 / -1;
     grid-row: 1;
     justify-self: center;
     width: 140px;
@@ -238,7 +262,7 @@
   .nav-right {
     justify-content: center;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 15px 20px;
   }
 
   .navbar .nav-left a,
@@ -254,6 +278,10 @@
     font-size: 30px;
   }
 
+  .hero p {
+    font-size: 16px;
+  }
+
   .hero span {
     font-size: 12px;
     letter-spacing: 2px;
@@ -263,55 +291,15 @@
     padding: 40px 20px;
   }
 
+  .radio-player h2 {
+    font-size: 26px;
+  }
+
   .content-section {
     padding: 40px 20px;
   }
-  /* ========================================
-     DJs PAGE
-  ======================================== */
 
-  .djs-page {
-    background-color: #fff4e2;
-    min-height: 80vh;
-    padding: 60px 20px;
-    text-align: center;
-  }
-
-  .djs-page h1 {
-    color: #54210f;
-    font-size: 40px;
-    margin-bottom: 15px;
-  }
-
-  .djs-page > p {
-    color: #682b16;
-    font-size: 18px;
-  }
-
-  .dj-container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 30px;
-    margin-top: 50px;
-  }
-
-  .dj-card {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    width: 280px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    text-align: left;
-  }
-
-  .dj-card h2 {
-    color: #54210f;
-    margin-bottom: 15px;
-  }
-
-  .dj-card p {
-    color: #682b16;
-    margin-bottom: 10px;
+  .content-section h2 {
+    font-size: 24px;
   }
 }
