@@ -1,0 +1,165 @@
+
+/* =====================================
+   WSBU DJs PAGE
+===================================== */
+
+.djs-page {
+  background-color: #fff4e2;
+  min-height: 100vh;
+  padding: 45px 5%;
+  color: #54210f;
+}
+
+/* SECTIONS */
+
+.djs-section {
+  margin-bottom: 45px;
+}
+
+.djs-section h1,
+.djs-section h2 {
+  color: #54210f;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.section-divider {
+  border: none;
+  border-top: 2px solid #d6b795;
+  margin: 40px 0;
+}
+
+/* DJ CARD GRID */
+
+.djs-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.live-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.all-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* INDIVIDUAL DJ CARD */
+
+.dj-card {
+  display: flex;
+  background-color: #ffffff;
+  border: 2px solid #54210f;
+  border-radius: 12px;
+  padding: 12px;
+  gap: 15px;
+  min-width: 0;
+  box-shadow: 0 4px 10px rgba(84, 33, 15, 0.08);
+  transition: transform 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+.dj-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(84, 33, 15, 0.18);
+}
+
+/* DJ PHOTO PLACEHOLDER */
+
+.dj-photo {
+  background-color: #54210f;
+  width: 42%;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dj-photo span {
+  color: #f4b942;
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+/* DJ INFORMATION */
+
+.dj-info {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.dj-info h3 {
+  font-size: 22px;
+  color: #54210f;
+  margin: 0 0 10px;
+}
+
+.dj-genre {
+  font-size: 14px;
+  color: #8a5a3c;
+  margin-bottom: 12px;
+}
+
+.shows-label {
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.dj-shows {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  color: #682b16;
+}
+
+.dj-shows li {
+  margin-bottom: 5px;
+}
+
+/* LIVE INDICATOR */
+
+.live-badge {
+  display: inline-block;
+  color: #b47b16;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+/* TABLET */
+
+@media (max-width: 1100px) {
+  .all-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+  .djs-page {
+    padding: 30px 15px;
+  }
+
+  .djs-section h1,
+  .djs-section h2 {
+    font-size: 28px;
+  }
+
+  .live-grid,
+  .all-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dj-info h3 {
+    font-size: 19px;
+  }
+  }
