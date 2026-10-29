@@ -13,6 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.session.Session;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * The Security Configuration that all endpoints follow unless annotated separately
@@ -22,15 +24,17 @@ import org.springframework.session.Session;
 class SecurityConfiguration {
     private final BuzzUserDetailsManager buzzUserDetailsManager;
     private final PasswordEncoder passwordEncoder;
+    private final UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource;
 
     /**
      * Autowired
      * @param buzzUserDetailsManager
      * @param passwordEncoder
      */
-    public SecurityConfiguration(BuzzUserDetailsManager buzzUserDetailsManager, PasswordEncoder passwordEncoder) {
+    public SecurityConfiguration(BuzzUserDetailsManager buzzUserDetailsManager, PasswordEncoder passwordEncoder, UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource) {
         this.buzzUserDetailsManager = buzzUserDetailsManager;
         this.passwordEncoder = passwordEncoder;
+        this.urlBasedCorsConfigurationSource = urlBasedCorsConfigurationSource;
     }
 
     /**
@@ -52,6 +56,8 @@ class SecurityConfiguration {
                 // This is not the correct solution, but makes testing easier
                 // @TODO FIX CSRF POLICY
                 .csrf(csrf -> csrf.disable())
+                // @TODO REINSTANTE CORS POLICY
+                .cors(cors -> cors.configurationSource(urlBasedCorsConfigurationSource))
                 /**
                  * This is where we determine what is required to access an endpoint
                  * To map a specific endpoint, use .requestMathers() with a string value of your endpoint,
@@ -90,7 +96,9 @@ class SecurityConfiguration {
                 .formLogin((formLogin) -> {
                     formLogin.loginPage("/login.html")
                             .loginProcessingUrl("/api/v1/login")
-                            .defaultSuccessUrl("/accountDetails.html")
+//                            .defaultSuccessUrl("/accountDetails.html")
+                            .successHandler(new SuccessfulAuthenticationHandler())
+                            .failureHandler(new FailureAuthenticationHandler())
                             .permitAll();
                 })
                 // Maps the logout authentication to clear the cookies from the browser,
@@ -101,7 +109,7 @@ class SecurityConfiguration {
                             .invalidateHttpSession(true)
                             .deleteCookies("SESSION", "JSESSION")
                             .logoutUrl("/api/v1/logout")
-                            .logoutSuccessUrl("/login.html")
+//                            .logoutSuccessUrl("/login.html")
                             .permitAll();
                 });
 
