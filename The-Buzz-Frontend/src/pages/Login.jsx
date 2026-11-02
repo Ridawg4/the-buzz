@@ -1,7 +1,12 @@
 import "./css/login.css"
-import {useState} from "react";
+import {useContext, useState} from "react";
+import {UserContext} from "../Contexts/UserContext.jsx";
+import {useNavigate} from "react-router-dom";
 
 function Login() {
+    const { userId, setUserId } = useContext(UserContext);
+    const navigate = useNavigate();
+
     const [error, setError] = useState(false);
     const onLogin = (event) => {
         event.preventDefault();
@@ -12,12 +17,20 @@ function Login() {
             credentials: "include"
         }).then(response => {
             if(response.ok){
-                window.location.replace("/")
+                response.text()
+                    .then(text => {
+                        setUserId(text)
+                        directTo("/")
+                })
             }
             if(response.status === 401) {
                 setError(true)
             }
         });
+    }
+
+    const directTo = (path) => {
+        navigate(path);
     }
 
     return (
@@ -34,6 +47,7 @@ function Login() {
                         <button onClick= {onLogin}>Login</button>
                     </form>
                 </div>
+                <a onClick = {() => navigate("/login")}>Signup</a>
             </div>
         </>
     )

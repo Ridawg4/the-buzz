@@ -37,13 +37,12 @@ public class SignupHandler {
         }
 
         userService.createUser(username, email, unhashedPassword);
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/login.html"))
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .build();
     }
 
-    @GetMapping("/emailExist?email={email}")
-    public ResponseEntity<String> doesEmailExist(@PathVariable("email") String email) {
+    @GetMapping("/emailExist")
+    public ResponseEntity<String> doesEmailExist(@RequestParam String email) {
         if(email == null && (!email.isEmpty())) {
             return new ResponseEntity<>("No email was received", HttpStatus.BAD_REQUEST);
         }
@@ -52,6 +51,6 @@ public class SignupHandler {
         if(result) {
             return new ResponseEntity<>("Email already registered", HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

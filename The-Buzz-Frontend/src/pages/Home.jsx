@@ -1,10 +1,12 @@
 import { useState } from "react";
+import Navbar from "../Components/Navbar.jsx";
 
 function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
 
   return (
     <>
+        <Navbar/>
       <section id="home" className="hero">
         <h1>Welcome to The Buzz!</h1>
         <p>St. Bonaventure University's Radio Station</p>

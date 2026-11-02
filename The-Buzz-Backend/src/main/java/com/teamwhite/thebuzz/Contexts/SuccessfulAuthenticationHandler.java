@@ -1,5 +1,6 @@
 package com.teamwhite.thebuzz.Contexts;
 
+import com.teamwhite.thebuzz.model.BuzzUser;
 import jakarta.json.Json;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,5 +17,9 @@ public class SuccessfulAuthenticationHandler implements AuthenticationSuccessHan
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         response.setStatus(200);
+        BuzzUser authenticatedUser = (BuzzUser) authentication.getPrincipal();
+        assert authenticatedUser != null;
+        response.getOutputStream().print(authenticatedUser.getUserId());
+        response.setContentLength(authenticatedUser.getUserId().length());
     }
 }

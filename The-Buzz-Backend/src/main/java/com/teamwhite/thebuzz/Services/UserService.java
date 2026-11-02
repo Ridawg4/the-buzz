@@ -283,7 +283,7 @@ public class UserService {
      * @throws IllegalArgumentException If the email is null
      */
     public boolean doesUserExist(String email) throws IllegalArgumentException {
-        if(email == null) {
+        if(email == null || email.isEmpty()) {
             throw new IllegalArgumentException("Email provided is null");
         }
 

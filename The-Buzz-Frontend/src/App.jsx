@@ -1,51 +1,32 @@
-
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import logo from "./assets/wsbu-logo.png";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import DJs from "./pages/DJs";
 import "./App.css";
 import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
+import {useState} from "react";
+import {UserContext} from "./Contexts/UserContext.jsx";
+import Account from "./pages/Account.jsx";
 
 function App() {
+    const [userId, setUserId] = useState(null);
+
   return (
-    <BrowserRouter>
-      <div className="app">
+		<BrowserRouter>
+            <UserContext.Provider value={{ userId, setUserId }}>
+			  <div className="app">
 
-	  
-	  <nav className="navbar">
-
-	    {/* Left navigation */}
-	    <div className="nav-left">
-	      <Link to="/news">News</Link>
-	      <Link to="/schedule">Show Schedule</Link>
-	      <Link to="/djs">Explore DJs</Link>
-	    </div>
-
-	    {/* Center logo - Home */}
-	    <Link to="/" className="nav-logo">
-	      <img src={logo} alt="WSBU Home" />
-	    </Link>
-
-	    {/* Right navigation */}
-	    <div className="nav-right">
-	      <Link to="/shows">Explore Shows</Link>
-	      <Link to="/authors">Explore Authors</Link>
-	      <Link to="/favorites">Favorites</Link>
-			<Link to="/login">Login</Link>
-	    </div>
-
-	  </nav>
-
-
-        {/* Page routes */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/djs" element={<DJs />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-
-      </div>
-    </BrowserRouter>
+				{/* Page routes */}
+				<Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/djs" element={<DJs />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/account" element={<Account />} />
+				</Routes>
+			  </div>
+            </UserContext.Provider>
+		</BrowserRouter>
   );
 }
 

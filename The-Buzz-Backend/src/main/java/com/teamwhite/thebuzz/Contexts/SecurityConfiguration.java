@@ -1,6 +1,7 @@
 package com.teamwhite.thebuzz.Contexts;
 
 import com.teamwhite.thebuzz.Services.BuzzUserDetailsManager;
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -84,10 +85,8 @@ class SecurityConfiguration {
                  * be made by class
                  */
                 .authorizeHttpRequests(auth -> {
-                    auth.dispatcherTypeMatchers().permitAll()
-                    .requestMatchers("/login.html", "/signup.html", "/api/v1/signup")
-                            .permitAll()
-                            .requestMatchers("/upload.html")
+                    auth.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                    .requestMatchers("/api/v1/signup", "/api/v1/signup/**")
                             .permitAll()
                     .anyRequest().authenticated();
                 }).authenticationManager(authenticationManager(httpSecurity))

@@ -17,7 +17,7 @@ body:
       disabled: false
     - type: text
       key: full_name
-      value: John User The 6th
+      value: John User The 7th
       description: ""
       disabled: false
     - type: text

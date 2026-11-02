@@ -1,5 +1,6 @@
 
 import "./DJs.css";
+import Navbar from "../Components/Navbar.jsx";
 
 // Example DJ data - replace with real information later
 const liveDJs = [
@@ -59,6 +60,7 @@ const allDJs = [
 // Reusable DJ card
 function DJCard({ dj, live = false }) {
   return (
+      <>
     <article className="dj-card">
       <div className="dj-photo">
         <span>WSBU</span>
@@ -80,11 +82,13 @@ function DJCard({ dj, live = false }) {
         </ul>
       </div>
     </article>
+      </>
   );
 }
 
 function DJs() {
   return (
+      <><Navbar/>
     <main className="djs-page">
 
       <section className="djs-section">
@@ -110,6 +114,7 @@ function DJs() {
       </section>
 
     </main>
+        </>
   );
 }
 
