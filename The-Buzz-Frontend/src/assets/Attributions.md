@@ -1,0 +1,1 @@
+UploadFileImage: Solar Icons - https://www.svgrepo.com/svg/525569/upload-minimalistic

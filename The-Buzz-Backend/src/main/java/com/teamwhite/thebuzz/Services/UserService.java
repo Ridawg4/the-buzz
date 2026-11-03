@@ -3,9 +3,13 @@ package com.teamwhite.thebuzz.Services;
 import com.teamwhite.thebuzz.Contexts.BuzzSessionService;
 import com.teamwhite.thebuzz.Exceptions.NoUserProvidedException;
 import com.teamwhite.thebuzz.Repositories.UserRepository;
+import com.teamwhite.thebuzz.Resources.ResourcePaths;
 import com.teamwhite.thebuzz.model.BuzzUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -13,10 +17,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
@@ -213,12 +219,10 @@ public class UserService {
 
         try {
             if (!email.isEmpty()) {
-                Logger.getGlobal().info("Email isn't empty");
                 repository.updateUserEmailByUserId(userId, email);
             }
 
             if (!username.isEmpty()) {
-                Logger.getGlobal().info("username isn't empty");
                 repository.updateUserUsernameByUserId(userId, username);
             }
 
@@ -297,5 +301,14 @@ public class UserService {
         }
         // For now, force any errors to tell the system that an email exists
         return true;
+    }
+
+    public void modifyProfilePicture(String filePath, String fileName, String userId) throws MalformedURLException {
+        Optional<Resource> potentialFile = LocalStorage.retrieveFileFromLocalStorage(filePath, fileName);
+        if(potentialFile.isEmpty()) {
+            throw new RuntimeException("File did not transfer out");
+        }
+
+        repository.updateUserPfpLocationByUserId(userId, filePath + fileName);
     }
 }

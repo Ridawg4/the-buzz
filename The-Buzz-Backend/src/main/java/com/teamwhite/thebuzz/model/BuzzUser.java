@@ -2,6 +2,7 @@ package com.teamwhite.thebuzz.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.teamwhite.thebuzz.Resources.ResourcePaths;
 import jakarta.json.*;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -80,7 +81,7 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
         this.volumeSettings = JsonObject.EMPTY_JSON_OBJECT;
         this.notificationSettings = JsonObject.EMPTY_JSON_OBJECT;
         this.joinDate = Timestamp.from(Instant.now());
-        this.userPfpLocation = "";
+        this.userPfpLocation = ResourcePaths.PROFILE_PICTURE_DIRECTORY + "default.jpg";
         this.fullName = "";
         this.userDesc = "";
     }

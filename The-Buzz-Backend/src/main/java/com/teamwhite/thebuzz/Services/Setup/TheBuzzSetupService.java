@@ -84,6 +84,19 @@ public class TheBuzzSetupService {
                     + securityException.getMessage());
         }
 
+        dir = new File(ResourcePaths.PROFILE_PICTURE_DIRECTORY);
+
+        try {
+            // If the directory doesn't exist, create the directory
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+        } catch (SecurityException securityException) {
+            // If the directory cannot be created due to a security rule, throw a SetupFailure
+            throw new SetupFailureException("Failed to create directory '/The-Buzz/Profile-Picture': "
+                    + securityException.getMessage());
+        }
+
         // @TODO LOAD USERPERMISSIONSDEFAULT INTO DIRECTORY
     }
 }

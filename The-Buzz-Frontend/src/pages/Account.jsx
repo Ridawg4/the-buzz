@@ -1,8 +1,10 @@
 import Navbar from "../Components/Navbar.jsx";
-import {useContext, useState} from "react";
+import React, {useContext} from "react";
 import {UserContext} from "../Contexts/UserContext.jsx";
 import {useNavigate} from "react-router-dom";
 import "./css/Account.css"
+import AccountDetailsInputBox from "../Components/AccountDetailsInputBox.jsx";
+import AccountDetailsProfilePictureInput from "../Components/AccountDetailsProfilePictureInput.jsx";
 
 function Account() {
     const { userId, setUserId } = useContext(UserContext);
@@ -60,19 +62,18 @@ function Account() {
                 const usernameBox = document.getElementById("username");
                 const emailBox = document.getElementById("email");
                 const joinDateBox = document.getElementById("join-date");
-                const fullNameBox = document.getElementById("full-name");
-                const descBox = document.getElementById("desc");
+                const fullNameBox = document.getElementById("full_name");
+                const descBox = document.getElementById("user_desc");
                 const pfpLocationBox = document.getElementById("pfp-location");
                 if (json === null) {
                     document.getElementById("FailedToGetInfo").style.display = "visible"
                 }
 
-                usernameBox.innerText = json.username;
-                emailBox.innerText = json.email;
-                joinDateBox.innerText = json.join_date;
-                fullNameBox.innerText = json.full_name;
-                descBox.innerText = json.user_desc;
-                pfpLocationBox.innerText = json.pfpLocation;
+                usernameBox.value = json.username;
+                emailBox.value = json.email;
+                joinDateBox.value = json.join_date;
+                fullNameBox.value = json.full_name;
+                descBox.value = json.user_desc;
             })
         })
     }
@@ -86,7 +87,7 @@ function Account() {
         navigate("/login")
     })
 
-    loadUserDetails()
+    React.useEffect(() => loadUserDetails())
     {/* @TODO Make it look pretty then allow for account details editing */}
     return (
         <>
@@ -95,23 +96,17 @@ function Account() {
                 Account Details
             </h3>
             <div>
-                <label>Username</label>
-                <p id="username"></p>
+                <AccountDetailsProfilePictureInput id="pfp-location"/>
 
-                <label>Email</label>
-                <p id="email"></p>
+                <AccountDetailsInputBox id="username" labelName = "Username"/>
 
-                <label>Join Date</label>
-                <p id="join-date"></p>
+                <AccountDetailsInputBox id="email" labelName = "Email"/>
 
-                <label>Full Name</label>
-                <p id="full-name"></p>
+                <AccountDetailsInputBox id="join-date" labelName = "Join Date" canEdit = {false}/>
 
-                <label>Description</label>
-                <p id="desc"></p>
+                <AccountDetailsInputBox id="full_name" labelName = "Full Name"/>
 
-                <label>Pfp location</label>
-                <p id="pfp-location"></p>
+                <AccountDetailsInputBox id="user_desc" labelName = "Description"/>
             </div>
             <div>
                 <button onClick = {verifyAccountDeletion}>deleteAccount</button>

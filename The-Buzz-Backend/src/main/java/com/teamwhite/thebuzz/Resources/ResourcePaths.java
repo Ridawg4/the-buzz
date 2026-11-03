@@ -14,7 +14,7 @@ public class ResourcePaths {
 
     /** The global directory where all created folders and files live
      * Ends with a file separator */
-    public static final String APPLICATION_DIRECTORY = WORKING_DIRECTORY + SEPARATOR + "The-Buzz" + SEPARATOR;
+    public static final String APPLICATION_DIRECTORY = WORKING_DIRECTORY + "The-Buzz" + SEPARATOR;
 
     /** The local installation to FFMpeg */
     public static final String FFMPEG_INSTALL = "/opt/homebrew/bin/ffmpeg";
@@ -28,6 +28,8 @@ public class ResourcePaths {
     /** The reference to the Temp directory inside the local file system
      * Ends with a file separator */
     public static final String TEMP_DIRECTORY = APPLICATION_DIRECTORY + "Temp" + SEPARATOR;
+
+    public static final String PROFILE_PICTURE_DIRECTORY = APPLICATION_DIRECTORY + "Profile-Picture" + SEPARATOR;
 
     /** A reference to the Live directory inside the local file system
      * Ends with a file separator */

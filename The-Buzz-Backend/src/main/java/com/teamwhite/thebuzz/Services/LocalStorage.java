@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -244,6 +245,36 @@ public class LocalStorage {
             return Optional.of(new UrlResource( fileToReturn.toURI()));
         } else {
             return Optional.empty();
+        }
+    }
+
+    /**
+     * Attempts to retrieve a file resource from local storage based on provided path
+     * Does not include any separators, the path should end with a separator
+     *
+     * @param path Pathway to the file requested
+     * @return Optional<Resource> File that may or may not be present
+     * @throws MalformedURLException If the path & filename are invalid or not present
+     */
+    public static Optional<Resource> retrieveFileFromLocalStorage(String path) throws MalformedURLException {
+        File fileToReturn = new File(path);
+        if(fileToReturn.exists()) {
+            return Optional.of(new UrlResource( fileToReturn.toURI()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static void moveFileToLocalStorage(MultipartFile file, String filePath, String fileName) throws IOException {
+        File tempFile = new File(filePath + fileName);
+
+        try {
+            tempFile.createNewFile();
+            FileOutputStream stream = new FileOutputStream(tempFile);
+            stream.write(file.getBytes());
+            stream.close();
+        } catch (IOException e) {
+            Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).warning(e.getMessage());
         }
     }
 }

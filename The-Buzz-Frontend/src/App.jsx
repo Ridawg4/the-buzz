@@ -4,31 +4,33 @@ import DJs from "./pages/DJs";
 import "./App.css";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
-import {useState} from "react";
+import React, {useState} from "react";
 import {UserContext} from "./Contexts/UserContext.jsx";
 import Account from "./pages/Account.jsx";
 
 function App() {
     const [userId, setUserId] = useState(null);
 
-    if(userId === null) {
-        if(cookieStore.get("session")) {
-            fetch("http://localhost:8080/api/v1/user/AuthValid",
-                {credentials: "include"})
-                .then(res => {
-                        if((res.ok && !res.redirected) || res.status === 403 || res.status === 401) {
-                            res.text()
-                                .then(text => {
-                                        setUserId(text)
-                                    }
-                                )
-                        } else {
-                            setUserId(null)
+    React.useEffect(() => {
+        if(userId === null) {
+            if(cookieStore.get("session")) {
+                fetch("http://localhost:8080/api/v1/user/AuthValid",
+                    {credentials: "include"})
+                    .then(res => {
+                            if((res.ok && !res.redirected) || res.status === 403 || res.status === 401) {
+                                res.text()
+                                    .then(text => {
+                                            setUserId(text)
+                                        }
+                                    )
+                            } else {
+                                setUserId(null)
+                            }
                         }
-                    }
-                );
+                    );
+            }
         }
-    }
+    })
 
   return (
 		<BrowserRouter>

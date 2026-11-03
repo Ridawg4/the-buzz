@@ -9,3 +9,67 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+.action-modals {
+    display: none;
+}
+.profile-picture {
+    position: relative;
+    width: 256px;
+    height: 256px;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-picture img {
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+}
+
+.profile-picture input {
+    float: left;
+    position: absolute;
+    left: 0;
+    top: 7%;
+    width: 50%;
+    height: 50%;
+    opacity: 0;
+}
+
+#image-upload-identifier {
+    float: left;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 0;
+    top: 7%;
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    opacity: 0;
+    transition: 150ms ease;
+}
+
+
+#image-upload-identifier:hover {
+    background: rgb(104 43 22 / 0.25);
+    backdrop-filter: blur(8px);
+    opacity: 100%;
+    transition: 150ms ease;
+}
+
+#image-upload-identifier img {
+    float: left;
+    position: absolute;
+    height: 50%;
+    width: 50%;
+}
+
+#image-upload-identifier img:hover {
+    float: left;
+    position: absolute;
+    height: 50%;
+    width: 50%;
+}
