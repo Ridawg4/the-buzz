@@ -25,6 +25,16 @@ public class SessionInfoService {
     }
 
     /**
+     * Updates a specific session's needsToDeleteAuth value
+     * Used for determining if an authentication object needs to be removed
+     * @param sessionId String session ID to be updated
+     * @param needsToDeleteAuth boolean new value
+     */
+    public void updateDeleteAuthToken(String sessionId, boolean needsToDeleteAuth) {
+        repository.updateNeedsToDeleteAuthBySessionId(sessionId, needsToDeleteAuth);
+    }
+
+    /**
      * Gets all sessions associated with a specific user
      * @param ownerId String userID of the sessions we want
      * @return SessionInfo[] All sessionInfo's associated with the ownerId
@@ -46,7 +56,7 @@ public class SessionInfoService {
         // I didn't want to rewrite as a real for loop, so added index on top out of spite
         for(Object[] objFromQuery : returnedValues) {
             SessionInfo info = new SessionInfo((String) objFromQuery[0], (String) objFromQuery[1],
-                    (boolean) objFromQuery[2]);
+                    (boolean) objFromQuery[2], (boolean) objFromQuery[3]);
             sessionInfos[index] = info;
             index++;
         }
@@ -83,7 +93,7 @@ public class SessionInfoService {
          */
 
         SessionInfo info = new SessionInfo( (String) objFromQuery[0], (String) objFromQuery[1],
-                (boolean) objFromQuery[2]);
+                (boolean) objFromQuery[2], (boolean) objFromQuery[3]);
         return info;
     }
 
@@ -93,9 +103,9 @@ public class SessionInfoService {
      * @param ownerId The ID of the owner for that session
      * @param needsRefresh If the session needs to be refreshed
      */
-    public void addSessionInfo(String sessionId, String ownerId, boolean needsRefresh) {
+    public void addSessionInfo(String sessionId, String ownerId, boolean needsRefresh, boolean needsToDeleteAuth) {
         try {
-            repository.addSessionInfo(sessionId, ownerId, needsRefresh);
+            repository.addSessionInfo(sessionId, ownerId, needsRefresh, needsToDeleteAuth);
         } catch (Exception e) {
             Logger.getGlobal().info("Error adding session info: " + e.getMessage());
         }

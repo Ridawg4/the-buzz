@@ -102,7 +102,8 @@ CREATE TABLE IF NOT EXISTS sessions (
 CREATE TABLE IF NOT EXISTS session_info (
     session_id BINARY(16) PRIMARY KEY NOT NULL UNIQUE,
     owner_id BINARY(16),
-    needs_refresh BOOL NOT NULL DEFAULT FALSE
+    needs_refresh BOOL NOT NULL DEFAULT FALSE,
+    needs_to_delete_auth BOOL NOT NULL DEFAULT FALSE
 );
 
 CREATE USER "credentialsReader"@"localhost" IDENTIFIED BY "testingpassword";

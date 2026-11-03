@@ -171,6 +171,17 @@ public class LocalStorage {
     }
 
     /**
+     * Deletes a file at the given path
+     *
+     * @param filePath Path the files exists within
+     * @return boolean Was deletion successful?
+     */
+    public static boolean removeFileFromLocalStorage(String filePath) {
+        File tempFile = new File(filePath);
+        return tempFile.delete();
+    }
+
+    /**
      * Deletes all files within a given file path
      * <p>
      * THIS IS NOT A REVERSIBLE ACTION AND MODIFIES SYSTEM STORAGE AT RUNTIME

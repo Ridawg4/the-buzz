@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {BrowserRouter, Routes, Route, useNavigate} from "react-router-dom";
 import Home from "./pages/Home";
 import DJs from "./pages/DJs";
 import "./App.css";
@@ -13,21 +13,25 @@ function App() {
 
     React.useEffect(() => {
         if(userId === null) {
-            if(cookieStore.get("session")) {
+            if(cookieStore.get("SESSION")) {
                 fetch("http://localhost:8080/api/v1/user/AuthValid",
-                    {credentials: "include"})
+                    {credentials: "include", redirect: "error"})
                     .then(res => {
-                            if((res.ok && !res.redirected) || res.status === 403 || res.status === 401) {
+                            if((res.ok)) {
                                 res.text()
                                     .then(text => {
                                             setUserId(text)
                                         }
-                                    )
+                                    ).catch((e) => {
+                                    setUserId(null)
+                                })
                             } else {
                                 setUserId(null)
                             }
                         }
-                    );
+                    ).catch((e) => {
+                        setUserId(null)
+                })
             }
         }
     })

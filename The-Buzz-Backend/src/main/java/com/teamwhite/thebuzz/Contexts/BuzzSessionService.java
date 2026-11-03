@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.session.SessionRepository;
+import org.springframework.session.jdbc.JdbcIndexedSessionRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -65,7 +66,13 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
     @Override
     public void save(BuzzUserSession session) {
         if(repository.getSessionById(session.getId()) == null) {
-            repository.addSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
+            try {
+                // @TODO duplicate entry error is here after deleting user account
+                // getSessionById is not equal to null, but should not be in database
+                repository.addSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
+            } catch (Exception e) {
+
+            }
 
             // Sessions need to also create a SessionInfo for themselves, or else it breaks
             SecurityContextImpl context = null;
@@ -87,7 +94,7 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
 
             if(userAuth != null) {
                 // If the user exists, then userAuth.getId will always have a value
-                sessionInfoService.addSessionInfo(session.getId(), userAuth.getUserId(), true);
+                sessionInfoService.addSessionInfo(session.getId(), userAuth.getUserId(), true, false);
             }
         } else {
             repository.updateSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
@@ -126,8 +133,9 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
                     response = attributes.getResponse();
                 } catch (NullPointerException exception) {
                     // If no request or response exist, something weird happened
+                    // Refreshing has an issue after deleting a user account
                     Logger.getGlobal().warning("Session refresh has an error: " + exception.getMessage());
-                    return retrievedSession;
+                    return null;
                 }
 
                 try {
@@ -150,6 +158,38 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
                 // We use userId, as the email can be changed, which can be why the refresh is needed
                 // Therefore, using the old email will return with a error
                 renewCurrentUserSession(userOnAuth.getUserId(), retrievedSession, context.getAuthentication(), request, response);
+            }
+            if(info.isNeedsToDeleteAuth()) {
+                SecurityContextImpl context = null;
+                // Gets the HttpServletRequest and HttpServletResponse objects in the request
+                ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+                HttpServletRequest request;
+                HttpServletResponse response;
+
+                try {
+                    request = attributes.getRequest();
+                    response = attributes.getResponse();
+                } catch (NullPointerException exception) {
+                    // If no request or response exist, something weird happened
+                    // Something consistently weird happens here, followed by a duplicate entry issue
+                    // It works fine, which is why im confused on where a problem exists
+                    Logger.getGlobal().warning("Deleting session has an error: " + exception.getMessage());
+                    return retrievedSession;
+                }
+
+                try {
+                    context = retrievedSession.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+                    if(context != null) {
+                        context.setAuthentication(null);
+                        retrievedSession.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+                        deleteById(retrievedSession.getId());
+                    }
+                } catch (NullPointerException nullValue) {
+                    // If no SecurityContext exists in the session, simply return the session
+                    return retrievedSession;
+                }
+
             }
             return retrievedSession;
         } else {
@@ -210,30 +250,49 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
                 deleteById(session.getId());
             }
 
-            if(updatedUser == null) {
-                throw new RuntimeException("session renewed is null");
+            // If user is null, the account was deleted
+            if(updatedUser != null) {
+                Authentication renewedAuth;
+                SecurityContext context = SecurityContextHolder.createEmptyContext();
+
+                // This creates a new Authentication token, which is where our user object is stored
+                renewedAuth = new UsernamePasswordAuthenticationToken(
+                        updatedUser,
+                        // Might create issues if these are updated as well
+                        auth.getCredentials(),
+                        updatedUser.getAuthorities()
+                );
+
+                // Sets our SecurityContext to the newly created Authentication token
+                context.setAuthentication(renewedAuth);
+                // Puts our SecurityContext into the system's SystemContextHolder
+                SecurityContextHolder.setContext(context);
+
+                // This is ridiculous, why do I need to do it this way
+                // Manually update the attribute in the session attribute with the new Authentication token
+                session.setAttribute(HttpSessionSecurityContextRepository
+                        .SPRING_SECURITY_CONTEXT_KEY, context);
+                // Tells the session it no longer needs to refresh in the database
+                sessionInfoService.updateNeedsRefreshBySessionId(session.getId(), false);
             }
-            Authentication renewedAuth;
-            SecurityContext context = SecurityContextHolder.createEmptyContext();
+    }
 
-            // This creates a new Authentication token, which is where our user object is stored
-            renewedAuth = new UsernamePasswordAuthenticationToken(
-                    updatedUser,
-                    // Might create issues if these are updated as well
-                    auth.getCredentials(),
-                    updatedUser.getAuthorities()
-            );
+    /**
+     * Labels all sessions for a given user that they need to renew authentication
+     * @param userId String userId we want to refresh sessions for
+     */
+    public void removeAllSessionsByUserId(String userId) {
+        SessionInfo[] sessionInfos = sessionInfoService.getAllSessionsInfoByOwnerId(userId);
 
-            // Sets our SecurityContext to the newly created Authentication token
-            context.setAuthentication(renewedAuth);
-            // Puts our SecurityContext into the system's SystemContextHolder
-            SecurityContextHolder.setContext(context);
-
-            // This is ridiculous, why do I need to do it this way
-            // Manually update the attribute in the session attribute with the new Authentication token
-            session.setAttribute(HttpSessionSecurityContextRepository
-                    .SPRING_SECURITY_CONTEXT_KEY, context);
-            // Tells the session it no longer needs to refresh in the database
-            sessionInfoService.updateNeedsRefreshBySessionId(session.getId(), false);
+        if(sessionInfos != null) {
+            for(SessionInfo info : sessionInfos) {
+                try {
+                    sessionInfoService.updateDeleteAuthToken(info.getId(), true);
+                    deleteById(info.getId());
+                } catch( Exception e) {
+                    Logger.getGlobal().warning(e.getMessage());
+                }
+            }
+        }
     }
 }

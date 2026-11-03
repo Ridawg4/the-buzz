@@ -1,8 +1,10 @@
 import React from "react";
+import {useNavigate} from "react-router-dom";
 
-function AccountDetailsInputBox({ id, labelName, defaultText, canEdit = true, children }) {
+function AccountDetailsInputBox({ id, labelName, defaultText, canEdit = true, type = "text", children }) {
     const [isModifyValue, setModifyValue] = React.useState(false);
     const [lastValue, setLastValue] = React.useState('');
+    const navigate = useNavigate();
 
     const enableModifying = () => {
         if (canEdit) {
@@ -46,6 +48,13 @@ function AccountDetailsInputBox({ id, labelName, defaultText, canEdit = true, ch
         }).then(res => {
             if(res.status === 401) {
                 console.log("Error creating modify user");
+                navigate("/login");
+            }
+            if(res.status === 400) {
+                console.log("Error modifying password | Bad Request");
+                res.text().then(text => {
+                    console.log("Error modifying password | Bad Request " + text);
+                })
             }
         })
 
@@ -61,7 +70,7 @@ function AccountDetailsInputBox({ id, labelName, defaultText, canEdit = true, ch
         <div className="accountDetailsInputBox">
             <label>{labelName}</label>
             <div>
-            <input disabled id={id} defaultValue={defaultText}>
+            <input disabled id={id} defaultValue={defaultText} type={type}>
                 {children}
             </input>
                 <button id={id + "-edit-button"} onClick={enableModifying}>Edit</button>

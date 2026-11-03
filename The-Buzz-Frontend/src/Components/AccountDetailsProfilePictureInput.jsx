@@ -1,6 +1,8 @@
 import fileUploadIcon from "../assets/uploadIcon.svg";
+import {useNavigate} from "react-router-dom";
 
 function AccountDetailsProfilePictureInput({ id, imagePath = "http://localhost:8080/api/v1/user/profile-picture?time=0" }) {
+    const navigate = useNavigate();
 
     const refreshImage = () => {
         document.getElementById(id).src = "http://localhost:8080/api/v1/user/profile-picture?time=" + Date.now();
@@ -17,12 +19,19 @@ function AccountDetailsProfilePictureInput({ id, imagePath = "http://localhost:8
             method: "POST",
             credentials: "include",
             body: formData
-        }).then(response => {
-            if (response.status === 201) {
+        }).then(res => {
+            if (res.status === 201) {
                 document.getElementById(id).src = "http://localhost:8080/api/v1/user/profile-picture";
             }
-            if (response.status === 401) {
+            if (res.status === 401) {
                 console.log("unauthorized")
+                navigate("/login");
+            }
+            if(res.status === 400) {
+                console.log("Error modifying password | Bad Request");
+                res.text().then(text => {
+                    console.log("Error modifying password | Bad Request " + text);
+                })
             }
         })
     }

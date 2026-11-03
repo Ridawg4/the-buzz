@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 import "./css/Account.css"
 import AccountDetailsInputBox from "../Components/AccountDetailsInputBox.jsx";
 import AccountDetailsProfilePictureInput from "../Components/AccountDetailsProfilePictureInput.jsx";
+import AccountPasswordInputBox from "../Components/AccountPasswordInputBox.jsx";
 
 function Account() {
     const { userId, setUserId } = useContext(UserContext);
@@ -47,7 +48,7 @@ function Account() {
     }
 
     const loadUserDetails = () => {
-        fetch("http://localhost:8080/api/v1/user/load-details", {credentials: "include"}
+        fetch("http://localhost:8080/api/v1/user/load-details", {credentials: "include", redirect: 'error'}
         ).then((response) => {
             if (response.status === 403) {
                 navigate("/login");
@@ -75,6 +76,8 @@ function Account() {
                 fullNameBox.value = json.full_name;
                 descBox.value = json.user_desc;
             })
+        }).catch((e) => {
+            navigate("/login");
         })
     }
 
@@ -100,7 +103,9 @@ function Account() {
 
                 <AccountDetailsInputBox id="username" labelName = "Username"/>
 
-                <AccountDetailsInputBox id="email" labelName = "Email"/>
+                <AccountDetailsInputBox id="email" labelName = "Email" type="email"/>
+
+                <AccountPasswordInputBox id="password" labelName = "Change Password" type="password"/>
 
                 <AccountDetailsInputBox id="join-date" labelName = "Join Date" canEdit = {false}/>
 

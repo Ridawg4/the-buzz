@@ -19,6 +19,9 @@ public class SessionInfo {
     @JdbcTypeCode(SqlTypes.BOOLEAN)
     @Column(name = "needs_refresh")
     private boolean needsRefresh;
+    @JdbcTypeCode(SqlTypes.BOOLEAN)
+    @Column(name = "needs_to_delete_auth")
+    private boolean needsToDeleteAuth;
 
     public SessionInfo() {
     }
@@ -29,10 +32,11 @@ public class SessionInfo {
      * @param ownerId String the owner of this session information
      * @param needsRefresh boolean if the session needs to be refreshed
      */
-    public SessionInfo(String sessionId, String ownerId, boolean needsRefresh) {
+    public SessionInfo(String sessionId, String ownerId, boolean needsRefresh, boolean needsToDeleteAuth) {
         this.sessionId = UUID.fromString(sessionId);
         this.ownerId = UUID.fromString(ownerId);
         this.needsRefresh = needsRefresh;
+        this.needsToDeleteAuth = needsToDeleteAuth;
     }
 
     /**
@@ -81,5 +85,13 @@ public class SessionInfo {
      */
     public void setNeedsRefresh(boolean needsRefresh) {
         this.needsRefresh = needsRefresh;
+    }
+
+    public boolean isNeedsToDeleteAuth() {
+        return needsToDeleteAuth;
+    }
+
+    public void setNeedsToDeleteAuth(boolean needsToDeleteAuth) {
+        this.needsToDeleteAuth = needsToDeleteAuth;
     }
 }
