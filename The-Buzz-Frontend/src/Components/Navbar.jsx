@@ -5,7 +5,6 @@ import {useContext} from "react";
 
 function Navbar() {
     const { userId, setUserId } = useContext(UserContext);
-    console.log("userId: " + userId);
 
     return (
         <nav className="navbar">

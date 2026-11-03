@@ -10,6 +10,7 @@ import com.teamwhite.thebuzz.model.BuzzUser;
 import jakarta.json.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.web.exchanges.HttpExchange;
@@ -22,6 +23,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
 import java.util.logging.Logger;
 
 
@@ -38,6 +42,21 @@ public class UserController {
     public UserController(UserService userService, BuzzSessionService sessionService) {
         this.userService = userService;
         this.sessionService = sessionService;
+    }
+
+    @GetMapping("AuthValid")
+    public ResponseEntity<String> isUserAuthenticated(Authentication userAuth) {
+        BuzzUser user = null;
+        if(userAuth.getPrincipal() instanceof BuzzUser) {
+            user = (BuzzUser) userAuth.getPrincipal();
+        }
+
+        // Verifies authentication is a valid BuzzUser
+        if(user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(user.getUserId());
     }
 
     @GetMapping("/load-details")
@@ -107,6 +126,50 @@ public class UserController {
     }
 
     // @TODO IMPLEMENT USER ACCOUNT DELETION
+
+    @PostMapping("/delete-account")
+    @PreAuthorize("hasAuthority('CAN_DELETE_ACCOUNT')")
+    public ResponseEntity<String> deleteAccount(@RequestParam boolean approved, Authentication userAuth) {
+        BuzzUser user = null;
+        // Checks if the authentication contains a version of our user
+        if(userAuth.getPrincipal() instanceof BuzzUser) {
+            user = (BuzzUser) userAuth.getPrincipal();
+        }
+
+        // If the user is null, the user is not authenticated properly and therefore has a bad request
+        if(user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // If the user doesn't have the correct permissions, they are unauthorized
+        if(!PermissionValues.IF_OWNER.equals(user.getPermissions().getPermission("CAN_DELETE_ACCOUNT"))) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if(!approved) {
+            return new ResponseEntity<>("Flag for verification is not true", HttpStatus.BAD_REQUEST);
+        }
+
+        // Gets the HttpServletRequest and HttpServletResponse objects in the request
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+        HttpServletRequest request;
+        HttpServletResponse response;
+
+        try {
+            request = attributes.getRequest();
+            response = attributes.getResponse();
+        } catch (NullPointerException exception) {
+            // If no request or response exist, something weird happened
+            Logger.getGlobal().warning("Account Deletion has an error: " + exception.getMessage());
+            return new ResponseEntity<>("Error deleting your account", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        sessionService.labelAllSessionsForUserToRenew(user.getUserId(), userAuth, request, response);
+        userService.deleteUser(user.getEmail());
+
+        return new ResponseEntity<>("Account Deleted", HttpStatus.OK);
+    }
 
     // @TODO IMPLEMENT USER PASSWORD CHANGING
 }

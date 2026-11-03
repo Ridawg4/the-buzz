@@ -10,6 +10,7 @@ import com.teamwhite.thebuzz.model.SessionInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -163,8 +164,12 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
      */
     @Override
     public void deleteById(String id) {
-        repository.deleteSession(id);
-        sessionInfoService.deleteSessionInfo(id);
+        try {
+            repository.deleteSession(id);
+            sessionInfoService.deleteSessionInfo(id);
+        } catch (Exception e) {
+            Logger.getGlobal().warning(e.getMessage());
+        }
     }
 
     /**
@@ -197,30 +202,38 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
      * @param response HttpServletResponse autofilled
      */
     public void renewCurrentUserSession(String userId, BuzzUserSession session, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
-        // Pulls the most up-to-date user from the database
-        BuzzUser updatedUser = userService.getUserRecordByUserId(userId);
+            // Pulls the most up-to-date user from the database
+            BuzzUser updatedUser = null;
+            try {
+                updatedUser = userService.getUserRecordByUserId(userId);
+            }  catch (RuntimeException exception) {
+                deleteById(session.getId());
+            }
 
-        Authentication renewedAuth;
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
+            if(updatedUser == null) {
+                throw new RuntimeException("session renewed is null");
+            }
+            Authentication renewedAuth;
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        // This creates a new Authentication token, which is where our user object is stored
-        renewedAuth = new UsernamePasswordAuthenticationToken(
-                updatedUser,
-                // Might create issues if these are updated as well
-                auth.getCredentials(),
-                updatedUser.getAuthorities()
-        );
+            // This creates a new Authentication token, which is where our user object is stored
+            renewedAuth = new UsernamePasswordAuthenticationToken(
+                    updatedUser,
+                    // Might create issues if these are updated as well
+                    auth.getCredentials(),
+                    updatedUser.getAuthorities()
+            );
 
-        // Sets our SecurityContext to the newly created Authentication token
-        context.setAuthentication(renewedAuth);
-        // Puts our SecurityContext into the system's SystemContextHolder
-        SecurityContextHolder.setContext(context);
+            // Sets our SecurityContext to the newly created Authentication token
+            context.setAuthentication(renewedAuth);
+            // Puts our SecurityContext into the system's SystemContextHolder
+            SecurityContextHolder.setContext(context);
 
-        // This is ridiculous, why do I need to do it this way
-        // Manually update the attribute in the session attribute with the new Authentication token
-        session.setAttribute(HttpSessionSecurityContextRepository
-                .SPRING_SECURITY_CONTEXT_KEY, context);
-        // Tells the session it no longer needs to refresh in the database
-        sessionInfoService.updateNeedsRefreshBySessionId(session.getId(), false);
+            // This is ridiculous, why do I need to do it this way
+            // Manually update the attribute in the session attribute with the new Authentication token
+            session.setAttribute(HttpSessionSecurityContextRepository
+                    .SPRING_SECURITY_CONTEXT_KEY, context);
+            // Tells the session it no longer needs to refresh in the database
+            sessionInfoService.updateNeedsRefreshBySessionId(session.getId(), false);
     }
 }

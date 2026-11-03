@@ -47,7 +47,8 @@ function Login() {
                         <button onClick= {onLogin}>Login</button>
                     </form>
                 </div>
-                <a onClick = {() => navigate("/login")}>Signup</a>
+                <a onClick = {() => navigate("/signup")}>Signup</a>
+                <a onClick = {() => navigate("/")}>Back to Home</a>
             </div>
         </>
     )

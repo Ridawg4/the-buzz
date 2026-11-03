@@ -1,0 +1,11 @@
+$kind: http-request
+name: EmailExists?
+description: ""
+url: http://localhost:8080/api/v1/signup/emailExist?email=email@a.a
+method: GET
+queryParams:
+  - key: email
+    value: email@a.a
+    disabled: false
+    description: ""
+order: 4500099505479776

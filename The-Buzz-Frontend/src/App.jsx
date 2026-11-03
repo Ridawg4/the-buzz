@@ -11,6 +11,25 @@ import Account from "./pages/Account.jsx";
 function App() {
     const [userId, setUserId] = useState(null);
 
+    if(userId === null) {
+        if(cookieStore.get("session")) {
+            fetch("http://localhost:8080/api/v1/user/AuthValid",
+                {credentials: "include"})
+                .then(res => {
+                        if((res.ok && !res.redirected) || res.status === 403 || res.status === 401) {
+                            res.text()
+                                .then(text => {
+                                        setUserId(text)
+                                    }
+                                )
+                        } else {
+                            setUserId(null)
+                        }
+                    }
+                );
+        }
+    }
+
   return (
 		<BrowserRouter>
             <UserContext.Provider value={{ userId, setUserId }}>

@@ -88,6 +88,7 @@ function Signup() {
                     </form>
                 </div>
                 <a onClick = {directToLogin}>Login</a>
+                <a onClick = {() => navigate("/")}>Back to Home</a>
             </div>
         </>
     )
