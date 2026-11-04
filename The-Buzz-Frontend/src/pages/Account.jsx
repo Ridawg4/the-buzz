@@ -11,10 +11,6 @@ function Account() {
     const { userId, setUserId } = useContext(UserContext);
     const navigate = useNavigate();
 
-    if (userId === null) {
-        navigate("/login");
-    }
-
     const verifyAccountDeletion = () => {
         document.getElementById("Account-Deletion-Confirmation-Popup").style.display = "flex";
     }
@@ -65,7 +61,6 @@ function Account() {
                 const joinDateBox = document.getElementById("join-date");
                 const fullNameBox = document.getElementById("full_name");
                 const descBox = document.getElementById("user_desc");
-                const pfpLocationBox = document.getElementById("pfp-location");
                 if (json === null) {
                     document.getElementById("FailedToGetInfo").style.display = "visible"
                 }
@@ -77,28 +72,34 @@ function Account() {
                 descBox.value = json.user_desc;
             })
         }).catch((e) => {
+            setUserId(null)
             navigate("/login");
         })
     }
 
     const logout = ((event) => {
         event.preventDefault()
-        setUserId(null);
-        fetch("/api/v1/logout", {
+        fetch("http://localhost:8080/api/v1/logout", {
             credentials: "include",
+            redirect: 'error'
+        }).catch(error => {
+            setUserId(null);
+            navigate("/login")
         })
-        navigate("/login")
     })
 
-    React.useEffect(() => loadUserDetails())
+    React.useEffect(() => {
+        loadUserDetails()
+    })
+
     {/* @TODO Make it look pretty then allow for account details editing */}
     return (
-        <>
+        <div className="centerdiv">
             <Navbar />
-            <h3>
-                Account Details
-            </h3>
             <div>
+                <h3>
+                    Account Details
+                </h3>
                 <AccountDetailsProfilePictureInput id="pfp-location"/>
 
                 <AccountDetailsInputBox id="username" labelName = "Username"/>
@@ -114,7 +115,8 @@ function Account() {
                 <AccountDetailsInputBox id="user_desc" labelName = "Description"/>
             </div>
             <div>
-                <button onClick = {verifyAccountDeletion}>deleteAccount</button>
+                <button onClick = {verifyAccountDeletion}>Delete Account</button>
+                <button onClick = {logout}>Logout</button>
             </div>
             <div id="Account-Deletion-Confirmation-Popup">
                 <h4>Woah there!</h4>
@@ -124,7 +126,7 @@ function Account() {
                     <button onClick = {deleteAccount}>Delete Account</button>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 

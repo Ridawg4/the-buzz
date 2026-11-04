@@ -65,15 +65,8 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
      */
     @Override
     public void save(BuzzUserSession session) {
+        BuzzUserSession test = repository.getSessionById(session.getId());
         if(repository.getSessionById(session.getId()) == null) {
-            try {
-                // @TODO duplicate entry error is here after deleting user account
-                // getSessionById is not equal to null, but should not be in database
-                repository.addSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
-            } catch (Exception e) {
-
-            }
-
             // Sessions need to also create a SessionInfo for themselves, or else it breaks
             SecurityContextImpl context = null;
             try {
@@ -86,15 +79,27 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
 
             try {
                 userAuth = (BuzzUser) context.getAuthentication().getPrincipal();
+                BuzzUser retrievedUser = userService.getUserRecordByUserId(userAuth.getUserId());
+
+                if(retrievedUser == null) {
+                    deleteById(session.getId());
+                } else {
+                    try {
+                        // Duplicate issue here, sessionId exists but returns null
+                        repository.addSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
+                    } catch (Exception e) {
+
+                    }
+
+                    if(userAuth != null) {
+                        // If the user exists, then userAuth.getId will always have a value
+                        sessionInfoService.addSessionInfo(session.getId(), userAuth.getUserId(), true, false);
+                    }
+                }
             } catch (ClassCastException | NullPointerException exception) {
                 // Delete any sessions that are generated that are not needed
                 // This does break redirects after auth, but those are broken right now anyway
                 deleteById(session.getId());
-            }
-
-            if(userAuth != null) {
-                // If the user exists, then userAuth.getId will always have a value
-                sessionInfoService.addSessionInfo(session.getId(), userAuth.getUserId(), true, false);
             }
         } else {
             repository.updateSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
@@ -159,24 +164,9 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
                 // Therefore, using the old email will return with a error
                 renewCurrentUserSession(userOnAuth.getUserId(), retrievedSession, context.getAuthentication(), request, response);
             }
+            // @TODO intermittently works??
             if(info.isNeedsToDeleteAuth()) {
                 SecurityContextImpl context = null;
-                // Gets the HttpServletRequest and HttpServletResponse objects in the request
-                ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-
-                HttpServletRequest request;
-                HttpServletResponse response;
-
-                try {
-                    request = attributes.getRequest();
-                    response = attributes.getResponse();
-                } catch (NullPointerException exception) {
-                    // If no request or response exist, something weird happened
-                    // Something consistently weird happens here, followed by a duplicate entry issue
-                    // It works fine, which is why im confused on where a problem exists
-                    Logger.getGlobal().warning("Deleting session has an error: " + exception.getMessage());
-                    return retrievedSession;
-                }
 
                 try {
                     context = retrievedSession.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
@@ -185,7 +175,8 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
                         retrievedSession.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
                         deleteById(retrievedSession.getId());
                     }
-                } catch (NullPointerException nullValue) {
+
+                } catch (Exception exception) {
                     // If no SecurityContext exists in the session, simply return the session
                     return retrievedSession;
                 }
@@ -288,7 +279,6 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
             for(SessionInfo info : sessionInfos) {
                 try {
                     sessionInfoService.updateDeleteAuthToken(info.getId(), true);
-                    deleteById(info.getId());
                 } catch( Exception e) {
                     Logger.getGlobal().warning(e.getMessage());
                 }

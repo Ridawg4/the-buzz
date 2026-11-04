@@ -89,6 +89,7 @@ public class UserController {
         }
 
         try {
+            // @TODO issue here somewhere
             Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
                     user.getUserPfpLocation());
 
@@ -100,7 +101,7 @@ public class UserController {
         } catch (Exception e) {
 
         }
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/load-details")

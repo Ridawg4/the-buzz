@@ -69,7 +69,7 @@ function AccountDetailsInputBox({ id, labelName, defaultText, canEdit = true, ty
     return (
         <div className="accountDetailsInputBox">
             <label>{labelName}</label>
-            <div>
+            <div className="accountDetailsInputBox-input">
             <input disabled id={id} defaultValue={defaultText} type={type}>
                 {children}
             </input>

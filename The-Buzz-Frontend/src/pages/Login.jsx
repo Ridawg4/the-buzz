@@ -37,18 +37,20 @@ function Login() {
         <>
             <div id="centerdiv">
                 <div id="loginDiv">
+                    <h3 className="FormTitle">Welcome Back!</h3>
                     {error && <p>'Credentials Do Not Match Records'</p>}
                     <form id="loginForm" onSubmit={e => e.preventDefault}>
-                        <h3>Login</h3>
                         <label htmlFor="email">Email</label>
                         <input type="email" name="username"/>
                         <label htmlFor="password">Password</label>
                         <input type="password" name="password"/>
                         <button onClick= {onLogin}>Login</button>
                     </form>
+                    <div className="navSignupOrBack">
+                        <a onClick = {() => navigate("/")}>Back to Home</a>
+                        <p>Don't have an account? <a onClick = {() => navigate("/signup")}>Signup</a></p>
+                    </div>
                 </div>
-                <a onClick = {() => navigate("/signup")}>Signup</a>
-                <a onClick = {() => navigate("/")}>Back to Home</a>
             </div>
         </>
     )

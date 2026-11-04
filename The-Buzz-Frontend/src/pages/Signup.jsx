@@ -1,3 +1,4 @@
+import "./css/signup.css"
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 
@@ -67,10 +68,10 @@ function Signup() {
     return (
         <>
             <div id="centerdiv">
-                <div id="loginDiv">
+                <div id="signupDiv">
+                    <h3 className="FormTitle">Create an Account</h3>
                     {globalError && <p>'An error occurred upon submitting your request'</p>}
-                    <form onSubmit = {e => e.preventDefault}>
-                        <h3>Sign Up</h3>
+                    <form className = "SignupForm" onSubmit = {e => e.preventDefault}>
                         {emailError && <p>'Email already exists'</p>}
                         <label htmlFor="email">Choose an Email</label>
                         {/* Why does React choose to use onInput() for onChange,
@@ -86,9 +87,11 @@ function Signup() {
                         <input id="verifyPassword" type="password" name="password" onChange = {verifyPasswordsMatch}/>
                         <button onClick = {onSignup}>Sign Up</button>
                     </form>
+                    <div className="navSignupOrBack">
+                        <a onClick = {() => navigate("/")}>Back to Home</a>
+                        <p>Already have an account? <a onClick = {directToLogin}>Login</a></p>
+                    </div>
                 </div>
-                <a onClick = {directToLogin}>Login</a>
-                <a onClick = {() => navigate("/")}>Back to Home</a>
             </div>
         </>
     )

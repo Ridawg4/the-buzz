@@ -105,6 +105,13 @@ public class SessionInfoService {
      */
     public void addSessionInfo(String sessionId, String ownerId, boolean needsRefresh, boolean needsToDeleteAuth) {
         try {
+            // Error is here
+            /**
+             * HHH000247: ErrorCode: 1062, SQLState: 23000
+             * 2026-11-03T17:41:51.903-05:00  WARN 62810 ---
+             * [The-Buzz-Backend] [nio-8080-exec-1] org.hibernate.orm.jdbc.error
+             * : Duplicate entry '\x08q\xA1;Mv@!\xBEfq\x18\xCB\x0A\x90\xE8' for key 'sessions.PRIMARY'
+             */
             repository.addSessionInfo(sessionId, ownerId, needsRefresh, needsToDeleteAuth);
         } catch (Exception e) {
             Logger.getGlobal().info("Error adding session info: " + e.getMessage());

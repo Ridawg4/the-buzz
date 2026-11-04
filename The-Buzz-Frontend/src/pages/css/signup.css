@@ -1,0 +1,54 @@
+#centerdiv {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+#signupDiv {
+    position: relative;
+    bottom: 15%;
+    align-content: center;
+    width: max(350px, 10vw);
+    height: auto;
+    margin: 15px;
+    padding: 25px;
+    border-radius: 5px;
+    background-color: #fafafa;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.SignupForm {
+    display: grid;
+    margin: auto;
+    width: 80%;
+    grid-template-columns: 1fr;
+}
+
+.navSignupOrBack {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-content: center;
+    justify-content: space-between;
+}
+
+.navSignupOrBack a, p{
+    width: fit-content;
+    height: fit-content;
+    font-size: 12px;
+}
+
+.navSignupOrBack a{
+    cursor: pointer;
+}
+
+.navSignupOrBack a:hover{
+    width: fit-content;
+    height: fit-content;
+    color: #f4b942;
+    transition: 100ms;
+}
