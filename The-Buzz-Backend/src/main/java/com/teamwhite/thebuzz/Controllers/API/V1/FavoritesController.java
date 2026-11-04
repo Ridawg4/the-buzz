@@ -1,5 +1,3 @@
-
-p
 package com.teamwhite.thebuzz.Controllers.API.V1;
 
 import com.teamwhite.thebuzz.Services.FavoritesService;

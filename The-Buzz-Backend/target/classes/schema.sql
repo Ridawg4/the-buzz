@@ -63,6 +63,20 @@ CREATE TABLE IF NOT EXISTS  shows (
         REFERENCES djs(dj_id)
 );
 
+CREATE TABLE IF NOT EXISTS show_likes (
+    user_id BINARY(16) NOT NULL,
+    show_id BINARY(16) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (user_id, show_id),
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id),
+
+    FOREIGN KEY (show_id)
+        REFERENCES shows(show_id)
+);
+
 CREATE TABLE IF NOT EXISTS account_moderation (
     user_id BINARY(16) NOT NULL,
     moderation_desc VARCHAR(255),
