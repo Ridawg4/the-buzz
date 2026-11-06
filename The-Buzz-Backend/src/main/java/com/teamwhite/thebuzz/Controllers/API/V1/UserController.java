@@ -1,44 +1,27 @@
 package com.teamwhite.thebuzz.Controllers.API.V1;
 
-
 import com.teamwhite.thebuzz.Contexts.BuzzSessionService;
 import com.teamwhite.thebuzz.Exceptions.InvalidAuthenticationPrincipalException;
 import com.teamwhite.thebuzz.Records.ContentTypes;
-import com.teamwhite.thebuzz.Resources.PermissionNames;
 import com.teamwhite.thebuzz.Resources.PermissionValues;
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
 import com.teamwhite.thebuzz.Services.LocalStorage;
 import com.teamwhite.thebuzz.Services.UserService;
 import com.teamwhite.thebuzz.model.BuzzUser;
-import jakarta.json.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.modelmapper.internal.bytebuddy.utility.nullability.NeverNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.actuate.web.exchanges.HttpExchange;
-import org.springframework.cglib.core.Local;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 
 @RestController
@@ -71,9 +54,34 @@ public class UserController {
         return ResponseEntity.ok(user.getUserId());
     }
 
-    @GetMapping("/profile-picture{time}")
-    @PreAuthorize("hasAuthority('CAN_SEE_ACCOUNT_INFO')")
-    public ResponseEntity<Resource> loadProfilePicture(@PathVariable String time, Authentication userAuth) {
+    @GetMapping("HasPermission")
+    public ResponseEntity<String> doesUserHavePermission(@RequestParam(required = false) String userId,
+                                                         @RequestParam String permissionToLookFor,
+                                                         Authentication userAuth) {
+        BuzzUser user = null;
+        try {
+            user = getUserFromPrincipal(userAuth);
+        } catch (InvalidAuthenticationPrincipalException exc) {
+            ResponseEntity.badRequest().build();
+        }
+
+        if(userId != null) {
+            if(!PermissionValues.ALLOWED.equals(user.getPermissions().getPermission("CAN_SEE_SYSTEM_PANELS"))) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+            return ResponseEntity.ok(userService.getUserRecordByUserId(userId).getPermissions().getPermission(permissionToLookFor));
+        }
+
+        assert user != null;
+        return ResponseEntity.ok(user.getPermissions().getPermission(permissionToLookFor));
+    }
+
+    @GetMapping("/profile-picture")
+    @PreAuthorize("hasAnyAuthority('CAN_SEE_ACCOUNT_INFO', 'CAN_SEE_SYSTEM_PANELS')")
+    public ResponseEntity<Resource> loadProfilePicture(@RequestParam(required = false) String time,
+                                                       @RequestParam(required = false) String userId,
+                                                       Authentication userAuth) {
         ResponseEntity<Resource> resp;
         BuzzUser user = null;
         try {
@@ -88,6 +96,27 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        if(userId != null) {
+            if(!PermissionValues.ALLOWED.equals(user.getPermissions().getPermission("CAN_SEE_SYSTEM_PANELS"))) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+            try {
+                // @TODO issue here somewhere
+                Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
+                        userService.getUserRecordByUserId(userId).getUserPfpLocation());
+
+                if(resourceOptional.isPresent()) {
+                    resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
+                    return resp;
+                }
+            } catch (Exception e) {
+
+            }
+
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         try {
             // @TODO issue here somewhere
             Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
@@ -95,7 +124,6 @@ public class UserController {
 
             if(resourceOptional.isPresent()) {
                 resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
-                resp.getHeaders().add("Cache-Control", "no-cache");
                 return resp;
             }
         } catch (Exception e) {
@@ -105,9 +133,8 @@ public class UserController {
     }
 
     @GetMapping("/load-details")
-    @PreAuthorize("hasAuthority('CAN_SEE_ACCOUNT_INFO')")
-    public ResponseEntity<String> loadUserDetails(Authentication userAuth) {
-
+    @PreAuthorize("hasAnyAuthority('CAN_SEE_ACCOUNT_INFO', 'CAN_SEE_SYSTEM_PANELS')")
+    public ResponseEntity<String> loadUserDetails(@RequestParam(required = false) String userId, Authentication userAuth) {
         BuzzUser user = null;
         try {
             user = getUserFromPrincipal(userAuth);
@@ -120,6 +147,19 @@ public class UserController {
         if(!PermissionValues.IF_OWNER.equals(user.getPermissions().getPermission("CAN_SEE_ACCOUNT_INFO"))) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+
+        if(userId != null) {
+            // @TODO Create permission to see other users details instead of assuming all moderators can see system panels
+            if(!PermissionValues.ALLOWED.equals(user.getPermissions().getPermission("CAN_SEE_SYSTEM_PANELS"))) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+            ResponseEntity<String> response = new ResponseEntity<>(userService.getUserRecordByUserId(userId).getAccountDetailsWithoutSettings().toString(), HttpStatus.OK);
+            response.getHeaders().add("Content-Type", ContentTypes.JSON);
+
+            return response;
+        }
+
         ResponseEntity<String> response = new ResponseEntity<>(user.getAccountDetailsWithoutSettings().toString(), HttpStatus.OK);
         response.getHeaders().add("Content-Type", ContentTypes.JSON);
 
@@ -133,8 +173,9 @@ public class UserController {
      */
 
     @PostMapping("/modify-user")
-    @PreAuthorize("hasAuthority('CAN_MODIFY_ACCOUNT_INFO')")
+    @PreAuthorize("hasAnyAuthority('CAN_MODIFY_ACCOUNT_INFO', 'CAN_MODIFY_ANY_ACCOUNT_INFO')")
     public ResponseEntity<String> modifyUserDetails(@RequestParam("username") String username,
+                                                    @RequestParam(required = false) String userId,
                                                     @RequestParam("email") String email,
                                                     @RequestParam("full_name") String fullName,
                                                     @RequestParam("user_desc") String userDesc,
@@ -154,6 +195,18 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        if(userId != null) {
+            if(!PermissionValues.ALLOWED.equals(user.getPermissions().getPermission("CAN_MODIFY_ANY_ACCOUNT_INFO"))) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+            userService.modifyUser(userId, email, username, fullName, userDesc);
+            // Needs the request and response for some reason
+            sessionService.labelAllSessionsForUserToRenew(userId, userAuth, request, response);
+
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        }
+
         /**
          * Fun Fact: If you swap the email and username field, it breaks things
          */
@@ -162,13 +215,14 @@ public class UserController {
         // Needs the request and response for some reason
         sessionService.labelAllSessionsForUserToRenew(user.getUserId(), userAuth, request, response);
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/modify-profile-picture")
-    @PreAuthorize("hasAuthority('CAN_MODIFY_ACCOUNT_INFO')")
+    @PreAuthorize("hasAnyAuthority('CAN_MODIFY_ACCOUNT_INFO', 'CAN_MODIFY_ANY_ACCOUNT_INFO')")
     public ResponseEntity<String> modifyProfilePicture(@RequestParam("file") MultipartFile file,
-                                                    Authentication userAuth,
+                                                       @RequestParam(required = false) String userId,
+                                                       Authentication userAuth,
                                                        HttpServletRequest request,
                                                        HttpServletResponse response) {
         BuzzUser user = null;
@@ -181,6 +235,37 @@ public class UserController {
         assert user != null;
         if(!PermissionValues.IF_OWNER.equals(user.getPermissions().getPermission("CAN_MODIFY_ACCOUNT_INFO"))) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if(userId != null) {
+            if(!PermissionValues.ALLOWED.equals(user.getPermissions().getPermission("CAN_MODIFY_ANY_ACCOUNT_INFO"))) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            BuzzUser userFromRequestParam = userService.getUserRecordByUserId(userId);
+            // Removes the old stored profile picture, which will create concurrency issues
+            LocalStorage.removeFileFromLocalStorage(userFromRequestParam.getUserPfpLocation());
+
+            String fileType = file.getContentType();
+            fileType = fileType.substring(fileType.indexOf("/") + 1);
+            String fileName = userFromRequestParam.getUserId() + "." + fileType;
+            try {
+                LocalStorage.moveFileToLocalStorage(file, ResourcePaths.PROFILE_PICTURE_DIRECTORY, fileName);
+            } catch (Exception e) {
+                return new ResponseEntity<>("Request Failed: Server was unable to save profile picture to storage", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+
+            // Modifies the user in the database
+            try {
+                userService.modifyProfilePicture(ResourcePaths.PROFILE_PICTURE_DIRECTORY, fileName, userId);
+            } catch (Exception e) {
+                return new ResponseEntity<>("Request Failed: Server was unable to persist profile picture change", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            // Needs the request and response for some reason
+            sessionService.labelAllSessionsForUserToRenew(userId, userAuth, request, response);
+
+
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
 
         // Removes the old stored profile picture, which will create concurrency issues
@@ -208,6 +293,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    // @TODO ALLOW FOR MODERATORS TO DELETE ACCOUNTS
     @PostMapping("/delete-account")
     @PreAuthorize("hasAuthority('CAN_DELETE_ACCOUNT')")
     public ResponseEntity<String> deleteAccount(@RequestParam boolean approved,
@@ -278,5 +364,4 @@ public class UserController {
         return user;
     }
 
-    // @TODO IMPLEMENT USER PASSWORD CHANGING
 }

@@ -7,7 +7,7 @@ body:
   content:
     - type: text
       key: username
-      value: MrEmailMan
+      value: MrEmailMaan
       description: ""
       disabled: false
     - type: text
@@ -22,7 +22,7 @@ body:
       disabled: false
     - type: text
       key: user_desc
-      value: ""
+      value: new user description
       description: ""
       disabled: false
 settings:
