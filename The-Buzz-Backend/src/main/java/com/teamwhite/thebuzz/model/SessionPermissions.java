@@ -3,6 +3,7 @@ package com.teamwhite.thebuzz.model;
 import com.teamwhite.thebuzz.Exceptions.InvalidPermissionsObjectException;
 import com.teamwhite.thebuzz.Resources.PermissionValues;
 import jakarta.json.Json;
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import org.jspecify.annotations.Nullable;
@@ -18,8 +19,8 @@ import static com.teamwhite.thebuzz.Resources.ResourcePaths.DEFAULT_USER_PERMISS
  * SessionPermissions contains all the permissions needed at session runtime for users
  */
 public class SessionPermissions implements GrantedAuthority {
-    private int permissionId;
-    private HashMap<String, String> permissions = new HashMap<String, String>();
+    protected int permissionId;
+    protected HashMap<String, String> permissions = new HashMap<String, String>();
 
     /**
      * Creates a SessionPermissions object with the formatted Json String of permissions
@@ -105,19 +106,12 @@ public class SessionPermissions implements GrantedAuthority {
     public JsonObject asJsonObject() {
         // Builder for overall JsonObject
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        // Builder for the actual permissions
-        JsonObjectBuilder permissionBuilder = Json.createObjectBuilder();
 
         // Adds the permissionId to overall JsonObject
         builder.add("permission_id", permissionId);
 
-        // Maps all the permissions into the permissions builder
-        for(String key : permissions.keySet()) {
-            permissionBuilder.add(key, permissions.get(key));
-        }
-
         // Adds the permission data to the overall JsonObject
-        builder.add("permission_data", permissionBuilder.build());
+        builder.add("permission_data", buildPermissionsJsonArray());
 
         return builder.build();
     }
@@ -161,5 +155,15 @@ public class SessionPermissions implements GrantedAuthority {
         } catch (NullPointerException nullValue) {
             return PermissionValues.DENIED;
         }
+    }
+
+    protected JsonObject buildPermissionsJsonArray() {
+        JsonObjectBuilder permissionBuilder = Json.createObjectBuilder();
+
+        for(String key : permissions.keySet()) {
+            permissionBuilder.add(key, permissions.get(key));
+        }
+
+        return permissionBuilder.build();
     }
 }

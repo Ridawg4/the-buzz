@@ -8,6 +8,9 @@ import com.teamwhite.thebuzz.Resources.ResourcePaths;
 import com.teamwhite.thebuzz.Services.LocalStorage;
 import com.teamwhite.thebuzz.Services.UserService;
 import com.teamwhite.thebuzz.model.BuzzUser;
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.modelmapper.internal.bytebuddy.utility.nullability.NeverNull;
@@ -362,6 +365,22 @@ public class UserController {
         }
 
         return user;
+    }
+
+    @GetMapping
+//    @PreAuthorize("hasAuthority('CAN_VIEW_ANY_ACCOUNT_INFO')")
+    public ResponseEntity<String> getAllUsers() {
+        JsonObjectBuilder usersWrapper = Json.createObjectBuilder();
+        JsonArrayBuilder arrBulder = Json.createArrayBuilder();
+
+        for(BuzzUser user : userService.getAllUsers()) {
+            arrBulder.add(user.getAccountDetails());
+        }
+        ResponseEntity<String> response = new ResponseEntity<>(usersWrapper.add("users", arrBulder.build()).build().toString(), HttpStatus.OK);
+
+        response.getHeaders().add("Content-Type", ContentTypes.JSON);
+
+        return response;
     }
 
 }

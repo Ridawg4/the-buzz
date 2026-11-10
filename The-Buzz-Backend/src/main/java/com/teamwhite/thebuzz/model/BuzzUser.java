@@ -401,6 +401,20 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
         return builder.build();
     }
 
+    public JsonObject getAccountDetails() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("user_id", userId.toString())
+                .add("username", username)
+                .add("email", email)
+                .add("join_date", joinDate.toString())
+                .add("full_name", fullName)
+                .add("user_desc", userDesc)
+                .add("pfpLocation", userPfpLocation)
+                .add("permissions", permissionData.asJsonObject());
+
+        return builder.build();
+    }
+
     @Override
     public boolean equals(Object obj) {
         BuzzUser otherUser;

@@ -7,6 +7,7 @@ function AccountNavbarDropdown() {
     const { userId, setUserId } = useContext(UserContext);
     const { isDj, setIsDj } = useState(false);
     const { isModerator, setIsModerator } = useState(false);
+    // @TODO implement getting if the usser is Dj or Moderator
 
     const openAccountDropdown = () => {
         document.getElementById("dropdownOptions").style.display = "flex";

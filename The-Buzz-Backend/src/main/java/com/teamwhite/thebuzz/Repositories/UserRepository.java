@@ -41,7 +41,7 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
      * Gets all records in development.users table
      * @return List<Object[]> List is the row entries, Object[] is the individual column values
      */
-    @Query(value = "SELECT * FROM development.users", nativeQuery = true)
+    @Query(value = "SELECT BIN_TO_UUID(user_id), username, password_hash, oauth_key, join_date, user_desc, full_name, user_pfp_location, email, favorites, volume_settings, notification_settings, permission_data FROM development.users", nativeQuery = true)
     List<Object[]> getAllUsers();
 
     /**

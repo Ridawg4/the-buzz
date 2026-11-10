@@ -151,7 +151,7 @@ public class UserService {
              * This looks disgusting, but is the most efficient way to map them explicitly, as the
              * deserializer cannot map Timestamp, JsonObject, or UUID values automatically
              */
-            list.add(new BuzzUser((String) objFromQuery[0], (String) objFromQuery[1],
+            list.add(new BuzzUser( (String) objFromQuery[0], (String) objFromQuery[1],
                     (String) objFromQuery[2], (String) objFromQuery[3],
                     Timestamp.valueOf((LocalDateTime) objFromQuery[4]), (String) objFromQuery[5],
                     (String) objFromQuery[6], (String) objFromQuery[7], (String) objFromQuery[8],
