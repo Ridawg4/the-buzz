@@ -86,7 +86,7 @@ class SecurityConfiguration {
                  */
                 .authorizeHttpRequests(auth -> {
                     auth.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                    .requestMatchers("/api/v1/signup", "/api/v1/signup/**")
+                    .requestMatchers("/api/v1/signup", "/api/v1/signup/**", "/api/v1/audio/**")
                             .permitAll()
                     .anyRequest().authenticated();
                 }).authenticationManager(authenticationManager(httpSecurity))

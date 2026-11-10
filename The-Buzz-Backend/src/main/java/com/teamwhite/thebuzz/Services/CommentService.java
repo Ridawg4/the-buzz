@@ -12,6 +12,7 @@ public class CommentService {
         this.commentRepository = commentRepository;
     }
 
+    // @TODO THIS DOESN'T ACTUALLY WORK | MYSQL DOES NOT AUTO_INCREMENT PRIMARY KEY BY DEFAULT
     public void createComment(
             String userId,
             int postId,
@@ -38,6 +39,9 @@ public class CommentService {
         }
     }
 
+    // Checking greater than zero will return true, even if we delete every row in the table,
+    // which would not be intended behavior. It is unlikely to be an issue, but something
+    // to consider
     public boolean deleteComment(int commentId, String userId) {
         return commentRepository.deleteCommentByIdAndUserId(
             commentId,

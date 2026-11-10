@@ -6,6 +6,7 @@ import "./css/Account.css"
 import AccountDetailsInputBox from "../Components/AccountDetailsInputBox.jsx";
 import AccountDetailsProfilePictureInput from "../Components/AccountDetailsProfilePictureInput.jsx";
 import AccountPasswordInputBox from "../Components/AccountPasswordInputBox.jsx";
+import LogoutButton from "../Components/LogoutButton.jsx";
 
 function Account() {
     const { userId, setUserId } = useContext(UserContext);
@@ -77,17 +78,6 @@ function Account() {
         })
     }
 
-    const logout = ((event) => {
-        event.preventDefault()
-        fetch("http://localhost:8080/api/v1/logout", {
-            credentials: "include",
-            redirect: 'error'
-        }).catch(error => {
-            setUserId(null);
-            navigate("/login")
-        })
-    })
-
     React.useEffect(() => {
         loadUserDetails()
     })
@@ -116,7 +106,7 @@ function Account() {
             </div>
             <div>
                 <button onClick = {verifyAccountDeletion}>Delete Account</button>
-                <button onClick = {logout}>Logout</button>
+                <LogoutButton />
             </div>
             <div id="Account-Deletion-Confirmation-Popup">
                 <h4>Woah there!</h4>

@@ -2,6 +2,7 @@ import {Link} from "react-router-dom";
 import logo from "../assets/wsbu-logo.png";
 import {UserContext} from "../Contexts/UserContext.jsx";
 import {useContext} from "react";
+import AccountNavbarDropdown from "./AccountNavbarDropdown.jsx";
 
 function Navbar() {
     const { userId, setUserId } = useContext(UserContext);
@@ -26,7 +27,7 @@ function Navbar() {
             <Link to="/shows">Explore Shows</Link>
             <Link to="/authors">Explore Authors</Link>
             <Link to="/favorites">Favorites</Link>
-            <Link to={userId !== null ? "/account" : "/login"}>{userId !== null ? "Account" : "Login"}</Link>
+            <AccountNavbarDropdown />
         </div>
 
     </nav>
