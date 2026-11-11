@@ -23,9 +23,6 @@ import org.springframework.session.jdbc.JdbcIndexedSessionRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.security.Security;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;

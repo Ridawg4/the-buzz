@@ -13,8 +13,8 @@ ALL USERS CAN:
 - like comments
 - post comments
 - delete comments
-- modify account info - BACKEND BUILT
-- delete account
+- modify account info - DONE
+- delete account - DONE
 DJs CAN:
 - see DJ system panels
 - create DJ profile
@@ -43,17 +43,17 @@ MODERATORS CAN:
 - delete account actions
 - modify account info
 - delete account info
-- create permission groups
-- modify permission groups
-- delete permission groups
-- set default permission group
+- create permission groups - DONE
+- modify permission groups - DONE
+- delete permission groups - DONE
+- set default permission group - DONE
 - view server runtime logs
 - view system usage statistics
 - download system usage statistics
 - upload stream audio - BACKEND BUILT
 - set stream audio to record or not
 SYSTEM CAN:
-- remove sessions - BACKEND BUILT
-- add sessions - BACKEND BUILT
-- invalidate sessions - BACKEND BUILT
-- modify sessions - BACKEND BUILT
+- remove sessions - DONE
+- add sessions - DONE
+- invalidate sessions - DONE
+- modify sessions - DONE
