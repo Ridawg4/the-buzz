@@ -30,7 +30,12 @@ public interface PermissionsRepository extends CrudRepository<Permissions, Integ
     @Transactional
     @Modifying
     @Query(value="UPDATE development.permissions SET permissions = ?2 WHERE permission_id = ?1", nativeQuery = true)
-    public void updatePermissionByPermissionId(int id, String permissionData);
+    public void updateSessionPermissionByPermissionId(int id, String permissionData);
+
+    @Transactional
+    @Modifying
+    @Query(value="UPDATE development.permissions SET permissions = ?2, permissions_name = ?3, permission_desc = ?4 WHERE permission_id = ?1", nativeQuery = true)
+    public void updatePermissionByPermissionId(int id, String permissionData, String permissionName, String permissionDesc);
 
     @Transactional
     @Modifying
@@ -39,6 +44,11 @@ public interface PermissionsRepository extends CrudRepository<Permissions, Integ
 
     @Transactional
     @Modifying
-    @Query(value="INSERT INTO development.permissions(permission_id, permissions_name, permission_desc, permissions, created_by, created_at) VALUES (?1, ?2, ?3, ?4, UUID_TO_BIN(?5), ?6, ?7)", nativeQuery = true)
+    @Query(value="INSERT INTO development.permissions(permission_id, permissions_name, permission_desc, permissions, created_by, created_at, isDefaultPermissionGroup) VALUES (?1, ?2, ?3, ?4, UUID_TO_BIN(?5), ?6, ?7)", nativeQuery = true)
     public void createPermissionGroup(int id, String permissionName, String permissionDesc, String permissionData, String createdBy, Timestamp createdAt, boolean isDefaultPermissionGroup);
+
+    @Transactional
+    @Modifying
+    @Query(value="DELETE FROM development.permissions WHERE permission_id = ?1", nativeQuery = true)
+    public void deletePermissionByPermissionId(int id);
 }

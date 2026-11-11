@@ -228,7 +228,7 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
         String[] userIds = userService.getAllUsersWithPermissionGroup(permissionGroup);
 
         if(userIds != null) {
-            if (permissionGroup != newPermissionGroup) {
+            if (permissionGroup == newPermissionGroup) {
                 for (String userId : userIds) {
                     try {
                         labelAllSessionsForUserToRenew(userId);

@@ -71,16 +71,28 @@ public class PermissionService {
         return arrWrapper.add("permissions", arrBuilder.build()).build();
     }
 
-    public void updatePermissionEntry(int id, SessionPermissions permissions) {
-        repository.updatePermissionByPermissionId(id, permissions.asJsonObject().toString());
+    public void updateSessionPermissionEntry(int id, SessionPermissions permissions) {
+        repository.updateSessionPermissionByPermissionId(id, permissions.asJsonObject().toString());
 
         sessionService.labelAllSessionsWithPermissionGroupToRenew(id, id);
+    }
+
+    public void updatePermissionEntry(int id, String permissionName, String permissionDesc, SessionPermissions permissions) {
+        repository.updatePermissionByPermissionId(id, permissions.asJsonObject().toString(), permissionName, permissionDesc);
+
+        sessionService.labelAllSessionsWithPermissionGroupToRenew(id, id);
+    }
+
+    public void deletePermissionEntry(int id) {
+        repository.deletePermissionByPermissionId(id);
+
+        sessionService.labelAllSessionsWithPermissionGroupToRenew(id, getDefaultPermissionGroupIndex());
     }
 
     public boolean doesPermissionExistAtIndex(int id) {
         List<Object[]> responseFromDb = repository.getPermissionById(id);
 
-        return responseFromDb.isEmpty();
+        return !responseFromDb.isEmpty();
     }
 
     public void createPermissionEntry(Permissions permission, boolean isDefaultPermission) {

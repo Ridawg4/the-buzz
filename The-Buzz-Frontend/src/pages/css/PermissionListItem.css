@@ -1,0 +1,11 @@
+.permission-delete-popup-confirmation {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.permission-list-item {
+    padding: 15px;
+}

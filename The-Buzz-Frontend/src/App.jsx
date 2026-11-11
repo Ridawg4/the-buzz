@@ -7,7 +7,10 @@ import Signup from "./pages/Signup.jsx";
 import React, {useState} from "react";
 import {UserContext} from "./Contexts/UserContext.jsx";
 import Account from "./pages/Account.jsx";
-import Permissions from "./pages/Permissions.jsx";
+import PermissionsEdit from "./pages/PermissionsEdit.jsx";
+import PermissionList from "./pages/PermissionList.jsx";
+import UserList from "./pages/UserList.jsx";
+import Admin from "./pages/Admin.jsx";
 
 function App() {
     const [userId, setUserId] = useState(null);
@@ -47,7 +50,9 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/account" element={<Account />} />
-                    <Route path="/admin/permissions" element={<Permissions />} />
+                    <Route path="/admin" element={<Admin />} />
+                    <Route path="/admin/permissions" element={<PermissionList />} />
+                    <Route path="/admin/users" element={<UserList />} />
 				</Routes>
 			  </div>
             </UserContext.Provider>

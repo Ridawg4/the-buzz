@@ -1,8 +1,7 @@
-import Navbar from "../Components/Navbar.jsx";
 import PermissionEditBox from "../Components/PermissionEditBox.jsx";
 import {useContext, useEffect, useState} from "react";
 
-function Permissions() {
+function PermissionsEdit({permissionId, permissionName, permissionDesc, removeEditing} ) {
     const [ permissionKeys, setPermissionKeys ] = useState([]);
     const [ permissionVals, setPermissionVals ] = useState([]);
     const [ retrievedPermissions, setRetrievedPermissions ] = useState(false);
@@ -26,7 +25,6 @@ function Permissions() {
     }
 
     const submitChanges = () => {
-        const permissionId = parseInt(document.getElementById("permissionId").value);
         const permissions = {};
         const permissionObject = {};
 
@@ -38,13 +36,17 @@ function Permissions() {
         console.log(permissionObject);
         let form = new FormData()
         form.append("permissionObject", JSON.stringify(permissionObject))
+        form.append("permissionName", document.getElementById("permission-name-input").value)
+        form.append("permissionDesc", document.getElementById("permission-description-input").value)
 
         fetch("http://localhost:8080/api/v1/permissions/update-permission-group", {
             method: "POST",
             credentials: "include",
             body: form
         }).then(res => {
-            console.log(res.status)
+            if(res.ok){
+                removeEditing()
+            }
         })
     }
 
@@ -56,17 +58,23 @@ function Permissions() {
 
     return (
         <>
-            <Navbar />
             <div id="permission-edit-div">
-                <label>Permission ID</label>
-                <input type="number" id="permissionId"></input>
+                <label>Permission Name
+                    <input type="text" defaultValue={permissionName} id="permission-name-input" />
+                </label>
+                <label>Permission Description
+                    <input type="text" defaultValue={permissionDesc} id="permission-description-input" />
+                </label>
                 {permissionKeys.map((key, index) => (
                     <PermissionEditBox keyName={key} key={key} value={permissionVals[index]} allKeys = {permissionKeys} allVals = {permissionVals} setValue = {setPermissionVals} />
                 ))}
-                <button onClick={submitChanges}>save permissions</button>
+                <div id="permission-edit-actions">
+                    <button onClick={submitChanges}>Save Permissions</button>
+                    <button onClick={removeEditing}>Cancel</button>
+                </div>
             </div>
         </>
     )
 }
 
-export default Permissions;
+export default PermissionsEdit;

@@ -106,10 +106,11 @@ public class UserController {
         } catch (InvalidAuthenticationPrincipalException exc) {
             ResponseEntity.badRequest().build();
         }
+        BuzzUser dbUser = userService.getUserRecordByUserId(user.getUserId());
 
         // Verifies the user has the proper permission to access the endpoint
         assert user != null;
-        if(!PermissionValues.IF_OWNER.equals(user.getPermissions().getPermission("CAN_SEE_ACCOUNT_INFO"))) {
+        if(!PermissionValues.IF_OWNER.equals(dbUser.getPermissions().getPermission("CAN_SEE_ACCOUNT_INFO"))) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -398,7 +399,7 @@ public class UserController {
     }
 
     @PostMapping("/modify-user-permissions")
-//    @PreAuthorize("hasAuthority('CAN_MODIFY_ANY_ACCOUNT_INFO')")
+    @PreAuthorize("hasAuthority('CAN_MODIFY_ANY_ACCOUNT_INFO')")
     public ResponseEntity<String> modifyUserDetails(@RequestParam String userId,
                                                     @RequestParam int permissionGroupId,
                                                     Authentication userAuth,

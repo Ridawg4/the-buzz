@@ -23,7 +23,6 @@ function AccountNavbarDropdown() {
         ).then(response => {
             if (response.ok) {
                 response.text().then(text => {
-                    console.log(text);
                     if(text === "allowed") {
                         setIsModerator(true)
                     } else {
@@ -54,7 +53,6 @@ function AccountNavbarDropdown() {
             hasAdminRole()
             hasDjRole()
         }
-        setHasRan(true)
     })
 
     if(userId === null) {
@@ -67,6 +65,7 @@ function AccountNavbarDropdown() {
             <img id="profile-pic-navbar" src= "http://localhost:8080/api/v1/user/profile-picture?time=0"/>
             <div id="dropdownOptions" onMouseLeave={closeAccountDropdown}>
                 <Link to="/account" className="dropdownOption">Account</Link>
+                // @TODO FLIP SO THIS WORKS PROPERLY
                 { isDj ? null : <Link to="/admin/djs" className="dropdownOption">DJ Profile</Link>}
                 { isModerator ? null : <Link to="/admin" className="dropdownOption">Moderation Panel</Link> }
                 <LogoutButton />
