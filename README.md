@@ -20,9 +20,9 @@ DJs CAN:
 - create DJ profile
 - modify DJ profile - BACKEND BUILT
 - delete DJ profile
-- create show listing
-- modify show listing
-- delete show listing
+- create show listing - BACKEND BUILT
+- modify show listing - BACKEND BUILT
+- delete show listing - BACKEND BUILT
 - upload prerecorded show audio
 - delete prerecorded show audio
 MODERATORS CAN:
