@@ -18,7 +18,7 @@ public interface PermissionsRepository extends CrudRepository<Permissions, Integ
     @Query(value="SELECT permission_id, permissions_name, permission_desc, permissions, BIN_TO_UUID(created_by), created_at, isDefaultPermissionGroup FROM permissions", nativeQuery = true)
     public List<Object[]> getAllPermissions();
 
-    @Query(value="SELECT permission_id FROM permissions WHERE permission_id = ?1", nativeQuery = true)
+    @Query(value="SELECT permission_id, permissions_name, permission_desc, permissions, BIN_TO_UUID(created_by), created_at, isDefaultPermissionGroup FROM permissions WHERE permission_id = ?1", nativeQuery = true)
     public List<Object[]> getPermissionById(int id);
 
     @Query(value="SELECT permission_id FROM permissions WHERE isDefaultPermissionGroup = ?1", nativeQuery = true)

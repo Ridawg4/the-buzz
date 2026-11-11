@@ -16,7 +16,7 @@ public class PermissionRetrievalService {
     }
 
     public static Permissions getPermissionById(int id) {
-        List<Object[]> entries = repository.getAllPermissions();
+        List<Object[]> entries = repository.getPermissionById(id);
 
         if(entries.isEmpty()) {
             throw new RuntimeException("Permissions table is empty");

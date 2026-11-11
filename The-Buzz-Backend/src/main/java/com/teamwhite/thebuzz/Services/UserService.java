@@ -132,7 +132,8 @@ public class UserService {
          * This looks disgusting, but is the most efficient way to map them explicitly, as the
          * deserializer cannot map Timestamp, JsonObject, or UUID values automatically
          */
-        String permissionString = permissionService.getPermissionById((int) objFromQuery[12]).getSessionPermissionsAsJsonObject().toString();
+        int permissionGroup = (int) objFromQuery[12];
+        String permissionString = PermissionRetrievalService.getPermissionById((int) objFromQuery[12]).getSessionPermissionsAsJsonObject().toString();
 
         user = new BuzzUser( (String) objFromQuery[0], (String) objFromQuery[1],
                 (String) objFromQuery[2], (String) objFromQuery[3],
