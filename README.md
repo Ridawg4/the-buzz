@@ -7,8 +7,8 @@ ALL FUNCTIONALITIES:
 ALL USERS CAN:
 - Play live stream - BACKEND BUILT
 - Play prerecorded streams - BACKEND BUILT
-- Add favorites
-- remove favorites
+- Add favorites - BACKEND BUILT
+- remove favorites - BACKEND BUILT
 - like shows
 - like comments
 - post comments
