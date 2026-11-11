@@ -41,7 +41,7 @@ MODERATORS CAN:
 - create account actions
 - modify account actions
 - delete account actions
-- modify account info
+- modify account info - PARTIALLY BUILT
 - delete account info
 - create permission groups - DONE
 - modify permission groups - DONE
