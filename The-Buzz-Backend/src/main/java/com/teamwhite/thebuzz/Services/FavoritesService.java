@@ -7,6 +7,8 @@ import com.teamwhite.thebuzz.model.BuzzUser;
 import jakarta.json.*;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -41,7 +43,7 @@ public class FavoritesService {
                 (String) row[1],
                 (String) row[2],
                 (String) row[3],
-                (java.sql.Timestamp) row[4],
+                Timestamp.valueOf((LocalDateTime) row[4]),
                 (String) row[5],
                 (String) row[6],
                 (String) row[7],

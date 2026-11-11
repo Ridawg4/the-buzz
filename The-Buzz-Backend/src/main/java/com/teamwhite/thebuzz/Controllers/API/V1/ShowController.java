@@ -1,11 +1,11 @@
 
-
-
 package com.teamwhite.thebuzz.Controllers.API.V1;
 
 import com.teamwhite.thebuzz.Services.ShowService;
 import com.teamwhite.thebuzz.model.BuzzUser;
 import com.teamwhite.thebuzz.model.Show;
+import com.teamwhite.thebuzz.model.SessionPermissions;
+import com.teamwhite.thebuzz.Resources.PermissionValues;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +38,22 @@ public class ShowController {
     }
 
     /**
+     * Checks if a user has an allowed permission.
+     */
+    private boolean hasPermission(
+            BuzzUser user,
+            String permissionName) {
+
+        return user.getAuthorities().stream()
+                .filter(SessionPermissions.class::isInstance)
+                .map(SessionPermissions.class::cast)
+                .anyMatch(permissions ->
+                        PermissionValues.ALLOWED.equals(
+                                permissions.getPermission(permissionName)
+                        ));
+    }
+
+    /**
      * Creates a new radio show listing.
      */
     @PostMapping
@@ -45,7 +61,7 @@ public class ShowController {
             Authentication authentication,
             @RequestBody Show show) {
 
-        // Verify that the user is logged in
+        // Check if user is authenticated
         if (authentication == null ||
                 !authentication.isAuthenticated() ||
                 !(authentication.getPrincipal() instanceof BuzzUser)) {
@@ -55,13 +71,14 @@ public class ShowController {
                     .body("You must be logged in.");
         }
 
+        // Get authenticated user
         BuzzUser user = (BuzzUser) authentication.getPrincipal();
 
         // Check permission to create show listings
-        boolean canCreate = user.getAuthorities().stream()
-                .anyMatch(authority ->
-                        authority.getAuthority()
-                                .equals("CAN_CREATE_SHOW_LISTING"));
+        boolean canCreate = hasPermission(
+                user,
+                "CAN_CREATE_SHOW_LISTING"
+        );
 
         if (!canCreate) {
             return ResponseEntity
@@ -70,7 +87,7 @@ public class ShowController {
         }
 
         try {
-            // Create the show using the service
+            // Create show using service
             boolean created = showService.createShow(show);
 
             if (!created) {
@@ -99,7 +116,7 @@ public class ShowController {
             @PathVariable UUID showId,
             @RequestBody Show updatedShow) {
 
-        // Verify that the user is logged in
+        // Check if user is authenticated
         if (authentication == null ||
                 !authentication.isAuthenticated() ||
                 !(authentication.getPrincipal() instanceof BuzzUser)) {
@@ -109,13 +126,14 @@ public class ShowController {
                     .body("You must be logged in.");
         }
 
+        // Get authenticated user
         BuzzUser user = (BuzzUser) authentication.getPrincipal();
 
         // Check permission to modify show listings
-        boolean canModify = user.getAuthorities().stream()
-                .anyMatch(authority ->
-                        authority.getAuthority()
-                                .equals("CAN_MODIFY_SHOW_LISTING"));
+        boolean canModify = hasPermission(
+                user,
+                "CAN_MODIFY_SHOW_LISTING"
+        );
 
         if (!canModify) {
             return ResponseEntity
@@ -124,9 +142,11 @@ public class ShowController {
         }
 
         try {
-            // Update the show using the service
+            // Update show using service
             boolean updated = showService.updateShow(
-                    showId, updatedShow);
+                    showId,
+                    updatedShow
+            );
 
             if (!updated) {
                 return ResponseEntity
@@ -152,7 +172,7 @@ public class ShowController {
             Authentication authentication,
             @PathVariable UUID showId) {
 
-        // Verify that the user is logged in
+        // Check if user is authenticated
         if (authentication == null ||
                 !authentication.isAuthenticated() ||
                 !(authentication.getPrincipal() instanceof BuzzUser)) {
@@ -162,13 +182,14 @@ public class ShowController {
                     .body("You must be logged in.");
         }
 
+        // Get authenticated user
         BuzzUser user = (BuzzUser) authentication.getPrincipal();
 
         // Check permission to delete show listings
-        boolean canDelete = user.getAuthorities().stream()
-                .anyMatch(authority ->
-                        authority.getAuthority()
-                                .equals("CAN_DELETE_SHOW_LISTING"));
+        boolean canDelete = hasPermission(
+                user,
+                "CAN_DELETE_SHOW_LISTING"
+        );
 
         if (!canDelete) {
             return ResponseEntity
@@ -177,7 +198,7 @@ public class ShowController {
         }
 
         try {
-            // Delete the show using the service
+            // Delete show using service
             boolean deleted = showService.deleteShow(showId);
 
             if (!deleted) {
