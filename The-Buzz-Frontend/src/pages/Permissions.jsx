@@ -51,6 +51,8 @@ function Permissions() {
     useEffect(() => {
         getPermissions();
     })
+    // @TODO Make getting all permission entries, this current file for editing those, setting default
+    // permission groups, and creating permission entries
 
     return (
         <>

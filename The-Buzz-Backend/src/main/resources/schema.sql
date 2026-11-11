@@ -21,8 +21,10 @@ CREATE TABLE IF NOT EXISTS  users (
     favorites JSON,
     volume_settings JSON,
     notification_settings JSON,
-    permission_data JSON
+    permissionGroup INT NOT NULL,
 
+    FOREIGN KEY (permissionGroup)
+        REFERENCES permissions(permission_id)
 );
 
 CREATE INDEX index_email ON development.users(email);
@@ -34,6 +36,7 @@ CREATE TABLE IF NOT EXISTS  permissions (
     permissions JSON NOT NULL,
     created_by BINARY(16) NOT NULL,
     created_at TIMESTAMP NOT NULL,
+    isDefaultPermissionGroup BOOL DEFAULT FALSE,
 
     FOREIGN KEY (created_by)
         REFERENCES users(user_id)

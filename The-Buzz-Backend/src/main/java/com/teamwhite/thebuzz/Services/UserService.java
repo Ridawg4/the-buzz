@@ -1,6 +1,7 @@
 package com.teamwhite.thebuzz.Services;
 
 import com.teamwhite.thebuzz.Contexts.BuzzSessionService;
+import com.teamwhite.thebuzz.Contexts.PermissionRetrievalService;
 import com.teamwhite.thebuzz.Exceptions.NoUserProvidedException;
 import com.teamwhite.thebuzz.Repositories.UserRepository;
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
@@ -35,16 +36,17 @@ public class UserService {
     // BCrypt Password Encoder
     private final PasswordEncoder passwordEncoder;
     // Session Service
-//    private final BuzzSessionService sessionService;
+    private final PermissionRetrievalService permissionService;
 
     /**
      * For autowiring values
      * @param repository User repository
      * @param passwordEncoder BCrypt password encoder
      */
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, PermissionRetrievalService permissionService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -79,6 +81,8 @@ public class UserService {
 
         // Magic number, but List<T> does not have getFirst() method, this recreates that result
         Object[] objFromQuery = returnedValues.get(0);
+
+        String permissionString = permissionService.getPermissionById((int) objFromQuery[12]).getSessionPermissionsAsJsonObject().toString();
         /**
          * This looks disgusting, but is the most efficient way to map them explicitly, as the
          * deserializer cannot map Timestamp, JsonObject, or UUID values automatically
@@ -88,7 +92,7 @@ public class UserService {
                 Timestamp.valueOf((LocalDateTime) objFromQuery[4]), (String) objFromQuery[5],
                 (String) objFromQuery[6], (String) objFromQuery[7], (String) objFromQuery[8],
                 (String) objFromQuery[9], (String) objFromQuery[10], (String) objFromQuery[11],
-                (String) objFromQuery[12]);
+                permissionString);
         return user;
     }
 
@@ -128,12 +132,14 @@ public class UserService {
          * This looks disgusting, but is the most efficient way to map them explicitly, as the
          * deserializer cannot map Timestamp, JsonObject, or UUID values automatically
          */
+        String permissionString = permissionService.getPermissionById((int) objFromQuery[12]).getSessionPermissionsAsJsonObject().toString();
+
         user = new BuzzUser( (String) objFromQuery[0], (String) objFromQuery[1],
                 (String) objFromQuery[2], (String) objFromQuery[3],
                 Timestamp.valueOf((LocalDateTime) objFromQuery[4]), (String) objFromQuery[5],
                 (String) objFromQuery[6], (String) objFromQuery[7], (String) objFromQuery[8],
                 (String) objFromQuery[9], (String) objFromQuery[10], (String) objFromQuery[11],
-                (String) objFromQuery[12]);
+                permissionString);
         return user;
     }
 
@@ -147,6 +153,7 @@ public class UserService {
 
         for(int i = 0; i < dbResults.size(); i++) {
             Object[] objFromQuery = dbResults.get(i);
+            String permissionString = permissionService.getPermissionById((int) objFromQuery[12]).getSessionPermissionsAsJsonObject().toString();
             /**
              * This looks disgusting, but is the most efficient way to map them explicitly, as the
              * deserializer cannot map Timestamp, JsonObject, or UUID values automatically
@@ -156,9 +163,21 @@ public class UserService {
                     Timestamp.valueOf((LocalDateTime) objFromQuery[4]), (String) objFromQuery[5],
                     (String) objFromQuery[6], (String) objFromQuery[7], (String) objFromQuery[8],
                     (String) objFromQuery[9], (String) objFromQuery[10], (String) objFromQuery[11],
-                    (String) objFromQuery[12]));
+                    permissionString));
         }
         return list;
+    }
+
+    public String[] getAllUsersWithPermissionGroup(int permissionId) {
+        List<Object[]> dbResults = repository.getAllUserIdsByPermissionId(permissionId);
+        String[] userIds = new String[dbResults.size()];
+
+        for(int i = 0; i < dbResults.size(); i++) {
+            Object[] objFromQuery = dbResults.get(i);
+
+            userIds[i] = (String) objFromQuery[0];
+        }
+        return userIds;
     }
 
     /**
@@ -176,7 +195,7 @@ public class UserService {
                     user.getOauthKey(), user.getJoinDate(), user.getUserDesc(), user.getFullName(),
                     user.getUserPfpLocation(), user.getEmail(), user.getFavorites().toString().trim(),
                     user.getVolumeSettings().toString().trim(), user.getNotificationSettings().toString().trim(),
-                    user.getPermissions().asJsonObject().toString().trim());
+                    user.getPermissions().getPermissionId());
         } catch (Exception e) {
             Logger.getGlobal().warning(e.getMessage());
         }
@@ -200,7 +219,7 @@ public class UserService {
             throw new IllegalArgumentException("Email provided is null");
         }
 
-        BuzzUser user = new BuzzUser(username, passwordEncoder.encode(unHashedPassword), email);
+        BuzzUser user = new BuzzUser(username, passwordEncoder.encode(unHashedPassword), email, PermissionRetrievalService.getPermissionById(PermissionRetrievalService.getDefaultPermissionGroupIndex()).asJsonObject().toString());
 
         // Required to catch any SQLExceptions, as they will silently fail otherwise
         try {
@@ -208,7 +227,8 @@ public class UserService {
                     user.getOauthKey(), user.getJoinDate(), user.getUserDesc(), user.getFullName(),
                     user.getUserPfpLocation(), user.getEmail(), user.getFavorites().toString().trim(),
                     user.getVolumeSettings().toString().trim(), user.getNotificationSettings().toString().trim(),
-                    user.getPermissions().asJsonObject().toString().trim());
+                    PermissionRetrievalService.getDefaultPermissionGroupIndex());
+            // @TODO SET PERMISSION ID BY DEFAULT PERMISSION GROUP
         } catch (Exception e) {
             Logger.getGlobal().warning(e.getMessage());
         }
@@ -310,5 +330,13 @@ public class UserService {
         }
 
         repository.updateUserPfpLocationByUserId(userId, filePath + fileName);
+    }
+
+    public void updatePermissionGroup(String userId, int newPermissionGroup) {
+        try {
+            repository.updateUserPermissionsByUserId(userId, newPermissionGroup);
+        } catch(Exception e) {
+            throw new RuntimeException("Failed to update User Permission Group");
+        }
     }
 }

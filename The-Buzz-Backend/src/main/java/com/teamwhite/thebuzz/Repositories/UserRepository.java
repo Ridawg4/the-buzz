@@ -23,7 +23,7 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
      * @param email email used for finding a specific table entry
      * @return List<Object[]> List is the row entries, Object[] is the individual column values
      */
-    @Query(value = "SELECT BIN_TO_UUID(user_id), username, password_hash, oauth_key, join_date, user_desc, full_name, user_pfp_location, email, favorites, volume_settings, notification_settings, permission_data FROM development.users WHERE email = ?1", nativeQuery = true)
+    @Query(value = "SELECT BIN_TO_UUID(user_id), username, password_hash, oauth_key, join_date, user_desc, full_name, user_pfp_location, email, favorites, volume_settings, notification_settings, permissionGroup FROM development.users WHERE email = ?1", nativeQuery = true)
     List<Object[]> getUserRecordByEmail(String email);
 
     /**
@@ -33,7 +33,7 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
      * @param userId String userId used for finding a specific table entry
      * @return List<Object[]> List is the row entries, Object[] is the individual column values
      */
-    @Query(value = "SELECT BIN_TO_UUID(user_id), username, password_hash, oauth_key, join_date, user_desc, full_name, user_pfp_location, email, favorites, volume_settings, notification_settings, permission_data FROM development.users WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    @Query(value = "SELECT BIN_TO_UUID(user_id), username, password_hash, oauth_key, join_date, user_desc, full_name, user_pfp_location, email, favorites, volume_settings, notification_settings, permissionGroup FROM development.users WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
     List<Object[]> getUserRecordByUserId(String userId);
 
 
@@ -41,8 +41,15 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
      * Gets all records in development.users table
      * @return List<Object[]> List is the row entries, Object[] is the individual column values
      */
-    @Query(value = "SELECT BIN_TO_UUID(user_id), username, password_hash, oauth_key, join_date, user_desc, full_name, user_pfp_location, email, favorites, volume_settings, notification_settings, permission_data FROM development.users", nativeQuery = true)
+    @Query(value = "SELECT BIN_TO_UUID(user_id), username, password_hash, oauth_key, join_date, user_desc, full_name, user_pfp_location, email, favorites, volume_settings, notification_settings, permissionGroup FROM development.users", nativeQuery = true)
     List<Object[]> getAllUsers();
+
+    /**
+     * Gets all records in development.users table with a given permissionId
+     * @return List<Object[]> List is the row entries, Object[] is the individual column values
+     */
+    @Query(value = "SELECT BIN_TO_UUID(user_id) FROM development.users WHERE permissionGroup = ?1", nativeQuery = true)
+    List<Object[]> getAllUserIdsByPermissionId(int permissionId);
 
     /**
      * Retrieves any entry containing the email provided
@@ -67,7 +74,7 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
      * @param favoritesList String representation of the JsonObject
      * @param volumeSettings String representation of the JsonObject
      * @param notificationSettings String representation of the JsonObject
-     * @param permissions String representation of the SessionPermissions object
+     * @param permissionGroup int reference to permissions group
      */
     @Modifying
     @Transactional
@@ -75,7 +82,7 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
     void createUser(String userId, String username, String passwordHash, String oauthKey,
                     Timestamp joinTime, String userDesc, String fullName, String userPfpLocation,
                     String email, String favoritesList, String volumeSettings,
-                    String notificationSettings, String permissions);
+                    String notificationSettings, int permissionGroup);
 
     /**
      * Updates a users username based off their old userId
@@ -190,12 +197,22 @@ public interface UserRepository extends CrudRepository<BuzzUser, UUID> {
     /**
      * Updates the users permissions based off the email
      * @param email String email of the record to modify
-     * @param permissions String new permissions
+     * @param permissionGroup int new permission group
      */
     @Modifying
     @Transactional
-    @Query(value="UPDATE development.users SET permission_data = ?2 WHERE email = ?1", nativeQuery = true)
-    void updateUserPermissionsByEmail(String email, String permissions);
+    @Query(value="UPDATE development.users SET permissionGroup = ?2 WHERE email = ?1", nativeQuery = true)
+    void updateUserPermissionsByEmail(String email, int permissionGroup);
+
+    /**
+     * Updates the users permissions based off the userId
+     * @param userId String userId of the record to modify
+     * @param permissionGroup int new permission group
+     */
+    @Modifying
+    @Transactional
+    @Query(value="UPDATE development.users SET permissionGroup = ?2 WHERE user_id = UUID_TO_BIN(?1)", nativeQuery = true)
+    void updateUserPermissionsByUserId(String userId, int permissionGroup);
 
     /**
      * Removes permanently a user based off an email

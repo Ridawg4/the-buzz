@@ -1,13 +1,13 @@
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {UserContext} from "../Contexts/UserContext.jsx";
 import {Link} from "react-router-dom";
 import LogoutButton from "./LogoutButton.jsx";
 
 function AccountNavbarDropdown() {
     const { userId, setUserId } = useContext(UserContext);
-    const { isDj, setIsDj } = useState(false);
-    const { isModerator, setIsModerator } = useState(false);
-    // @TODO implement getting if the usser is Dj or Moderator
+    const [ isDj, setIsDj ] = useState(false);
+    const [ isModerator, setIsModerator ] = useState(false);
+    const [ hasRan, setHasRan ] = useState(false);
 
     const openAccountDropdown = () => {
         document.getElementById("dropdownOptions").style.display = "flex";
@@ -18,19 +18,44 @@ function AccountNavbarDropdown() {
     }
 
     const hasAdminRole = () => {
-        if (isModerator === null || isModerator === false) {
-            return null
-        } else {
-            return <Link to="/admin" className="dropdownOption">Moderation Panel</Link>
-        }
+        fetch("http://localhost:8080/api/v1/user/HasPermission?permissionToLookFor=CAN_SEE_ALL_SYSTEM_PANELS",
+            {credentials: "include"}
+        ).then(response => {
+            if (response.ok) {
+                response.text().then(text => {
+                    console.log(text);
+                    if(text === "allowed") {
+                        setIsModerator(true)
+                    } else {
+                        setIsModerator(false)
+                    }
+                })
+            }
+        })
     }
     const hasDjRole = () => {
-        if (isDj === null || isDj === false) {
-            return null
-        } else {
-            <Link to="/admin/djs" className="dropdownOption">DJ Profile</Link>
-        }
+        fetch("http://localhost:8080/api/v1/user/HasPermission?permissionToLookFor=CAN_SEE_DJ_SYSTEM_PANELS",
+            {credentials: "include"}
+        ).then(response => {
+            if (response.ok) {
+                response.text().then(text => {
+                    if(text === "allowed") {
+                        setIsDj(true)
+                    } else {
+                        setIsDj(false)
+                    }
+                })
+            }
+        })
     }
+
+    useEffect(() => {
+        if (!hasRan) {
+            hasAdminRole()
+            hasDjRole()
+        }
+        setHasRan(true)
+    })
 
     if(userId === null) {
         return (
@@ -39,11 +64,11 @@ function AccountNavbarDropdown() {
     }
     return (
         <div className="account-dropdown-navbar" onMouseEnter={openAccountDropdown}>
-            <img id="profile-pic-navbar" src="http://localhost:8080/api/v1/user/profile-picture?time=0"/>
+            <img id="profile-pic-navbar" src= "http://localhost:8080/api/v1/user/profile-picture?time=0"/>
             <div id="dropdownOptions" onMouseLeave={closeAccountDropdown}>
                 <Link to="/account" className="dropdownOption">Account</Link>
-                { hasDjRole }
-                { hasAdminRole }
+                { isDj ? null : <Link to="/admin/djs" className="dropdownOption">DJ Profile</Link>}
+                { isModerator ? null : <Link to="/admin" className="dropdownOption">Moderation Panel</Link> }
                 <LogoutButton />
             </div>
         </div>

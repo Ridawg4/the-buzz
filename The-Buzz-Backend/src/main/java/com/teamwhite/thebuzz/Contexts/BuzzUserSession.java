@@ -83,9 +83,16 @@ public class BuzzUserSession implements Session {
      * This gives the session holder only default user permissions
      * @TODO IMPLEMENT CHANGING DEFAULT PERMISSIONS
      */
+    public BuzzUserSession(String sessionPermissions) {
+        id = generateId();
+        this.permissions = new SessionPermissions(sessionPermissions);
+        creationTime = Timestamp.from(Instant.now());
+        lastAccessedTime = Timestamp.from(Instant.now());
+        this.attributes = JsonObject.EMPTY_JSON_OBJECT;
+    }
+
     public BuzzUserSession() {
         id = generateId();
-        this.permissions = new SessionPermissions();
         creationTime = Timestamp.from(Instant.now());
         lastAccessedTime = Timestamp.from(Instant.now());
         this.attributes = JsonObject.EMPTY_JSON_OBJECT;
@@ -101,7 +108,7 @@ public class BuzzUserSession implements Session {
             throw new RuntimeException("Permissions not provided");
         }
         try {
-            this.permissions = permissions;
+            this.permissions = (SessionPermissions) permissions;
         } catch (InvalidPermissionsObjectException invalidPermissions) {
             Logger.getGlobal().warning("invalid permissions provided and was unable to be assigned");
         }
@@ -126,8 +133,6 @@ public class BuzzUserSession implements Session {
         this.creationTime = Timestamp.valueOf(creationTime);
         this.lastAccessedTime = Timestamp.valueOf(lastAccessedTime);
         this.attributes = Json.createReader(new StringReader(attributes)).readObject();
-//        this.ownerId = UUID.fromString(ownerId);
-//        this.needsRenewal = needsRenewal;
     }
 
     /**
@@ -164,10 +169,11 @@ public class BuzzUserSession implements Session {
                     SecurityContext context = null;
                     try {
                         // Requires the mapper, otherwise the class cannot be recreated
+                        SecurityContextImpl implSecurityContext = new SecurityContextImpl();
                         context = SECURITY_MAPPER.readValue(attributes.getString(attributeName), SecurityContextImpl.class);
                     } catch (Exception e) {
                         // In case the SECURITY_MAPPER fails, it catches and logs the result
-                        Logger.getGlobal().info(e.getMessage());
+                        Logger.getGlobal().info("SECURITY MAPPER FAILURE : " + e.getMessage());
                     }
                     // Returns the object converted to the class requested
                     return (T) context;

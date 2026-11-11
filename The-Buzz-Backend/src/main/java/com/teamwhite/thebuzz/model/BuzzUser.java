@@ -1,8 +1,11 @@
 package com.teamwhite.thebuzz.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
+import com.teamwhite.thebuzz.Services.PermissionService;
 import jakarta.json.*;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -52,7 +55,6 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonIgnore // @TODO Might be an issue soon
     private JsonObject notificationSettings;
-    @JdbcTypeCode(SqlTypes.JSON)
     private SessionPermissions permissionData;
 
     /**
@@ -70,13 +72,13 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
      * @param passwordHash String hashed password of the user
      * @param email String email of the user
      */
-    public BuzzUser(String username, String passwordHash, String email) {
+    public BuzzUser(String username, String passwordHash, String email, String sessionPermissions) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.email = email;
         this.userId = UUID.randomUUID();
         this.oauthKey = "";
-        this.permissionData = new SessionPermissions();
+        this.permissionData = new SessionPermissions(sessionPermissions);
         this.favorites = JsonObject.EMPTY_JSON_OBJECT;
         this.volumeSettings = JsonObject.EMPTY_JSON_OBJECT;
         this.notificationSettings = JsonObject.EMPTY_JSON_OBJECT;
@@ -102,10 +104,14 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
      * @param notificationSettings String user's notification settings as Json formatted String
      * @param permissionData String user's permissions as Json formatted String
      */
-    public BuzzUser(String userId, String username, String passwordHash, String oauthKey,
-                    Timestamp joinDate, String userDesc, String fullName, String userPfpLocation,
-                    String email, String favorites, String volumeSettings,
-                    String notificationSettings, String permissionData) {
+    @JsonCreator
+    public BuzzUser(@JsonProperty("userId") String userId, @JsonProperty("username") String username,
+                    @JsonProperty("passwordHash") String passwordHash, @JsonProperty("oauthKey") String oauthKey,
+                    @JsonProperty("joinDate") Timestamp joinDate, @JsonProperty("userDesc") String userDesc,
+                    @JsonProperty("fullName") String fullName, @JsonProperty("userPfpLocation") String userPfpLocation,
+                    @JsonProperty("email") String email, @JsonProperty("favorites") String favorites,
+                    @JsonProperty("volumeSettings") String volumeSettings, @JsonProperty("notificationSettings") String notificationSettings,
+                    @JsonProperty("sessionPermissions") String permissionData) {
         this.userId = UUID.fromString(userId);
         this.username = username;
         this.passwordHash = passwordHash;
@@ -118,6 +124,7 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
         this.favorites = Json.createReader(new StringReader(favorites)).readObject();
         this.volumeSettings = Json.createReader(new StringReader(volumeSettings)).readObject();
         this.notificationSettings = Json.createReader(new StringReader(notificationSettings)).readObject();
+
         this.permissionData = new SessionPermissions(permissionData);
 
     }
@@ -226,8 +233,12 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
      * Gets the user's favorites list
      * @return JsonObject favorites list
      */
-    public JsonObject getFavorites() {
+    public JsonObject getFavoritesAsJson() {
         return favorites;
+    }
+
+    public String getFavorites() {
+        return favorites.toString();
     }
 
     /**
@@ -242,8 +253,12 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
      * Gets the user's volume settings
      * @return JsonObject volume settings
      */
-    public JsonObject getVolumeSettings() {
+    public JsonObject getVolumeSettingsAsJson() {
         return volumeSettings;
+    }
+
+    public String getVolumeSettings() {
+        return volumeSettings.toString();
     }
 
     /**
@@ -258,8 +273,12 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
      * Gets the user's notification settings
      * @return JsonObject notification settings
      */
-    public JsonObject getNotificationSettings() {
+    public JsonObject getNotificationSettingsAsJson() {
         return notificationSettings;
+    }
+
+    public String getNotificationSettings() {
+        return notificationSettings.toString();
     }
 
     /**
@@ -276,6 +295,10 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
      */
     public SessionPermissions getPermissions() {
         return permissionData;
+    }
+
+    public String getSessionPermissions() {
+        return permissionData.asJsonObject().toString();
     }
 
     /**
@@ -429,8 +452,8 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
         if (!ourAccDetails.equals(theirAccDetails)) {
             return false;
         }
-        String ourStringPermissions = getPermissions().asJsonObject().toString().trim();
-        String theirStringPermissions = otherUser.getPermissions().asJsonObject().toString().trim();
+        String ourStringPermissions = getSessionPermissions().trim();
+        String theirStringPermissions = otherUser.getSessionPermissions();
         if (!ourStringPermissions.equals(theirStringPermissions)) {
             return false;
         }

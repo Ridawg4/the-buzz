@@ -5,6 +5,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import org.springframework.session.Session;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -21,7 +22,9 @@ public class Permissions extends SessionPermissions{
     private UUID createdBy;
     private Timestamp createdAt;
 
-    public Permissions() {}
+    public Permissions() {
+//        super();
+    }
 
     public Permissions(String jsonString) {
         super(jsonString);
@@ -31,6 +34,15 @@ public class Permissions extends SessionPermissions{
         super(jsonString);
 
         this.permissionId = id;
+        this.permissionsName = permissionsName;
+        this.permissionDesc = permissionDesc;
+        this.createdBy = UUID.fromString(createdBy);
+        this.createdAt = Timestamp.valueOf(createdAt);
+    }
+
+    public Permissions(String permissionsName, String permissionDesc, SessionPermissions sessionPermissions, String createdBy, LocalDateTime createdAt) {
+        super(sessionPermissions.asJsonObject());
+
         this.permissionsName = permissionsName;
         this.permissionDesc = permissionDesc;
         this.createdBy = UUID.fromString(createdBy);
@@ -67,6 +79,10 @@ public class Permissions extends SessionPermissions{
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public JsonObject getSessionPermissionsAsJsonObject() {
+        return super.asJsonObject();
     }
 
     @Override

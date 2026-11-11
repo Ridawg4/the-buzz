@@ -10,6 +10,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -21,7 +22,7 @@ public interface BuzzSessionRepository extends CrudRepository<BuzzUser, UUID> {
     public void addSession(String id, Timestamp creationTime, Timestamp lastAccessedTime, String permissions, String attributes);
 
     @Query(value = "SELECT BIN_TO_UUID(session_id) AS session_id, creation_time, expiry_time, permissions, attributes  FROM development.sessions WHERE session_id = UUID_TO_BIN(?1)", nativeQuery = true)
-    public BuzzUserSession getSessionById(String id);
+    public List<Object[]> getSessionById(String id);
 
     @Modifying
     @Transactional

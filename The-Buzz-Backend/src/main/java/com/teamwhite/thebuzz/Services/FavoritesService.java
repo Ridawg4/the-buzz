@@ -13,10 +13,12 @@ import java.util.List;
 public class FavoritesService {
 
     private final UserRepository userRepository;
+    private final PermissionService permissionService;
 
     // Connect the service to our existing repository
-    public FavoritesService(UserRepository userRepository) {
+    public FavoritesService(UserRepository userRepository, PermissionService permissionService) {
         this.userRepository = userRepository;
+        this.permissionService = permissionService;
     }
 
     // Find the user's current favorites
@@ -31,6 +33,9 @@ public class FavoritesService {
 
         Object[] row = records.get(0);
 
+        String permissionString = permissionService.getPermissionById((int) row[12]).getSessionPermissionsAsJsonObject().toString();
+
+
         return new BuzzUser(
                 (String) row[0],
                 (String) row[1],
@@ -44,7 +49,7 @@ public class FavoritesService {
                 row[9] == null ? "{}" : row[9].toString(),
                 row[10] == null ? "{}" : row[10].toString(),
                 row[11] == null ? "{}" : row[11].toString(),
-                row[12].toString()
+                permissionString
         );
     }
 
@@ -53,7 +58,7 @@ public class FavoritesService {
 
         BuzzUser user = getUser(userId);
 
-        JsonObject favorites = user.getFavorites();
+        JsonObject favorites = user.getFavoritesAsJson();
 
         JsonArray shows = favorites.getJsonArray("shows");
 
@@ -92,7 +97,7 @@ public class FavoritesService {
 
         BuzzUser user = getUser(userId);
 
-        JsonObject favorites = user.getFavorites();
+        JsonObject favorites = user.getFavoritesAsJson();
 
         JsonArray shows = favorites.getJsonArray("shows");
 

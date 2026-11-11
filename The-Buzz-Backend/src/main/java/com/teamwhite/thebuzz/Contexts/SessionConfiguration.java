@@ -20,7 +20,7 @@ public class SessionConfiguration {
      * @return BuzzUserSessionRepository session repository
      */
     @Bean
-    public BuzzSessionService sessionRepository(BuzzSessionRepository sessionRepository, UserService userService, SessionInfoService sessionInfoService) {
-        return new BuzzSessionService(sessionRepository, userService, sessionInfoService);
+    public BuzzSessionService sessionRepository(BuzzSessionRepository sessionRepository, UserService userService, SessionInfoService sessionInfoService, PermissionRetrievalService permissionRetrievalService) {
+        return new BuzzSessionService(sessionRepository, userService, sessionInfoService, permissionRetrievalService);
     }
 }

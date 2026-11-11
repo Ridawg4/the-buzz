@@ -36,15 +36,17 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
     private final BuzzSessionRepository repository;
     private final SessionInfoService sessionInfoService;
     private final UserService userService;
+    private final PermissionRetrievalService permissionService;
 
     /**
      * Autowired constructor
      * @param repository BuzzSessionRepository reference
      */
-    public BuzzSessionService(BuzzSessionRepository repository, UserService userService, SessionInfoService sessionInfoService) {
+    public BuzzSessionService(BuzzSessionRepository repository, UserService userService, SessionInfoService sessionInfoService, PermissionRetrievalService permissionService) {
         this.repository = repository;
         this.userService = userService;
         this.sessionInfoService = sessionInfoService;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -55,7 +57,8 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
      */
     @Override
     public BuzzUserSession createSession() {
-        return new BuzzUserSession();
+        //@TODO MIGHT BE WHY PERMISSIONS ARE STILL ALWAYS DEFAULT
+        return new BuzzUserSession(permissionService.getPermissionById(permissionService.getDefaultPermissionGroupIndex()));
     }
 
     /**
@@ -65,8 +68,8 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
      */
     @Override
     public void save(BuzzUserSession session) {
-        BuzzUserSession test = repository.getSessionById(session.getId());
-        if(repository.getSessionById(session.getId()) == null) {
+        BuzzUserSession sessionInDb = createUserSessionObjectFromId(session.getId());
+        if(sessionInDb == null) {
             // Sessions need to also create a SessionInfo for themselves, or else it breaks
             SecurityContextImpl context = null;
             try {
@@ -115,7 +118,7 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
     @Override
     public BuzzUserSession findById(String id) {
         if(!id.isEmpty()) {
-            BuzzUserSession retrievedSession = repository.getSessionById(id);
+            BuzzUserSession retrievedSession = createUserSessionObjectFromId(id);
 
             SessionInfo info = sessionInfoService.getSessionInfoBySessionId(id);
 
@@ -206,11 +209,8 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
     /**
      * Labels all sessions for a given user that they need to renew authentication
      * @param userId String userId we want to refresh sessions for
-     * @param auth Authentication the current authentication
-     * @param request HttpServletRequest autofilled
-     * @param response HttpServletResponse autofilled
      */
-    public void labelAllSessionsForUserToRenew(String userId, Authentication auth, HttpServletRequest request, HttpServletResponse response) {
+    public void labelAllSessionsForUserToRenew(String userId) {
         SessionInfo[] sessionInfos = sessionInfoService.getAllSessionsInfoByOwnerId(userId);
 
         if(sessionInfos != null) {
@@ -219,6 +219,31 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
                     sessionInfoService.updateNeedsRefreshBySessionId(info.getId(), true);
                 } catch( Exception e) {
                     Logger.getGlobal().warning(e.getMessage());
+                }
+            }
+        }
+    }
+
+    public void labelAllSessionsWithPermissionGroupToRenew(int permissionGroup, int newPermissionGroup) {
+        String[] userIds = userService.getAllUsersWithPermissionGroup(permissionGroup);
+
+        if(userIds != null) {
+            if (permissionGroup != newPermissionGroup) {
+                for (String userId : userIds) {
+                    try {
+                        labelAllSessionsForUserToRenew(userId);
+                    } catch (Exception e) {
+                        Logger.getGlobal().warning(e.getMessage());
+                    }
+                }
+            } else {
+                for (String userId : userIds) {
+                    try {
+                        userService.updatePermissionGroup(userId, newPermissionGroup);
+                        labelAllSessionsForUserToRenew(userId);
+                    } catch (Exception e) {
+                        Logger.getGlobal().warning(e.getMessage());
+                    }
                 }
             }
         }
@@ -283,6 +308,30 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
                     Logger.getGlobal().warning(e.getMessage());
                 }
             }
+        }
+    }
+
+    private BuzzUserSession createUserSessionObjectFromId(String id) {
+        try {
+            List<Object[]> sessionFromDb = repository.getSessionById(id);
+
+            if (sessionFromDb.isEmpty()) {
+                return null;
+            }
+
+            Object[] objFromQuery = sessionFromDb.get(0);
+
+            BuzzUserSession retrievedSession = new BuzzUserSession(
+                    (String) objFromQuery[0],
+                    (LocalDateTime) objFromQuery[1],
+                    (LocalDateTime) objFromQuery[2],
+                    (String) objFromQuery[3],
+                    (String) objFromQuery[4]
+            );
+
+            return retrievedSession;
+        } catch (Exception e) {
+            throw new RuntimeException("session cannot be loaded");
         }
     }
 }

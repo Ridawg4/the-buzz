@@ -80,6 +80,20 @@ public class UserController {
         return ResponseEntity.ok(user.getPermissions().getPermission(permissionToLookFor));
     }
 
+    @GetMapping("HasPermissions")
+    public ResponseEntity<String> checkPermissions(@RequestParam(required = false) String userId,
+                                                         Authentication userAuth) {
+        BuzzUser user = null;
+        try {
+            user = getUserFromPrincipal(userAuth);
+        } catch (InvalidAuthenticationPrincipalException exc) {
+            ResponseEntity.badRequest().build();
+        }
+
+        assert user != null;
+        return ResponseEntity.ok(user.getPermissions().asJsonObject().toString());
+    }
+
     @GetMapping("/profile-picture")
     @PreAuthorize("hasAnyAuthority('CAN_SEE_ACCOUNT_INFO', 'CAN_SEE_SYSTEM_PANELS')")
     public ResponseEntity<Resource> loadProfilePicture(@RequestParam(required = false) String time,
@@ -100,7 +114,7 @@ public class UserController {
         }
 
         if(userId != null) {
-            if(!PermissionValues.ALLOWED.equals(user.getPermissions().getPermission("CAN_SEE_SYSTEM_PANELS"))) {
+            if(!PermissionValues.IF_OWNER.equals(user.getPermissions().getPermission("CAN_SEE_SYSTEM_PANELS"))) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -205,7 +219,7 @@ public class UserController {
 
             userService.modifyUser(userId, email, username, fullName, userDesc);
             // Needs the request and response for some reason
-            sessionService.labelAllSessionsForUserToRenew(userId, userAuth, request, response);
+            sessionService.labelAllSessionsForUserToRenew(userId);
 
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         }
@@ -216,7 +230,7 @@ public class UserController {
         // Modifies the user in the database
         userService.modifyUser(user.getUserId(), email, username, fullName, userDesc);
         // Needs the request and response for some reason
-        sessionService.labelAllSessionsForUserToRenew(user.getUserId(), userAuth, request, response);
+        sessionService.labelAllSessionsForUserToRenew(user.getUserId());
 
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
@@ -265,7 +279,7 @@ public class UserController {
                 return new ResponseEntity<>("Request Failed: Server was unable to persist profile picture change", HttpStatus.INTERNAL_SERVER_ERROR);
             }
             // Needs the request and response for some reason
-            sessionService.labelAllSessionsForUserToRenew(userId, userAuth, request, response);
+            sessionService.labelAllSessionsForUserToRenew(userId);
 
 
             return new ResponseEntity<>(HttpStatus.CREATED);
@@ -291,7 +305,7 @@ public class UserController {
 
         }
         // Needs the request and response for some reason
-        sessionService.labelAllSessionsForUserToRenew(user.getUserId(), userAuth, request, response);
+        sessionService.labelAllSessionsForUserToRenew(user.getUserId());
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -368,7 +382,7 @@ public class UserController {
     }
 
     @GetMapping
-//    @PreAuthorize("hasAuthority('CAN_VIEW_ANY_ACCOUNT_INFO')")
+    @PreAuthorize("hasAuthority('CAN_VIEW_ANY_ACCOUNT_INFO')")
     public ResponseEntity<String> getAllUsers() {
         JsonObjectBuilder usersWrapper = Json.createObjectBuilder();
         JsonArrayBuilder arrBulder = Json.createArrayBuilder();
@@ -381,6 +395,26 @@ public class UserController {
         response.getHeaders().add("Content-Type", ContentTypes.JSON);
 
         return response;
+    }
+
+    @PostMapping("/modify-user-permissions")
+//    @PreAuthorize("hasAuthority('CAN_MODIFY_ANY_ACCOUNT_INFO')")
+    public ResponseEntity<String> modifyUserDetails(@RequestParam String userId,
+                                                    @RequestParam int permissionGroupId,
+                                                    Authentication userAuth,
+                                                    HttpServletRequest request,
+                                                    HttpServletResponse response) {
+        BuzzUser user = null;
+        try {
+            user = getUserFromPrincipal(userAuth);
+        } catch (InvalidAuthenticationPrincipalException exc) {
+            ResponseEntity.badRequest().build();
+        }
+
+        userService.updatePermissionGroup(userId, permissionGroupId);
+        sessionService.labelAllSessionsForUserToRenew(userId);
+
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
 }

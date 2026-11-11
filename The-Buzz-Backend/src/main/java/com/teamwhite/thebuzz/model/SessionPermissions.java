@@ -1,5 +1,8 @@
 package com.teamwhite.thebuzz.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.teamwhite.thebuzz.Contexts.PermissionRetrievalService;
 import com.teamwhite.thebuzz.Exceptions.InvalidPermissionsObjectException;
 import com.teamwhite.thebuzz.Resources.PermissionValues;
 import jakarta.json.Json;
@@ -26,9 +29,15 @@ public class SessionPermissions implements GrantedAuthority {
      * Creates a SessionPermissions object with the formatted Json String of permissions
      * @param jsonStringToConvert String permissions to use
      */
+
     public SessionPermissions(String jsonStringToConvert) {
         JsonObject obj = Json.createReader(new StringReader(jsonStringToConvert.trim())).readObject();
         parseJsonAsPermissionsMap(obj);
+    }
+
+//    // @TODO NEEDS TO RETURN USERS PERMISSION OBJECT
+    public SessionPermissions() {
+//        parseJsonAsPermissionsMap(PermissionRetrievalService.getPermissionById(PermissionRetrievalService.getDefaultPermissionGroupIndex()).getSessionPermissionsAsJsonObject());
     }
 
     /**
@@ -37,28 +46,6 @@ public class SessionPermissions implements GrantedAuthority {
      */
     public SessionPermissions(JsonObject permissions) {
         parseJsonAsPermissionsMap(permissions);
-    }
-
-    /**
-     * Creates a SessionPermissions object with the default permissions
-     */
-    public SessionPermissions() {
-        // @TODO FIX WHEN PERMISSION GROUPS ARE ADDED TO USE SET DEFAULT PERMISSIONS
-        File defaultUserPermissions = new File(DEFAULT_USER_PERMISSIONS_LOCATION);
-        BufferedReader reader;
-        StringBuilder permissionsJsonString = new StringBuilder();
-        try {
-            reader = new BufferedReader(new FileReader(defaultUserPermissions));
-
-            while(reader.ready()) {
-                permissionsJsonString.append(reader.readLine());
-            }
-        } catch (IOException IOException) {
-            Logger.getGlobal().warning("Default permissions not found, aborting");
-        }
-        // Maps the Json formatted String to a JsonObject
-        JsonObject obj = Json.createReader(new StringReader(permissionsJsonString.toString())).readObject();
-        parseJsonAsPermissionsMap(obj);
     }
 
     /**
@@ -165,5 +152,14 @@ public class SessionPermissions implements GrantedAuthority {
         }
 
         return permissionBuilder.build();
+    }
+
+    public int getPermissionId() {
+        return permissionId;
+    }
+
+    public void setPermissions(String jsonString) {
+        JsonObject obj = Json.createReader(new StringReader(jsonString.trim())).readObject();
+        parseJsonAsPermissionsMap(obj);
     }
 }
