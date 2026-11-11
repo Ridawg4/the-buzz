@@ -108,6 +108,20 @@ CREATE TABLE IF NOT EXISTS  comments (
         REFERENCES comments(comment_id)
 );
 
+CREATE TABLE IF NOT EXISTS comment_likes (
+    user_id BINARY(16) NOT NULL,
+    comment_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (user_id, comment_id),
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id),
+
+    FOREIGN KEY (comment_id)
+        REFERENCES comments(comment_id)
+);
+
 CREATE TABLE IF NOT EXISTS sessions (
     session_id BINARY(16) PRIMARY KEY NOT NULL UNIQUE,
     creation_time TIMESTAMP NOT NULL,
