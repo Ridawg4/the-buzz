@@ -25,7 +25,8 @@ public class PermissionRetrievalService {
         Object[] currEntry = entries.get(0);
 
         return new Permissions((int) currEntry[0], (String) currEntry[1],
-                (String) currEntry[2], (String) currEntry[3], (String) currEntry[4], (LocalDateTime) currEntry[5]);
+                (String) currEntry[2], (String) currEntry[3], (String) currEntry[4],
+                (LocalDateTime) currEntry[5], (boolean) currEntry[6]);
     }
 
     public static int getDefaultPermissionGroupIndex() {

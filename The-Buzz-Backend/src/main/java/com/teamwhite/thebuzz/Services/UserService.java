@@ -2,6 +2,7 @@ package com.teamwhite.thebuzz.Services;
 
 import com.teamwhite.thebuzz.Contexts.BuzzSessionService;
 import com.teamwhite.thebuzz.Contexts.PermissionRetrievalService;
+import com.teamwhite.thebuzz.Exceptions.NoUserFoundException;
 import com.teamwhite.thebuzz.Exceptions.NoUserProvidedException;
 import com.teamwhite.thebuzz.Repositories.UserRepository;
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
@@ -101,7 +102,7 @@ public class UserService {
      * @param userId String used for finding a specific table entry
      * @return BuzzUser user as represented in the database
      */
-    public BuzzUser getUserRecordByUserId(String userId) throws IllegalArgumentException{
+    public BuzzUser getUserRecordByUserId(String userId) throws IllegalArgumentException, NoUserFoundException {
         if(userId == null) {
             throw new IllegalArgumentException("userId provided is null");
         }
@@ -122,7 +123,7 @@ public class UserService {
             throw new RuntimeException("results are more than one");
         }
         if(returnedValues.isEmpty()) { //@TODO CHANGE EXCEPTION
-            throw new RuntimeException("results are empty");
+            throw new NoUserFoundException("No user object was found");
         }
 
 

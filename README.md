@@ -26,7 +26,7 @@ DJs CAN:
 - upload prerecorded show audio
 - delete prerecorded show audio
 MODERATORS CAN:
-- see ALL system panels
+- see ALL system panels - DONE
 - modify ANY DJ profile
 - create ANY DJ profile
 - delete ANY DJ profile
@@ -41,8 +41,8 @@ MODERATORS CAN:
 - create account actions
 - modify account actions
 - delete account actions
-  - modify account info - PARTIALLY BUILT
-- delete account info
+- modify account info - DONE
+- delete account info - DONE
 - create permission groups - DONE
 - modify permission groups - DONE
 - delete permission groups - DONE
@@ -57,3 +57,6 @@ SYSTEM CAN:
 - add sessions - DONE
 - invalidate sessions - DONE
 - modify sessions - DONE
+- login to accounts - DONE
+- logout of accounts - DONE
+- create accounts - DONE

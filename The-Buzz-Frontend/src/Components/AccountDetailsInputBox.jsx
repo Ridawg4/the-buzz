@@ -1,7 +1,7 @@
 import React from "react";
 import {useNavigate} from "react-router-dom";
 
-function AccountDetailsInputBox({ id, labelName, defaultText, canEdit = true, type = "text", children }) {
+function AccountDetailsInputBox({ userId = null, id, labelName, defaultText, canEdit = true, type = "text", children }) {
     const [isModifyValue, setModifyValue] = React.useState(false);
     const [lastValue, setLastValue] = React.useState('');
     const navigate = useNavigate();
@@ -41,22 +41,41 @@ function AccountDetailsInputBox({ id, labelName, defaultText, canEdit = true, ty
 
         formData.set(id, document.getElementById(id).value);
 
-        fetch("http://localhost:8080/api/v1/user/modify-user", {
-            method: "POST",
-            credentials: "include",
-            body: formData
-        }).then(res => {
-            if(res.status === 401) {
-                console.log("Error creating modify user");
-                navigate("/login");
-            }
-            if(res.status === 400) {
-                console.log("Error modifying password | Bad Request");
-                res.text().then(text => {
-                    console.log("Error modifying password | Bad Request " + text);
-                })
-            }
-        })
+        if(userId != null) {
+            formData.append("userId", userId);
+            fetch("http://localhost:8080/api/v1/user/modify-user", {
+                method: "POST",
+                credentials: "include",
+                body: formData
+            }).then(res => {
+                if (res.status === 403) {
+                    console.log("Not authorized");
+                }
+                if (res.status === 400) {
+                    console.log("Error modifying password | Bad Request");
+                    res.text().then(text => {
+                        console.log("Error modifying password | Bad Request " + text);
+                    })
+                }
+            })
+        } else {
+            fetch("http://localhost:8080/api/v1/user/modify-user", {
+                method: "POST",
+                credentials: "include",
+                body: formData
+            }).then(res => {
+                if (res.status === 401) {
+                    console.log("Error creating modify user");
+                    navigate("/login");
+                }
+                if (res.status === 400) {
+                    console.log("Error modifying password | Bad Request");
+                    res.text().then(text => {
+                        console.log("Error modifying password | Bad Request " + text);
+                    })
+                }
+            })
+        }
 
         setModifyValue(false);
         setLastValue(document.getElementById(id).value);

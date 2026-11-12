@@ -58,7 +58,7 @@ function PermissionList() {
         }  else {
             return (<div id="permission-list">
                 {permissionEntries.map((object, index) => (
-                    <PermissionListItem key={index} permissionId={object.permission_id} permissionName={object.permission_name} permissionDesc={object.permission_desc} createdBy={object.created_by} createdAt={object.created_at} editPage={prepareForEditing}/>
+                    <PermissionListItem key={index} permissionId={object.permission_id} permissionName={object.permission_name} permissionDesc={object.permission_desc} createdBy={object.created_by} createdAt={object.created_at} isDefaultPermissions={object.is_default_permission_group} editPage={prepareForEditing}/>
                 ))}
                 <button onClick={newPermission}>Create New Permission Group</button>
             </div>)

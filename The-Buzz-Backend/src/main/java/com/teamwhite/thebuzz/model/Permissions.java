@@ -21,6 +21,7 @@ public class Permissions extends SessionPermissions{
     private String permissionDesc;
     private UUID createdBy;
     private Timestamp createdAt;
+    private boolean isDefaultPermissionGroup;
 
     public Permissions() {
 //        super();
@@ -30,7 +31,7 @@ public class Permissions extends SessionPermissions{
         super(jsonString);
     }
 
-    public Permissions(Integer id, String permissionsName, String permissionDesc, String jsonString, String createdBy, LocalDateTime createdAt) {
+    public Permissions(Integer id, String permissionsName, String permissionDesc, String jsonString, String createdBy, LocalDateTime createdAt, boolean isDefaultPermissionGroup) {
         super(jsonString);
 
         this.permissionId = id;
@@ -38,15 +39,17 @@ public class Permissions extends SessionPermissions{
         this.permissionDesc = permissionDesc;
         this.createdBy = UUID.fromString(createdBy);
         this.createdAt = Timestamp.valueOf(createdAt);
+        this.isDefaultPermissionGroup = isDefaultPermissionGroup;
     }
 
-    public Permissions(String permissionsName, String permissionDesc, SessionPermissions sessionPermissions, String createdBy, LocalDateTime createdAt) {
+    public Permissions(String permissionsName, String permissionDesc, SessionPermissions sessionPermissions, String createdBy, LocalDateTime createdAt, boolean isDefaultPermissionGroup) {
         super(sessionPermissions.asJsonObject());
 
         this.permissionsName = permissionsName;
         this.permissionDesc = permissionDesc;
         this.createdBy = UUID.fromString(createdBy);
         this.createdAt = Timestamp.valueOf(createdAt);
+        this.isDefaultPermissionGroup = isDefaultPermissionGroup;
     }
 
     public String getPermissionsName() {
@@ -95,6 +98,7 @@ public class Permissions extends SessionPermissions{
         builder.add("created_by", createdBy.toString());
         builder.add("created_at", createdAt.toString());
         builder.add("permission_data", buildPermissionsJsonArray());
+        builder.add("is_default_permission_group", isDefaultPermissionGroup);
 
         return builder.build();
     }

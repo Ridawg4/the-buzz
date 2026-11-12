@@ -2,10 +2,10 @@ import React, {useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {UserContext} from "../Contexts/UserContext.jsx";
 
-function AccountDetailsInputBox({ id, labelName, defaultText, canEdit = true, type = "password", children }) {
+function AccountDetailsInputBox({ userId = null, id, labelName, defaultText, canEdit = true, type = "password", children }) {
     const [isModifyValue, setModifyValue] = React.useState(false);
     const [lastValue, setLastValue] = React.useState('');
-    const { userId, setUserId } = useContext(UserContext);
+    const { globalUserId, setGlobalUserId } = useContext(UserContext);
     const navigate = useNavigate();
 
     const enableModifying = () => {
@@ -38,27 +38,49 @@ function AccountDetailsInputBox({ id, labelName, defaultText, canEdit = true, ty
         let formData = new FormData();
         formData.append("newPassword", document.getElementById(id).value);
 
-        fetch("http://localhost:8080/api/v1/user/modify-password", {
-            method: "POST",
-            credentials: "include",
-            body: formData
-        }).then(res => {
-            if(res.status === 401) {
-                console.log("Error modifying password | Unauthorized");
-                navigate("/login");
-            }
-            if(res.status === 400) {
-                console.log("Error modifying password | Bad Request");
-                res.text().then(text => {
-                    console.log("Error modifying password | Bad Request " + text);
-                })
-            }
-            if(res.status === 200) {
-                cookieStore.delete("SESSION");
-                setUserId(null)
-                navigate("/login");
-            }
-        })
+        if(userId != null) {
+            formData.append("userId", userId);
+            fetch("http://localhost:8080/api/v1/user/modify-password", {
+                method: "POST",
+                credentials: "include",
+                body: formData
+            }).then(res => {
+                if (res.status === 403) {
+                    console.log("Error modifying password | Forbidden");
+                    navigate("/login");
+                }
+                if (res.status === 400) {
+                    console.log("Error modifying password | Bad Request");
+                    res.text().then(text => {
+                        console.log("Error modifying password | Bad Request " + text);
+                    })
+                }
+                if (res.status === 200) {
+
+                }
+            })
+        } else {
+            fetch("http://localhost:8080/api/v1/user/modify-password", {
+                method: "POST",
+                credentials: "include",
+                body: formData
+            }).then(res => {
+                if (res.status === 403) {
+                    console.log("Error modifying password | Forbidden");
+                    navigate("/login");
+                }
+                if (res.status === 400) {
+                    console.log("Error modifying password | Bad Request");
+                    res.text().then(text => {
+                        console.log("Error modifying password | Bad Request " + text);
+                    })
+                }
+                if (res.status === 200) {
+                    setGlobalUserId(null)
+                    navigate("/login");
+                }
+            })
+        }
 
         setModifyValue(false);
         setLastValue(document.getElementById(id).value);

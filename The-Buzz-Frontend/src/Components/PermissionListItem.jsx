@@ -1,7 +1,7 @@
 import React from "react";
 import '../pages/css/PermissionListItem.css'
 
-function PermissionListItem({ permissionId, permissionName, permissionDesc, createdBy, createdAt, editPage, deleteEntry}) {
+function PermissionListItem({ permissionId, permissionName, permissionDesc, createdBy, createdAt, isDefaultPermissions = false, editPage, deleteEntry}) {
     let [ isVisible, setIsVisible ] = React.useState(true);
 
     const editItem = () => {
@@ -72,7 +72,7 @@ function PermissionListItem({ permissionId, permissionName, permissionDesc, crea
                     </label>
                     <button onClick={editItem}>Edit Permissions</button>
                     <button onClick={promptDeletePermission}>Delete Permissions</button>
-                    <button onClick={setDefaultPermissionGroup}>Set As The Default Permissions</button>
+                    <button onClick={setDefaultPermissionGroup} disabled={isDefaultPermissions}>Set As The Default Permissions</button>
                     <div id={permissionId + "-permission-delete-popup-confirmation"} className = "permission-delete-popup-confirmation">
                         <h4>Woah there!</h4>
                         <p>This action will permanently delete your permission group and reset all users using this group to defaults</p>

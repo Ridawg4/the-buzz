@@ -28,7 +28,7 @@ public class PermissionsController {
     }
 
     @GetMapping
-//    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
+    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
     public ResponseEntity<String> getAllPermissionGroups() {
         ResponseEntity<String> resp = new ResponseEntity<>(permissionService.getAllPermissionsAsJsonObject().toString(), HttpStatus.OK);
         resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, ContentTypes.JSON);
@@ -37,7 +37,7 @@ public class PermissionsController {
     }
 
     @GetMapping("/defaults")
-//    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
+    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
     public ResponseEntity<String> getAllPermissionNames(Authentication userAuth) {
         if (!(userAuth.getPrincipal() instanceof BuzzUser)) {
             throw new RuntimeException("Not a BuzzUser");
@@ -52,7 +52,7 @@ public class PermissionsController {
     }
 
     @PostMapping("/create-permission-group")
-//    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
+    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
     public ResponseEntity<String> createPermissionEntry(@RequestParam String permissionObject,
                                                         @RequestParam String permissionName,
                                                         @RequestParam String permissionDesc,
@@ -72,7 +72,7 @@ public class PermissionsController {
 
         BuzzUser user = (BuzzUser) userAuth.getPrincipal();
 
-        Permissions permissionGroup = new Permissions(permissionName, permissionDesc, permissionToCreate, user.getUserId(), LocalDateTime.now());
+        Permissions permissionGroup = new Permissions(permissionName, permissionDesc, permissionToCreate, user.getUserId(), LocalDateTime.now(), false);
         permissionService.createPermissionEntry(permissionGroup, isDefaultPermissionGroup);
 
         resp = new ResponseEntity<>(HttpStatus.CREATED);
@@ -80,7 +80,7 @@ public class PermissionsController {
     }
 
     @PostMapping("/update-permission-group")
-//    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
+    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
     public ResponseEntity<String> updatePermissionEntry(@RequestParam String permissionObject,
                                                         @RequestParam String permissionName,
                                                         @RequestParam String permissionDesc,
@@ -95,7 +95,7 @@ public class PermissionsController {
     }
 
     @PostMapping("/delete-permission-group")
-//    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
+    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
     public ResponseEntity<String> deletePermissionEntry(@RequestParam int permissionId,
                                                         @RequestParam boolean isConfirmed,
                                                         Authentication userAuth) {
@@ -110,7 +110,7 @@ public class PermissionsController {
     }
 
     @PostMapping("/update-default-permission-group")
-//    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
+    @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
     public ResponseEntity<String> updatePermissionEntry(@RequestParam int permissionId,
                                                         @RequestParam boolean isDefaultPermissionGroup) {
         ResponseEntity<String> resp = new ResponseEntity<>(HttpStatus.OK);

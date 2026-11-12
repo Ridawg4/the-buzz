@@ -1,4 +1,4 @@
-function AccountEditPermissions({userId, permissionGroups}) {
+function AccountEditPermissions({defaultValue, userId, permissionGroups}) {
 
     const changeUserPermissionGroup = () => {
         const permissionSelector = document.getElementById(userId);
@@ -13,9 +13,9 @@ function AccountEditPermissions({userId, permissionGroups}) {
     }
 
     return (
-            <select id={userId} onChange={changeUserPermissionGroup}>
+            <select id={userId} onChange={changeUserPermissionGroup} defaultValue={defaultValue}>
                 {permissionGroups.map((object, index) => (
-                    <option key={index} value={object.permission_id}>{object.permission_id}</option>
+                    <option key={index} value={object.permission_name}>{object.permission_name}</option>
                 ))}
             </select>
     )

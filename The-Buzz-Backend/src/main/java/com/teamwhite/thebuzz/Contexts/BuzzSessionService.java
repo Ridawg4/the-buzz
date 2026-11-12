@@ -1,5 +1,6 @@
 package com.teamwhite.thebuzz.Contexts;
 
+import com.teamwhite.thebuzz.Exceptions.NoUserFoundException;
 import com.teamwhite.thebuzz.Repositories.BuzzSessionRepository;
 import com.teamwhite.thebuzz.Repositories.SessionInfoRepository;
 import com.teamwhite.thebuzz.Repositories.UserRepository;
@@ -271,7 +272,7 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
             BuzzUser updatedUser = null;
             try {
                 updatedUser = userService.getUserRecordByUserId(userId);
-            }  catch (RuntimeException exception) {
+            }  catch (NoUserFoundException exception) {
                 deleteById(session.getId());
             }
 
