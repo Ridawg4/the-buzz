@@ -96,7 +96,6 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
 
                         }
                     }
-                Logger.getGlobal().info("Should be saved in db");
             } catch (ClassCastException | NullPointerException exception) {
                 // Delete any sessions that are generated that are not needed
                 // This does break redirects after auth, but those are broken right now anyway
@@ -112,10 +111,9 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
             BuzzUser userAuth = null;
 
             userAuth = (BuzzUser) context.getAuthentication().getPrincipal();
-            repository.updateSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
-            Logger.getGlobal().info("Session was updated instead of saved");
+            repository.updateSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), userAuth.getSessionPermissions(), session.getAllAttributs().toString());
             } catch (Exception e) {
-                Logger.getGlobal().warning("Failed to edit session");
+                Logger.getGlobal().warning("Failed to edit session: " + e.getMessage());
             }
         }
     }

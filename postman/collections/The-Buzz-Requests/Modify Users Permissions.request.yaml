@@ -1,0 +1,17 @@
+$kind: http-request
+description: ""
+url: http://localhost:8080/api/v1/user/modify-user-permissions?userId=e0799334-0083-46b9-aa6b-896e338fca67&permissionGroupId=2
+method: POST
+queryParams:
+  - key: userId
+    value: e0799334-0083-46b9-aa6b-896e338fca67
+    disabled: false
+    description: ""
+  - key: permissionGroupId
+    value: "2"
+    disabled: false
+    description: ""
+body:
+  type: json
+  content: ""
+order: 4502961960687456

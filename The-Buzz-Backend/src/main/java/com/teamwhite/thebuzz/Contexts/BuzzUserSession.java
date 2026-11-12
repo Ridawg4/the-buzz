@@ -162,7 +162,6 @@ public class BuzzUserSession implements Session {
      */
     @Override
     public @Nullable <T> T getAttribute(String attributeName) {
-        Logger.getGlobal().info(attributes.toString());
         if(attributes.containsKey(attributeName)) {
                 // Checks if the attribute is a SecurityContextImpl class
                 if(attributeName.equals(HttpSessionSecurityContextRepository
@@ -189,7 +188,7 @@ public class BuzzUserSession implements Session {
                         savedRequest = new JsonMapper().readValue(attributes.getString(attributeName), DefaultSavedRequest.class);
                     } catch (Exception e) {
                         // In case the SECURITY_MAPPER fails, it catches and logs the result
-                        Logger.getGlobal().info(e.getMessage());
+//                        Logger.getGlobal().info(e.getMessage());
                     }
                     // Returns the object converted to the class requested
                     return (T) savedRequest;

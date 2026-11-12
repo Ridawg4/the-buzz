@@ -375,9 +375,6 @@ public class UserController {
             user = (BuzzUser) userAuth.getPrincipal();
         }
 
-        Logger.getGlobal().info(userAuth.getAuthorities().toString());
-        Logger.getGlobal().info(user.getSessionPermissions());
-
         // If the user is null, the user is not authenticated properly and therefore has a bad request
         if(user == null) {
             throw new InvalidAuthenticationPrincipalException("Principal was not BuzzUser object");
