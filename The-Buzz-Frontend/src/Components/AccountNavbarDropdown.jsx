@@ -66,8 +66,8 @@ function AccountNavbarDropdown() {
             <div id="dropdownOptions" onMouseLeave={closeAccountDropdown}>
                 <Link to="/account" className="dropdownOption">Account</Link>
                 // @TODO FLIP SO THIS WORKS PROPERLY
-                { isDj ? null : <Link to="/admin/djs" className="dropdownOption">DJ Profile</Link>}
-                { isModerator ? null : <Link to="/admin" className="dropdownOption">Moderation Panel</Link> }
+                { isDj ? <Link to="/admin/djs" className="dropdownOption">DJ Profile</Link> : null}
+                { isModerator ? <Link to="/admin" className="dropdownOption">Moderation Panel</Link> : null }
                 <LogoutButton />
             </div>
         </div>

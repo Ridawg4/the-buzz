@@ -162,6 +162,7 @@ public class BuzzUserSession implements Session {
      */
     @Override
     public @Nullable <T> T getAttribute(String attributeName) {
+        Logger.getGlobal().info(attributes.toString());
         if(attributes.containsKey(attributeName)) {
                 // Checks if the attribute is a SecurityContextImpl class
                 if(attributeName.equals(HttpSessionSecurityContextRepository
@@ -174,6 +175,7 @@ public class BuzzUserSession implements Session {
                     } catch (Exception e) {
                         // In case the SECURITY_MAPPER fails, it catches and logs the result
                         Logger.getGlobal().info("SECURITY MAPPER FAILURE : " + e.getMessage());
+                        return null;
                     }
                     // Returns the object converted to the class requested
                     return (T) context;
@@ -256,9 +258,12 @@ public class BuzzUserSession implements Session {
      */
     @Override
     public void setAttribute(String attributeName, Object attributeValue) {
-        JsonObjectBuilder builder = Json.createObjectBuilder(attributes);
+        JsonObjectBuilder builder = Json.createObjectBuilder();
         // Checks if value is null, which indicates to remove the attribute
         // No clue who in Spring made that decision, but we must follow it
+        for(String key : attributes.keySet()) {
+            builder.add(key, attributes.getString(key));
+        }
         if(attributeValue == null) {
             // If the value already exists in our set, the builder has it as well
             if(attributes.containsKey(attributeName)) {
@@ -266,7 +271,9 @@ public class BuzzUserSession implements Session {
             }
             // if the value is not null, add it to the builder
         } else {
-            builder.add(attributeName, SECURITY_MAPPER.writeValueAsString(attributeValue));
+            if(!attributeName.equals("SPRING_SECURITY_SAVED_REQUEST")) {
+                builder.add(attributeName, SECURITY_MAPPER.writeValueAsString(attributeValue));
+            }
         }
         // Set the JsonObject of attributes to the newly built JsonObject
         attributes = builder.build();

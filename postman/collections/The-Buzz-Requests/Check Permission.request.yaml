@@ -1,0 +1,7 @@
+$kind: http-request
+description: ""
+url: http://localhost:8080/api/v1/user/HasPermission?permissionToLookFor=CAN_SEE_ALL_SYSTEM_PANELS
+method: GET
+queryParams:
+  permissionToLookFor: CAN_SEE_ALL_SYSTEM_PANELS
+order: 4502961960686456

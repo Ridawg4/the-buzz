@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 
 @RestController
@@ -373,6 +374,9 @@ public class UserController {
         if(userAuth.getPrincipal() instanceof BuzzUser) {
             user = (BuzzUser) userAuth.getPrincipal();
         }
+
+        Logger.getGlobal().info(userAuth.getAuthorities().toString());
+        Logger.getGlobal().info(user.getSessionPermissions());
 
         // If the user is null, the user is not authenticated properly and therefore has a bad request
         if(user == null) {

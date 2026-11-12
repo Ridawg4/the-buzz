@@ -302,14 +302,6 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
     }
 
     /**
-     * Sets a user's permissions
-     * @param permissionData new SessionPermissions
-     */
-    public void setPermissions(SessionPermissions permissionData) {
-        this.permissionData = permissionData;
-    }
-
-    /**
      * Maps the user's details to a string
      * Can be accessed with Principal.getName()
      * @return String the userId

@@ -30,7 +30,8 @@ public class SessionPermissions implements GrantedAuthority {
      * @param jsonStringToConvert String permissions to use
      */
 
-    public SessionPermissions(String jsonStringToConvert) {
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public SessionPermissions( String jsonStringToConvert) {
         JsonObject obj = Json.createReader(new StringReader(jsonStringToConvert.trim())).readObject();
         parseJsonAsPermissionsMap(obj);
     }
@@ -134,6 +135,7 @@ public class SessionPermissions implements GrantedAuthority {
         return null;
     }
 
+    // @TODO THIS BREAKS EVERYTHING RIGHT NOW CAUSE SESSIONPERMISSIONS IS NULL
     public String getPermission(String permissionToCheckFor) {
         try {
             String value = permissions.get(permissionToCheckFor);
@@ -156,10 +158,5 @@ public class SessionPermissions implements GrantedAuthority {
 
     public int getPermissionId() {
         return permissionId;
-    }
-
-    public void setPermissions(String jsonString) {
-        JsonObject obj = Json.createReader(new StringReader(jsonString.trim())).readObject();
-        parseJsonAsPermissionsMap(obj);
     }
 }

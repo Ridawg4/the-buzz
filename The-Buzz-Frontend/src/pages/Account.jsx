@@ -45,7 +45,9 @@ function Account() {
     }
 
     const loadUserDetails = () => {
-        fetch("http://localhost:8080/api/v1/user/load-details", {credentials: "include", redirect: 'error'}
+        fetch("http://localhost:8080/api/v1/user/load-details",
+            {credentials: "include",
+                }
         ).then((response) => {
             if (response.status === 403) {
                 navigate("/login");

@@ -55,7 +55,7 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
     @Override
     public BuzzUserSession createSession() {
         //@TODO MIGHT BE WHY PERMISSIONS ARE STILL ALWAYS DEFAULT
-        return new BuzzUserSession(permissionService.getPermissionById(permissionService.getDefaultPermissionGroupIndex()));
+        return new BuzzUserSession();
     }
 
     /**
@@ -71,38 +71,52 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
             SecurityContextImpl context = null;
             try {
                 // Pulls the SecurityContextImpl from the session
+                // Pulling incorrectly?
                 context = session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
             } catch (NullPointerException exception) {
-//                Logger.getGlobal().info("Session does not have SecurityContextImpl");
+                Logger.getGlobal().info("Session does not have SecurityContextImpl");
+                deleteById(session.getId());
             }
             BuzzUser userAuth = null;
 
             try {
                 userAuth = (BuzzUser) context.getAuthentication().getPrincipal();
-                BuzzUser retrievedUser = userService.getUserRecordByUserId(userAuth.getUserId());
-
-                if(retrievedUser == null) {
-                    deleteById(session.getId());
-                } else {
                     try {
                         // Duplicate issue here, sessionId exists but returns null
-                        repository.addSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
+                        repository.addSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), userAuth.getSessionPermissions(), session.getAllAttributs().toString());
                     } catch (Exception e) {
-
+                        Logger.getGlobal().info(e.getMessage());
                     }
 
                     if(userAuth != null) {
                         // If the user exists, then userAuth.getId will always have a value
-                        sessionInfoService.addSessionInfo(session.getId(), userAuth.getUserId(), true, false);
+                        try {
+                            sessionInfoService.addSessionInfo(session.getId(), userAuth.getUserId(), true, false);
+                        } catch (Exception e) {
+
+                        }
                     }
-                }
+                Logger.getGlobal().info("Should be saved in db");
             } catch (ClassCastException | NullPointerException exception) {
                 // Delete any sessions that are generated that are not needed
                 // This does break redirects after auth, but those are broken right now anyway
+                Logger.getGlobal().warning(exception.getMessage());
                 deleteById(session.getId());
             }
         } else {
+            SecurityContextImpl context = null;
+            try {
+                // Pulls the SecurityContextImpl from the session
+                // Pulling incorrectly?
+                context = session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+            BuzzUser userAuth = null;
+
+            userAuth = (BuzzUser) context.getAuthentication().getPrincipal();
             repository.updateSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), session.getPermissions().asJsonObject().toString(), session.getAllAttributs().toString());
+            Logger.getGlobal().info("Session was updated instead of saved");
+            } catch (Exception e) {
+                Logger.getGlobal().warning("Failed to edit session");
+            }
         }
     }
 
