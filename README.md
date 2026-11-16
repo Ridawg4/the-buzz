@@ -54,7 +54,7 @@ MODERATORS CAN:
 - upload stream audio - BACKEND BUILT
 - set stream audio to record or not
 - view reports - DONE
-- handle reports
+- handle reports - Handling User Accout reports done, waiting on DJs, Comments, and Shows
 SYSTEM CAN:
 - remove sessions - DONE
 - add sessions - DONE

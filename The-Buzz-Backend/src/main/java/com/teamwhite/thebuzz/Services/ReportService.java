@@ -84,6 +84,9 @@ public class ReportService {
         if(report.getAction().equals("delete")) {
             // @TODO IMPLEMENT CREATING ACCOUNT MODERATION ENTRY WITH ACCOUNTMODERATIONSERVICE
         }
+        if(report.getAction().equals("warn")) {
+            // @TODO IMPLEMENT CREATING ACCOUNT MODERATION ENTRY WITH ACCOUNTMODERATIONSERVICE
+        }
         Logger.getGlobal().info(String.valueOf(report.getReportId()));
         handledReportRepository.createReport(report.getOriginalReport(), report.getHandlerId(), report.getAction(), report.getExplanation(), report.getDateHandled());
         activeReportRepository.deleteActiveReportById(report.getReportId());
