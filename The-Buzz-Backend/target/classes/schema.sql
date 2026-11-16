@@ -108,20 +108,6 @@ CREATE TABLE IF NOT EXISTS  comments (
         REFERENCES comments(comment_id)
 );
 
-CREATE TABLE IF NOT EXISTS comment_likes (
-    user_id BINARY(16) NOT NULL,
-    comment_id INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (user_id, comment_id),
-
-    FOREIGN KEY (user_id)
-        REFERENCES users(user_id),
-
-    FOREIGN KEY (comment_id)
-        REFERENCES comments(comment_id)
-);
-
 CREATE TABLE IF NOT EXISTS sessions (
     session_id BINARY(16) PRIMARY KEY NOT NULL UNIQUE,
     creation_time TIMESTAMP NOT NULL,
@@ -135,6 +121,25 @@ CREATE TABLE IF NOT EXISTS session_info (
     owner_id BINARY(16),
     needs_refresh BOOL NOT NULL DEFAULT FALSE,
     needs_to_delete_auth BOOL NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS active_reports (
+    report_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    content_type VARCHAR(25) NOT NULL,
+    content_uuid_id BINARY(16),
+    content_int_id INT,
+    user_who_reported BINARY(16),
+    date_reported TIMESTAMP NOT NULL,
+    reason VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS handled_reports (
+    report_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    original_report JSON NOT NULL,
+    handler_id BINARY(16) NOT NULL,
+    report_response VARCHAR(25) NOT NULL,
+    response_explanation VARCHAR(150) NOT NULL,
+    date_handled TIMESTAMP NOT NULL
 );
 
 CREATE USER "credentialsReader"@"localhost" IDENTIFIED BY "testingpassword";

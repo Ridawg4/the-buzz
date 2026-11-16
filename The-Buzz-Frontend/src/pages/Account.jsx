@@ -86,9 +86,9 @@ function Account() {
 
     {/* @TODO Make it look pretty then allow for account details editing */}
     return (
+        <>
+        <Navbar />
         <div className="centerdiv">
-            <Navbar />
-            <div>
                 <h3>
                     Account Details
                 </h3>
@@ -105,11 +105,11 @@ function Account() {
                 <AccountDetailsInputBox id="full_name" labelName = "Full Name"/>
 
                 <AccountDetailsInputBox id="user_desc" labelName = "Description"/>
-            </div>
-            <div>
+            <div className="options">
                 <button onClick = {verifyAccountDeletion}>Delete Account</button>
                 <LogoutButton />
             </div>
+        </div>
             <div id="Account-Deletion-Confirmation-Popup">
                 <h4>Woah there!</h4>
                 <p>This action will permanently delete your user account and all settings related to your account</p>
@@ -117,8 +117,8 @@ function Account() {
                     <button onClick = {closePopup}>Cancel</button>
                     <button onClick = {deleteAccount}>Delete Account</button>
                 </div>
-            </div>
         </div>
+        </>
     )
 }
 

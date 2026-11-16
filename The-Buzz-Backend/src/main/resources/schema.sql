@@ -123,6 +123,25 @@ CREATE TABLE IF NOT EXISTS session_info (
     needs_to_delete_auth BOOL NOT NULL DEFAULT FALSE
 );
 
+CREATE TABLE IF NOT EXISTS active_reports (
+    report_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    content_type VARCHAR(25) NOT NULL,
+    content_uuid_id BINARY(16),
+    content_int_id INT,
+    user_who_reported BINARY(16),
+    date_reported TIMESTAMP NOT NULL,
+    reason VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS handled_reports (
+    report_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    original_report JSON NOT NULL,
+    handler_id BINARY(16) NOT NULL,
+    report_response VARCHAR(25) NOT NULL,
+    response_explanation VARCHAR(150) NOT NULL,
+    date_handled TIMESTAMP NOT NULL
+);
+
 CREATE USER "credentialsReader"@"localhost" IDENTIFIED BY "testingpassword";
 CREATE USER "credentialsWriter"@"localhost" IDENTIFIED BY "testingpassword";
 

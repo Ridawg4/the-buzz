@@ -1,4 +1,4 @@
-import PermissionEditBox from "../Components/PermissionEditBox.jsx";
+import PermissionEditBox from "./PermissionEditBox.jsx";
 import {useContext, useEffect, useState} from "react";
 
 function PermissionsEdit({permissionId, removeCreating} ) {

@@ -2,8 +2,9 @@ import Navbar from "../Components/Navbar.jsx";
 import PermissionEditBox from "../Components/PermissionEditBox.jsx";
 import {useContext, useEffect, useState} from "react";
 import PermissionListItem from "../Components/PermissionListItem.jsx";
-import PermissionsEdit from "./PermissionsEdit.jsx";
-import PermissionsCreate from "./PermissionsCreate.jsx";
+import PermissionsEdit from "../Components/PermissionsEdit.jsx";
+import PermissionsCreate from "../Components/PermissionsCreate.jsx";
+import LoadingCircle from "../Components/LoadingCircle.jsx";
 
 function PermissionList() {
     const [ permissionEntries, setPermissionEntries ] = useState([]);
@@ -11,6 +12,7 @@ function PermissionList() {
     const [ pemissionEditingName, setPemissionEditingName ] = useState('');
     const [ pemissionEditingDesc, setPemissionEditingDesc ] = useState('');
     const [ isCreating, setIsCreating ] = useState(-1);
+    const [ isLoading, setIsLoading ] = useState(true);
 
 
     const getPermissions = () => {
@@ -24,6 +26,7 @@ function PermissionList() {
                     console.log("permissionData", permissionData)
 
                     setPermissionEntries(data.permissions)
+                    setIsLoading(false);
                 })
             })
         }
@@ -51,19 +54,28 @@ function PermissionList() {
     }
 
     const setState = () => {
-        if(isEditing !== -1) {
-            return <PermissionsEdit permissionName={pemissionEditingName} permissionDesc={pemissionEditingDesc} permissionId={isEditing} removeEditing={removeEditing}/>
-        } else if(isCreating !== -1) {
-            return <PermissionsCreate permissionId={isCreating} removeCreating={removeCreating}/>
-        }  else {
-            return (<div id="permission-list">
-                {permissionEntries.map((object, index) => (
-                    <PermissionListItem key={index} permissionId={object.permission_id} permissionName={object.permission_name} permissionDesc={object.permission_desc} createdBy={object.created_by} createdAt={object.created_at} isDefaultPermissions={object.is_default_permission_group} editPage={prepareForEditing}/>
-                ))}
-                <button onClick={newPermission}>Create New Permission Group</button>
-            </div>)
+        if(!isLoading) {
+            if (isEditing !== -1) {
+                return <PermissionsEdit permissionName={pemissionEditingName} permissionDesc={pemissionEditingDesc}
+                                        permissionId={isEditing} removeEditing={removeEditing}/>
+            } else if (isCreating !== -1) {
+                return <PermissionsCreate permissionId={isCreating} removeCreating={removeCreating}/>
+            } else {
+                return (<div id="permission-list">
+                    {permissionEntries.map((object, index) => (
+                        <PermissionListItem key={index} permissionId={object.permission_id}
+                                            permissionName={object.permission_name}
+                                            permissionDesc={object.permission_desc} createdBy={object.created_by}
+                                            createdAt={object.created_at}
+                                            isDefaultPermissions={object.is_default_permission_group}
+                                            editPage={prepareForEditing}/>
+                    ))}
+                    <button onClick={newPermission}>Create New Permission Group</button>
+                </div>)
+            }
+        } else {
+            return (<div className="centerdiv"><LoadingCircle /></div>)
         }
-
     }
 
     useEffect(() => {

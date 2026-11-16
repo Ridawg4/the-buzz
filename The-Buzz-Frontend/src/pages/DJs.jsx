@@ -1,5 +1,5 @@
 
-import "./DJs.css";
+import "./css/DJs.css";
 import Navbar from "../Components/Navbar.jsx";
 
 // Example DJ data - replace with real information later

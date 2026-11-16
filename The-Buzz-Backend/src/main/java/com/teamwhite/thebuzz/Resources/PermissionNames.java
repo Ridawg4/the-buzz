@@ -1,5 +1,7 @@
 package com.teamwhite.thebuzz.Resources;
 
+import jakarta.json.JsonObject;
+
 /** Describes all the permission names and their possible values
  * For using these with @PreAuthorize or @PostAuthorize, you must turn the values into constants
  *
@@ -105,4 +107,9 @@ public class PermissionNames {
     public static final String CAN_SET_LIVE_STREAM_RECORDING = "CAN_SET_LIVE_STREAM_RECORDING";
     /** Does the user have the ability to disable the live stream? | ALLOWED, DENIED */
     public static final String CAN_DISABLE_LIVE_STREAM = "CAN_DISABLE_LIVE_STREAM";
+
+    // @TODO IMPLEMENT
+    public JsonObject getAllPermissionsAndValues() {
+        return null;
+    }
 }

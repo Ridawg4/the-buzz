@@ -1,12 +1,3 @@
-#centerdiv {
-    display: flex;
-    flex-direction: column;
-    width: 100vw;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
-}
-
 #FailedToGetInfo {
     display: none;
 }
@@ -96,4 +87,9 @@
 .accountDetailsInputBox-input {
     width: 100%;
     height: 100%;
+}
+
+#options {
+    display: flex;
+    flex-direction: row;
 }

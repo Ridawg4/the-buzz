@@ -8,6 +8,7 @@ function Admin() {
             <Navbar />
             <Link to="/admin/permissions">Permissions</Link>
             <Link to="/admin/users">Users</Link>
+            <Link to="/admin/reports">Reports</Link>
         </>
     )
 }

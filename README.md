@@ -15,6 +15,7 @@ ALL USERS CAN:
 - delete comments
 - modify account info - DONE
 - delete account - DONE
+- report content - BACKEND BUILT
 DJs CAN:
 - see DJ system panels
 - create DJ profile

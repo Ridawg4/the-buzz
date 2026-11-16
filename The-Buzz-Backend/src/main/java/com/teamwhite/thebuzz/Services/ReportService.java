@@ -1,0 +1,72 @@
+package com.teamwhite.thebuzz.Services;
+
+import com.teamwhite.thebuzz.Repositories.ReportRepository;
+import com.teamwhite.thebuzz.model.ActiveReport;
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class ReportService {
+    private final ReportRepository repository;
+
+    public ReportService(ReportRepository repository) {
+        this.repository = repository;
+    }
+
+    public JsonObject getAllReports() {
+        List<Object[]> entries = repository.getAllReports();
+        ActiveReport[] reports = new ActiveReport[entries.size()];
+        JsonArrayBuilder arrBuilder = Json.createArrayBuilder();
+        JsonObjectBuilder objWrapper = Json.createObjectBuilder();
+
+        for(int i = 0; i < entries.size(); i++) {
+            Object[] currObject = entries.get(i);
+
+            if(currObject[2] != null) {
+                reports[i] = new ActiveReport((int) currObject[0], (String) currObject[1], (String) currObject[2],
+                        (String) currObject[4], (String) currObject[5], (LocalDateTime) currObject[6]);
+            } else {
+                reports[i] = new ActiveReport((int) currObject[0], (String) currObject[1], (int) currObject[3],
+                        (String) currObject[4], (String) currObject[5], (LocalDateTime) currObject[6]);
+            }
+        }
+
+        for(ActiveReport report : reports) {
+            arrBuilder.add(report.asJsonObject());
+        }
+
+        objWrapper.add("reports", arrBuilder.build());
+
+        return objWrapper.build();
+    }
+
+    public JsonObject getReportByReportId(int reportId) {
+        List<Object[]> entries = repository.getReportById(reportId);
+
+        if(entries.isEmpty()) {
+            throw new IllegalArgumentException("No Active Report exists at that ID");
+        }
+
+        if(entries.size() > 1) {
+            throw new IllegalArgumentException("Database somehow has more than one Active Report at ID");
+        }
+        Object[] currObject = entries.get(0);
+
+        if(currObject[2] != null) {
+            return new ActiveReport((int) currObject[0], (String) currObject[1], (String) currObject[2],
+                    (String) currObject[4], (String) currObject[5], (LocalDateTime) currObject[6]).asJsonObject();
+        } else {
+             return new ActiveReport((int) currObject[0], (String) currObject[1], (int) currObject[3],
+                    (String) currObject[4], (String) currObject[5], (LocalDateTime) currObject[6]).asJsonObject();
+        }
+    }
+
+    public void createReport(ActiveReport report) {
+        repository.createReport(report.getContentType(), report.getContentUuidId(), report.getContentIntId(), report.getReporter(), report.getReasonForReporting(), report.getDateReported());
+    }
+}

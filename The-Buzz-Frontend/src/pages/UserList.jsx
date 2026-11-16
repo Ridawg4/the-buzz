@@ -3,12 +3,15 @@ import {useEffect, useState} from "react";
 import UserListItem from "../Components/UserListItem.jsx";
 import "./css/user-list.css"
 import ModerationUserEdit from "../Components/ModerationUserEdit.jsx";
+import LoadingCircle from "../Components/LoadingCircle.jsx";
 
 function UserList() {
     const [ userEntries, setUserEntries ] = useState([]);
     const [ permissionEntries, setPermissionEntries ] = useState([]);
     const [ isEditing, setIsEditing ] = useState(false);
     const [ userDetailsToEdit, setUserDetailsToEdit ] = useState(null);
+    const [ isLoading, setIsLoading ] = useState(true);
+
 
     const getUsers = async () => {
         if (!userEntries.length > 0) {
@@ -30,6 +33,7 @@ function UserList() {
                     let permissions = data.permissions
 
                     setPermissionEntries(permissions)
+                    setIsLoading(false);
                 })
             })
         }
@@ -46,22 +50,29 @@ function UserList() {
     }
 
     const isEditingPageVisible = () => {
-        if (isEditing) {
-           return  (
-               <ModerationUserEdit userId={userDetailsToEdit.userId} username = {userDetailsToEdit.username} email = {userDetailsToEdit.email} joinDate = {userDetailsToEdit.joinDate} fullName ={userDetailsToEdit.fullName}  userDesc = {userDetailsToEdit.desc} endEditing={closeEditing}/>
-           )
+        if(!isLoading) {
+            if (isEditing) {
+                return (
+                    <ModerationUserEdit userId={userDetailsToEdit.userId} username={userDetailsToEdit.username}
+                                        email={userDetailsToEdit.email} joinDate={userDetailsToEdit.joinDate}
+                                        fullName={userDetailsToEdit.fullName} userDesc={userDetailsToEdit.desc}
+                                        endEditing={closeEditing}/>
+                )
+            } else {
+                getUsers();
+                return (
+                    <div className="user-list">
+                        {userEntries.map((object, index) => (
+                            <UserListItem key={object.user_id} userId={object.user_id} username={object.username}
+                                          email={object.email} joinDate={object.join_date} fullName={object.full_name}
+                                          userDesc={object.user_desc} permissionId={object.permissions.permission_id}
+                                          permissionGroups={permissionEntries} setEditing={editAccount}/>
+                        ))}
+                    </div>
+                )
+            }
         } else {
-            getUsers();
-            return (
-                <div className="user-list">
-                {userEntries.map((object, index) => (
-                    <UserListItem key={object.user_id} userId={object.user_id} username={object.username}
-                                  email={object.email} joinDate={object.join_date} fullName={object.full_name}
-                                  userDesc={object.user_desc} permissionId={object.permissions.permission_id}
-                                  permissionGroups={permissionEntries} setEditing = {editAccount}/>
-                ))}
-            </div>
-            )
+            return (<div className="centerdiv"><LoadingCircle /></div>)
         }
     }
 
