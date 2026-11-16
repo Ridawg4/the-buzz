@@ -4,9 +4,15 @@ WSBU 88.3 The Buzz - Software Engineering Project
 This application is built using Spring Boot
 
 ALL FUNCTIONALITIES:
-ALL USERS CAN:
+ANYONE CAN:
 - Play live stream - BACKEND BUILT
 - Play prerecorded streams - BACKEND BUILT
+- report content - BACKEND BUILT
+- View DJ profiles
+- View showtimes
+- View shows
+- View comments
+ALL USERS CAN:
 - Add favorites - BACKEND BUILT
 - remove favorites - BACKEND BUILT
 - like shows
@@ -15,7 +21,6 @@ ALL USERS CAN:
 - delete comments
 - modify account info - DONE
 - delete account - DONE
-- report content - BACKEND BUILT
 DJs CAN:
 - see DJ system panels
 - create DJ profile
