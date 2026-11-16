@@ -27,4 +27,6 @@ public class ReportController {
         }
         return new ResponseEntity<>(reportService.getAllReports().toString(), HttpStatus.OK);
     }
+
+    // @TODO IMPLEMENT HANDLING REPORTS
 }

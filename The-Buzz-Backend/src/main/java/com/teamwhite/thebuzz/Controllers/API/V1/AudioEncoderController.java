@@ -28,79 +28,15 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/audio")
-@EnableMethodSecurity
 public class AudioEncoderController {
     private static String[] lastThreeLiveSegmentFiles =  {"", "", ""};
 
-    @GetMapping("/live")
-    public ResponseEntity<Resource> getAudio() throws MalformedURLException {
-        ResponseEntity<Resource> resp;
-
-        /* An Optional<T> is a wrapper you can create to alert the programmer that an object
-          or may not be present inside. This is a slightly nicer way to handle null objects */
-        Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
-                ResourcePaths.LIVE_SEGMENTS_DIRECTORY, "live.m3u8");
-
-        if(resourceOptional.isPresent()) {
-            resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
-            // HTTP standard indicate that .m3u8 files are returned with the type shown below
-            resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, ContentTypes.M3U8);
-
-        } else {
-            resp = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        // Return the generated request
-        return resp;
-    }
-
-    @GetMapping("/{filename}")
-    public ResponseEntity<Resource> getLiveAudioSegment(@PathVariable String filename) throws MalformedURLException {
-        ResponseEntity<Resource> resp;
-
-        // Creates the Optional<T> received from local storage
-        Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
-                ResourcePaths.LIVE_SEGMENTS_DIRECTORY, filename);
-
-        if(resourceOptional.isPresent()) {
-            // If the Optional<T> is not empty, send the file contained inside
-            resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
-            resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, ContentTypes.MP3);
-
-        } else {
-            resp = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        // Return the generated request
-        return resp;
-    }
-
-    @GetMapping("/{resource}/{filename}")
-    public ResponseEntity<Resource> getAudio(@PathVariable String filename, @PathVariable String resource) throws MalformedURLException {
-        ResponseEntity<Resource> resp;
-
-        // Creates the Optional<T> received from local storage
-        Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(
-                ResourcePaths.TEMP_DIRECTORY + resource + ResourcePaths.SEPARATOR
-                        + "Segments" + ResourcePaths.SEPARATOR, filename);
-
-        if(resourceOptional.isPresent()) {
-            // If the Optional<T> is not empty, send those files
-            resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
-            // Required by HTTP HLS standard, clients deny loading the files without this tag
-            resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, ContentTypes.M3U8);
-        } else {
-            // If file is not present, alert client of such
-            resp = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return resp;
-    }
-
     @PostMapping("/upload")
+    // @TODO SPLIT INTO TWO SEPARATE ENDPOINTS
+    @PreAuthorize("hasAnyAuthority('CAN_UPLOAD_LIVE_STREAM_SEGMENTS', 'CAN_UPLOAD_ANY_PRERECORDED_SHOW_AUDIO')")
     public ResponseEntity<String> uploadRecordedAudio
             (@RequestParam("file") MultipartFile file,
-             @RequestParam("resourcePath") String resourcePath,
+             @RequestParam(required = false) String resourcePath,
              @RequestParam("isLive") boolean isLive,
              HttpExchange.Principal principal) throws IOException {
         // Adds the newly created file into the queue to create the playlist with

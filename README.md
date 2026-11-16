@@ -53,6 +53,8 @@ MODERATORS CAN:
 - download system usage statistics
 - upload stream audio - BACKEND BUILT
 - set stream audio to record or not
+- view reports - DONE
+- handle reports
 SYSTEM CAN:
 - remove sessions - DONE
 - add sessions - DONE
