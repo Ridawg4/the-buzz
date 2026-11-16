@@ -1,7 +1,7 @@
 import fileUploadIcon from "../assets/uploadIcon.svg";
 import {useNavigate} from "react-router-dom";
 
-function AccountDetailsProfilePictureInput({userId = null, id, imagePath = "http://localhost:8080/api/v1/user/profile-picture?time=0" }) {
+function AccountDetailsProfilePictureInput({userId = null, id, imagePath = "http://localhost:8080/api/v1/user/profile-picture?time=0", sendChangesToParent = null }) {
     const navigate = useNavigate();
 
     const refreshImage = () => {
@@ -19,25 +19,30 @@ function AccountDetailsProfilePictureInput({userId = null, id, imagePath = "http
         formData.append("file", file);
 
         if (userId != null) {
-            formData.append("userId", userId);
-            fetch("http://localhost:8080/api/v1/user/modify-profile-picture?time=" + Date.now() + "&userId=" + userId, {
-                method: "POST",
-                credentials: "include",
-                body: formData
-            }).then(res => {
-                if (res.status === 201){
-                    console.log("updated");
-                }
-                if (res.status === 403) {
-                    console.log("Forbidden")
-                }
-                if(res.status === 400) {
-                    console.log("Error modifying password | Bad Request");
-                    res.text().then(text => {
-                        console.log("Error modifying password | Bad Request " + text);
-                    })
-                }
-            })
+            if(sendChangesToParent == null) {
+                formData.append("userId", userId);
+                fetch("http://localhost:8080/api/v1/user/modify-profile-picture?time=" + Date.now() + "&userId=" + userId, {
+                    method: "POST",
+                    credentials: "include",
+                    body: formData
+                }).then(res => {
+                    if (res.status === 201) {
+                        console.log("updated");
+                    }
+                    if (res.status === 403) {
+                        console.log("Forbidden")
+                    }
+                    if (res.status === 400) {
+                        console.log("Error modifying password | Bad Request");
+                        res.text().then(text => {
+                            console.log("Error modifying password | Bad Request " + text);
+                        })
+                    }
+                })
+            } else {
+                formData.append("userId", userId);
+                sendChangesToParent(formData, "image");
+            }
         } else {
             fetch("http://localhost:8080/api/v1/user/modify-profile-picture?time=" + Date.now(), {
                 method: "POST",

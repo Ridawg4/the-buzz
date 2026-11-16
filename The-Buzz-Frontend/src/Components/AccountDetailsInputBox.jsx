@@ -1,7 +1,7 @@
 import React from "react";
 import {useNavigate} from "react-router-dom";
 
-function AccountDetailsInputBox({ userId = null, id, labelName, defaultText, canEdit = true, type = "text", children }) {
+function AccountDetailsInputBox({ userId = null, id, labelName, defaultText, canEdit = true, type = "text", sendChangesToParent = null, children }) {
     const [isModifyValue, setModifyValue] = React.useState(false);
     const [lastValue, setLastValue] = React.useState('');
     const navigate = useNavigate();
@@ -42,22 +42,27 @@ function AccountDetailsInputBox({ userId = null, id, labelName, defaultText, can
         formData.set(id, document.getElementById(id).value);
 
         if(userId != null) {
-            formData.append("userId", userId);
-            fetch("http://localhost:8080/api/v1/user/modify-user", {
-                method: "POST",
-                credentials: "include",
-                body: formData
-            }).then(res => {
-                if (res.status === 403) {
-                    console.log("Not authorized");
-                }
-                if (res.status === 400) {
-                    console.log("Error modifying password | Bad Request");
-                    res.text().then(text => {
-                        console.log("Error modifying password | Bad Request " + text);
-                    })
-                }
-            })
+            if(sendChangesToParent == null) {
+                formData.append("userId", userId);
+                fetch("http://localhost:8080/api/v1/user/modify-user", {
+                    method: "POST",
+                    credentials: "include",
+                    body: formData
+                }).then(res => {
+                    if (res.status === 403) {
+                        console.log("Not authorized");
+                    }
+                    if (res.status === 400) {
+                        console.log("Error modifying User | Bad Request");
+                        res.text().then(text => {
+                            console.log("Error modifying User | Bad Request " + text);
+                        })
+                    }
+                })
+            } else {
+                formData.append("userId", userId);
+                sendChangesToParent(formData, "text");
+            }
         } else {
             fetch("http://localhost:8080/api/v1/user/modify-user", {
                 method: "POST",

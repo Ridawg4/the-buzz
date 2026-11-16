@@ -407,11 +407,28 @@ public class BuzzUser implements UserDetails, CredentialsContainer {
     public JsonObject getAccountDetailsWithoutSettings() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("username", username)
+                .add("userId", userId.toString())
                 .add("email", email)
                 .add("join_date", joinDate.toString())
                 .add("full_name", fullName)
                 .add("user_desc", userDesc)
                 .add("pfpLocation", userPfpLocation);
+
+        return builder.build();
+    }
+
+    /**
+     * Gets all of an accounts details without getting settings, email, permisisons, or auth tokens
+     * and wraps it into a JsonObject
+     * @return JsonObject containing username, email, joinDate, fullName, and userDesc
+     */
+    public JsonObject getAccountDetailsWithoutSensitiveInfo() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("username", username)
+                .add("userId", userId.toString())
+                .add("join_date", joinDate.toString())
+                .add("full_name", fullName)
+                .add("user_desc", userDesc);
 
         return builder.build();
     }

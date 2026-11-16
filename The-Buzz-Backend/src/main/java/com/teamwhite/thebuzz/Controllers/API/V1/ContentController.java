@@ -1,19 +1,24 @@
 package com.teamwhite.thebuzz.Controllers.API.V1;
 
 import com.teamwhite.thebuzz.Exceptions.InvalidAuthenticationPrincipalException;
+import com.teamwhite.thebuzz.Exceptions.NoUserFoundException;
 import com.teamwhite.thebuzz.Records.ContentTypes;
+import com.teamwhite.thebuzz.Resources.PermissionValues;
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
 import com.teamwhite.thebuzz.Services.LocalStorage;
 import com.teamwhite.thebuzz.Services.ReportService;
+import com.teamwhite.thebuzz.Services.UserService;
 import com.teamwhite.thebuzz.model.ActiveReport;
 import com.teamwhite.thebuzz.model.BuzzUser;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Optional;
 
@@ -21,9 +26,11 @@ import java.util.Optional;
 @RequestMapping("/api/v1/content")
 public class ContentController {
     private final ReportService reportService;
+    private final UserService userService;
 
-    public ContentController(ReportService reportService) {
+    public ContentController(ReportService reportService, UserService userService) {
         this.reportService = reportService;
+        this.userService = userService;
     }
 
     @PostMapping("/report/report-content")
@@ -130,5 +137,43 @@ public class ContentController {
         }
 
         return resp;
+    }
+
+    @GetMapping("user/load-profile-info")
+    public ResponseEntity<String> loadUserDetails(@RequestParam String userId) {
+        if(userId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            BuzzUser dbUser = userService.getUserRecordByUserId(userId);
+            ResponseEntity<String> response = new ResponseEntity<>(dbUser.getAccountDetailsWithoutSensitiveInfo().toString(),
+                    HttpStatus.OK);
+            response.getHeaders().add("Content-Type", ContentTypes.JSON);
+
+            return response;
+        } catch (NoUserFoundException exc) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("user/load-profile-picture")
+    public ResponseEntity<Resource> loadProfilePicture(@RequestParam String userId) {
+        ResponseEntity<Resource> resp;
+        if(userId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            String pathToPfp = userService.getUserRecordByUserId(userId).getUserPfpLocation();
+            Optional<Resource> resourceOptional = LocalStorage.retrieveFileFromLocalStorage(pathToPfp);
+
+            if(resourceOptional.isPresent()) {
+                resp = new ResponseEntity<>(resourceOptional.get(), HttpStatus.OK);
+                return resp;
+            }
+        } catch (IOException exc) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
