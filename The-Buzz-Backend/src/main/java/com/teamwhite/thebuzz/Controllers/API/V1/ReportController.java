@@ -38,6 +38,7 @@ public class ReportController {
                                                @RequestParam String originalReport,
                                                @RequestParam String handlerId,
                                                @RequestParam String action,
+                                               @RequestParam(required = false) String unbanDate,
                                                @RequestParam String explanation) {
         try {
             reportService.getReportByReportId(Integer.parseInt(reportId));
@@ -47,7 +48,7 @@ public class ReportController {
 
 
         try {
-            reportService.createHandledReport(new HandledReport(Integer.parseInt(reportId), originalReport, handlerId, action, explanation));
+            reportService.createHandledReport(new HandledReport(Integer.parseInt(reportId), originalReport, handlerId, action, explanation), unbanDate);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create handled report: " + e.getMessage());
         }

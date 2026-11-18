@@ -26,16 +26,18 @@ class SecurityConfiguration {
     private final BuzzUserDetailsManager buzzUserDetailsManager;
     private final PasswordEncoder passwordEncoder;
     private final UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource;
+    private final SuccessfulAuthenticationHandler successfulAuthenticationHandler;
 
     /**
      * Autowired
      * @param buzzUserDetailsManager
      * @param passwordEncoder
      */
-    public SecurityConfiguration(BuzzUserDetailsManager buzzUserDetailsManager, PasswordEncoder passwordEncoder, UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource) {
+    public SecurityConfiguration(BuzzUserDetailsManager buzzUserDetailsManager, PasswordEncoder passwordEncoder, UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource, SuccessfulAuthenticationHandler successfulAuthenticationHandler) {
         this.buzzUserDetailsManager = buzzUserDetailsManager;
         this.passwordEncoder = passwordEncoder;
         this.urlBasedCorsConfigurationSource = urlBasedCorsConfigurationSource;
+        this.successfulAuthenticationHandler = successfulAuthenticationHandler;
     }
 
     /**
@@ -97,7 +99,7 @@ class SecurityConfiguration {
                     formLogin.loginPage("/login.html")
                             .loginProcessingUrl("/api/v1/login")
 //                            .defaultSuccessUrl("/accountDetails.html")
-                            .successHandler(new SuccessfulAuthenticationHandler())
+                            .successHandler(successfulAuthenticationHandler)
                             .failureHandler(new FailureAuthenticationHandler())
                             .permitAll();
                 })

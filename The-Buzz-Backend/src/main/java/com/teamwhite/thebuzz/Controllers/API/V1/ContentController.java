@@ -3,34 +3,38 @@ package com.teamwhite.thebuzz.Controllers.API.V1;
 import com.teamwhite.thebuzz.Exceptions.InvalidAuthenticationPrincipalException;
 import com.teamwhite.thebuzz.Exceptions.NoUserFoundException;
 import com.teamwhite.thebuzz.Records.ContentTypes;
-import com.teamwhite.thebuzz.Resources.PermissionValues;
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
+import com.teamwhite.thebuzz.Services.AccountModerationService;
 import com.teamwhite.thebuzz.Services.LocalStorage;
 import com.teamwhite.thebuzz.Services.ReportService;
 import com.teamwhite.thebuzz.Services.UserService;
+import com.teamwhite.thebuzz.model.AccountModeration;
 import com.teamwhite.thebuzz.model.ActiveReport;
 import com.teamwhite.thebuzz.model.BuzzUser;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/content")
 public class ContentController {
     private final ReportService reportService;
     private final UserService userService;
+    private final AccountModerationService accountModerationService;
 
-    public ContentController(ReportService reportService, UserService userService) {
+    public ContentController(ReportService reportService, UserService userService, AccountModerationService accountModerationService) {
         this.reportService = reportService;
         this.userService = userService;
+        this.accountModerationService = accountModerationService;
     }
 
     @PostMapping("/report/report-content")
@@ -175,5 +179,26 @@ public class ContentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("/action/acknowledge")
+    public ResponseEntity<String> acknowledgeAction(@RequestParam String userId,
+                                                    @RequestParam String reportId,
+                                                    @RequestParam boolean isAcknowledged) {
+        AccountModeration moderationEntry = null;
+        Logger.getGlobal().info(reportId);
+        try {
+            moderationEntry = accountModerationService.getModerationById(Integer.parseInt(reportId));
+        } catch (IllegalArgumentException exc) {
+            return ResponseEntity.badRequest().body("ReportId does not match any account actions");
+        }
+        assert moderationEntry != null;
+        if(LocalDateTime.now().isBefore(moderationEntry.getDateExpires().toLocalDateTime())) {
+            return ResponseEntity.badRequest().body("Action cannot be acknowledged before it expires");
+        }
+
+        accountModerationService.acknowledgeAccountModeration(Integer.parseInt(reportId), true);
+
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

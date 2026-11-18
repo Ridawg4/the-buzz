@@ -1,0 +1,12 @@
+.NoticeEntry {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border-color: #54210f;
+    border-width: 2px;
+    padding: 15px;
+    margin: 15px;
+    border-style: solid;
+}

@@ -41,8 +41,8 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
                 return (<></>);
             } else if (activeAction === "edit") {
                 return (<ReportUserEdit userObject={userObject} reportId={reportId} contentType={contentType} sendValuesToParent={saveChangesFromForm} />);
-            } else if (activeAction === "delete") {
-                return (<></>);
+            } else if (activeAction === "ban") {
+                return (<input id={reportId + "-BanLengthInput"} type="datetime-local"></input>);
             } else {
                 return (<></>);
             }
@@ -71,11 +71,18 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
         formData.append("originalReport", JSON.stringify(reportObject));
         formData.append("handlerId", globalUser.userId);
         formData.append("action", actionOption.value);
+        console.log(explanation);
         if (explanation !== "other") {
-            formData.append("explanation", explanation);
+            let explanationOption = document.getElementById(reportId + "-Explanation-Dropdown");
+            formData.append("explanation", explanationOption.value);
         } else {
             let textArea = document.getElementById(reportId + "-Response");
-            formData.append("explanation", textArea.innerText);
+            formData.append("explanation", textArea.value);
+        }
+
+        if(actionOption.value === "ban") {
+            let banInput = document.getElementById(reportId + "-BanLengthInput");
+            formData.append("unbanDate", banInput.value);
         }
 
         if(!savedReport) {
@@ -93,14 +100,22 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
                         if(imageFormData !== null) {
                             alterUserProfilePicture();
                         }
-                    } else if (actionOption.value === "delete") {
-                        deleteUserAccount();
                     }
                     cancelReport();
                 }
             })
         }
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        let explanationOption = document.getElementById(reportId + "-Explanation-Dropdown");
+
+        setExplanation(explanationOption.value)
+
+        let actionOption = document.getElementById(reportId + "-Action-Dropdown");
+
+        setActiveAction(actionOption.value)
+    })
 
     const alterUserAccountDetails = () => {
         fetch("http://localhost:8080/api/v1/user/modify-user", {
@@ -113,23 +128,6 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
             }
             if (res.status === 400) {
                 console.log("Error modifying password | Bad Request");
-            }
-        })
-    }
-
-    const deleteUserAccount = () => {
-        console.log(userObject.userId)
-        fetch("http://localhost:8080/api/v1/user/delete-account?approved=true&userId=" + userObject.userId, {
-            method: "POST",
-            credentials: "include"
-        }).then(res => {
-            if(res.status === 400) {
-                res.text().then(text => {
-                    console.log("Deletion failed: Bad Request | " + text);
-                })
-            }
-            if(res.status === 500) {
-                console.log("Deletion failed from server error");
             }
         })
     }
@@ -163,7 +161,7 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
                     <option value="nothing">No Action</option>
                     <option value="warn">Warning</option>
                     <option value="edit">Edit Account</option>
-                    <option value="delete">Delete Account</option>
+                    <option value="ban">Ban Account</option>
                 </select>
                 {showActiveAction()}
                 <select id={reportId + "-Explanation-Dropdown"} onChange={changeExplanation}>

@@ -7,6 +7,7 @@ import jakarta.json.JsonObjectBuilder;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import java.io.StringReader;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -70,6 +71,18 @@ public class ActiveReport {
         this.reporter = UUID.fromString(reporter);
         this.reasonForReporting = reasonForReporting;
         this.dateReported = Timestamp.valueOf(dateReported);
+    }
+
+    public ActiveReport(String activeReportJsonString) {
+        JsonObject jsonActiveReport = Json.createReader(new StringReader(activeReportJsonString)).readObject();
+
+        this.contentType = jsonActiveReport.getString("contentType");
+        this.reportId = jsonActiveReport.getInt("reportId");
+        this.contentIntId = jsonActiveReport.getInt("contentId");
+        this.contentUuidId = UUID.fromString(jsonActiveReport.getString("contentUUID"));
+        this.reporter = UUID.fromString(jsonActiveReport.getString("userWhoReported"));
+        this.reasonForReporting = jsonActiveReport.getString("reason");
+        this.dateReported = Timestamp.valueOf(jsonActiveReport.getString("dateReported"));
     }
 
     public String getContentType() {

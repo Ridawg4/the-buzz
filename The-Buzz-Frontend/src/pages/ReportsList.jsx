@@ -76,7 +76,6 @@ function UserList() {
                     )
                 }
             } else {
-                getReportEntries();
                 if (reportEntries.length > 0) {
                     return (
                         <div className="splitContentBox">
@@ -114,6 +113,7 @@ function UserList() {
 
     useEffect(() => {
         getReportEntries()
+        // setInterval(getReportEntries, 10000)
     })
 
     return (

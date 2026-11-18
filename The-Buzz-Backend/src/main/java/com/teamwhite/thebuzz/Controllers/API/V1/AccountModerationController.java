@@ -23,10 +23,10 @@ public class AccountModerationController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<AccountModeration>> getModerationByUserId(
+    public ResponseEntity<AccountModeration[]> getModerationByUserId(
             @PathVariable String userId) {
-        List<AccountModeration> records =
-                moderationService.getModerationByUserId(UUID.fromString(userId));
+        AccountModeration[] records =
+                moderationService.getModerationByUserId(userId);
 
         return ResponseEntity.ok(records);
     }

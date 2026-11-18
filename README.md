@@ -22,7 +22,7 @@ ALL USERS CAN:
 - modify account info - DONE
 - delete account - DONE
 DJs CAN:
-- see DJ system panels
+- see DJ system panels - BACKEND BUILT
 - create DJ profile
 - modify DJ profile - BACKEND BUILT
 - delete DJ profile
@@ -44,7 +44,7 @@ MODERATORS CAN:
 - delete ANY prerecorded show audio
 - modify show schedule visibility
 - view account action logs
-- create account actions
+- create account actions - DONE
 - modify account actions
 - delete account actions
 - modify account info - DONE
@@ -68,3 +68,5 @@ SYSTEM CAN:
 - login to accounts - DONE
 - logout of accounts - DONE
 - create accounts - DONE
+- block banned users from login - DONE
+- make users acknowledge account actions - DONE

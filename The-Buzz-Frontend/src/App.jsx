@@ -16,34 +16,64 @@ import ReportsList from "./pages/ReportsList.jsx";
 
 function App() {
     const [userId, setUserId] = useState(null);
+    const [isError, setIsError] = useState(false);
+    const [hasAlertedOfLogout, setHasAlertedOfLogout] = useState(false);
 
-    React.useEffect(() => {
-        if(userId === null) {
+    const checkUserAuth = () => {
             fetch("http://localhost:8080/api/v1/user/AuthValid",
                 {credentials: "include", redirect: "error"})
                 .then(res => {
-                    if((res.ok)) {
-                        res.text()
-                            .then(text => {
-                                setUserId(text)
-                            }
-                            ).catch((e) => {
+                        if((res.ok)) {
+                            res.text()
+                                .then(text => {
+                                    if(userId === null) {
+                                        setIsError(false)
+                                        setHasAlertedOfLogout(false)
+                                        setUserId(text)
+                                    }
+                                }).catch((e) => {
                                 setUserId(null)
                             })
-                    } else {
+                        } if (res.status === 401) {
                         setUserId(null)
+                        }
                     }
-                }
                 ).catch((e) => {
-                    setUserId(null)
-                })
+                setUserId(null)
+                if (hasAlertedOfLogout) {
+                    setIsError(true)
+                    setTimeout(setErrorFalse, 5000, []);
+                    setHasAlertedOfLogout(true)
+                }
+            })
+    }
+
+    const setErrorFalse = () => {
+        setIsError(false);
+    }
+
+    const showLogoutError = () => {
+        if(isError) {
+            if (!hasAlertedOfLogout) {
+                return (
+                    <div className="alert critical" role="alert">
+                        <p>You have been logged out!</p>
+                    </div>
+                )
+            }
         }
+    }
+
+    React.useEffect(() => {
+        checkUserAuth()
+        setInterval(checkUserAuth, 30000, [])
     })
 
   return (
 		<BrowserRouter>
             <UserContext.Provider value={{ userId, setUserId }}>
 			  <div className="app">
+                  {showLogoutError()}
 
 				{/* Page routes */}
 				<Routes>

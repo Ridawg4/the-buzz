@@ -55,7 +55,6 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
      */
     @Override
     public BuzzUserSession createSession() {
-        //@TODO MIGHT BE WHY PERMISSIONS ARE STILL ALWAYS DEFAULT
         return new BuzzUserSession();
     }
 
@@ -86,21 +85,23 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
                         // Duplicate issue here, sessionId exists but returns null
                         repository.addSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), userAuth.getSessionPermissions(), session.getAllAttributs().toString());
                     } catch (Exception e) {
-                        Logger.getGlobal().info(e.getMessage());
+//                        Logger.getGlobal().info(e.getMessage());
                     }
 
                     if(userAuth != null) {
                         // If the user exists, then userAuth.getId will always have a value
                         try {
-                            sessionInfoService.addSessionInfo(session.getId(), userAuth.getUserId(), true, false);
+                            if (sessionInfoService.getSessionInfoBySessionId(session.getId()) != null) {
+                                sessionInfoService.addSessionInfo(session.getId(), userAuth.getUserId(), true, false);
+                            }
                         } catch (Exception e) {
-
+                            Logger.getGlobal().info("Error adding session info: " + e.getMessage());
                         }
                     }
             } catch (ClassCastException | NullPointerException exception) {
                 // Delete any sessions that are generated that are not needed
                 // This does break redirects after auth, but those are broken right now anyway
-                Logger.getGlobal().warning(exception.getMessage());
+//                Logger.getGlobal().warning(exception.getMessage());
                 deleteById(session.getId());
             }
         } else {
@@ -115,6 +116,7 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
             repository.updateSession(session.getId(), session.getCreationTimeAsTimestamp(), session.getLastAccessedTimeAsTimestamp(), userAuth.getSessionPermissions(), session.getAllAttributs().toString());
             } catch (Exception e) {
                 Logger.getGlobal().warning("Failed to edit session: " + e.getMessage());
+//                deleteById(session.getId());
             }
         }
     }
@@ -152,7 +154,7 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
                 } catch (NullPointerException exception) {
                     // If no request or response exist, something weird happened
                     // Refreshing has an issue after deleting a user account
-                    Logger.getGlobal().warning("Session refresh has an error: " + exception.getMessage());
+//                    Logger.getGlobal().warning("Session refresh has an error: " + exception.getMessage());
                     return null;
                 }
 
@@ -168,7 +170,7 @@ public class BuzzSessionService implements SessionRepository<BuzzUserSession> {
                     userOnAuth = (BuzzUser) context.getAuthentication().getPrincipal();
                 } catch (ClassCastException | NullPointerException exception) {
                     // If the principal is not a BuzzUser, then something weird happened here too
-                    Logger.getGlobal().warning("Session refreshing has an error: " + exception.getMessage());
+//                    Logger.getGlobal().warning("Session refreshing has an error: " + exception.getMessage());
                     return retrievedSession;
                 }
 

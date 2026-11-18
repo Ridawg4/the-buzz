@@ -81,12 +81,14 @@ CREATE TABLE IF NOT EXISTS show_likes (
 );
 
 CREATE TABLE IF NOT EXISTS account_moderation (
+    moderation_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id BINARY(16) NOT NULL,
     moderation_desc VARCHAR(255),
     date_applied TIMESTAMP,
-    moderator_applied_action VARCHAR(255),
+    moderator_applied_action BINARY(16) NOT NULL,
     moderation_severity VARCHAR(50),
     date_expires TIMESTAMP,
+    is_acknowledged BOOL DEFAULT FALSE,
 
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)
