@@ -41,6 +41,9 @@ public class Show {
     @Column(name = "show_date")
     private Date showDate;
 
+    @Column(name = "is_visible")
+    private Boolean isVisible = true;
+
     public Show() {
     }
 
@@ -98,5 +101,13 @@ public class Show {
 
     public void setShowDate(Date showDate) {
         this.showDate = showDate;
+    }
+
+    public Boolean getIsVisible() {
+        return isVisible;
+    }
+
+    public void setIsVisible(Boolean isVisible) {
+        this.isVisible = isVisible;
     }
 }
