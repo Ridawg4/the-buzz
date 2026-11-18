@@ -1,4 +1,5 @@
 
+
 package com.teamwhite.thebuzz.Controllers.API.V1;
 
 import com.teamwhite.thebuzz.Services.ShowService;
@@ -13,10 +14,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.List;
 
 /**
- * Controller for creating, modifying, and deleting
- * radio show listings.
+ * Controller for creating, modifying, deleting,
+ * and viewing radio shows and showtimes.
  */
 @RestController
 @RequestMapping("/api/v1/shows")
@@ -51,6 +53,29 @@ public class ShowController {
                         PermissionValues.ALLOWED.equals(
                                 permissions.getPermission(permissionName)
                         ));
+    }
+
+    /**
+     * Retrieves all radio shows.
+     */
+    @GetMapping
+    public ResponseEntity<List<Show>> getAllShows() {
+
+        List<Show> shows = showService.getAllShows();
+
+        return ResponseEntity.ok(shows);
+    }
+
+    /**
+     * Retrieves all shows ordered by
+     * their scheduled date and start time.
+     */
+    @GetMapping("/schedule")
+    public ResponseEntity<List<Show>> getShowSchedule() {
+
+        List<Show> schedule = showService.getShowSchedule();
+
+        return ResponseEntity.ok(schedule);
     }
 
     /**

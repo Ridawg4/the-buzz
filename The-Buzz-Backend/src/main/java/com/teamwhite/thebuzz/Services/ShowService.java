@@ -1,5 +1,6 @@
 
 
+
 package com.teamwhite.thebuzz.Services;
 
 import com.teamwhite.thebuzz.Repositories.ShowRepository;
@@ -9,9 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
- * Service for creating, modifying, and deleting radio shows.
+ * Service for creating, modifying, deleting,
+ * and viewing radio shows and showtimes.
  */
 @Service
 public class ShowService {
@@ -113,7 +118,56 @@ public class ShowService {
     }
 
     /**
-     * Validates show information before creating or updating.
+     * Retrieves all radio shows from the database.
+     *
+     * @return List of all shows
+     */
+    @Transactional(readOnly = true)
+    public List<Show> getAllShows() {
+
+        // Create a list to store the shows
+        List<Show> shows = new ArrayList<>();
+
+        // Retrieve all shows from the database
+        showRepository.findAll().forEach(shows::add);
+
+        // Return all shows
+        return shows;
+    }
+
+    /**
+     * Retrieves all shows ordered by their
+     * scheduled date and start time.
+     *
+     * @return List of shows in schedule order
+     */
+    @Transactional(readOnly = true)
+    public List<Show> getShowSchedule() {
+
+        // Retrieve all shows
+        List<Show> shows = getAllShows();
+
+        // Sort by show date, then start time
+        shows.sort(
+            Comparator.comparing(
+                Show::getShowDate,
+                Comparator.nullsLast(
+                    Comparator.naturalOrder()
+                )
+            ).thenComparing(
+                Show::getStartTime,
+                Comparator.nullsLast(
+                    Comparator.naturalOrder()
+                )
+            )
+        );
+
+        return shows;
+    }
+
+    /**
+     * Validates show information before
+     * creating or updating a show.
      *
      * @param show Show to validate
      */
