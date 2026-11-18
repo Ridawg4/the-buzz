@@ -8,9 +8,9 @@ ANYONE CAN:
 - Play live stream - BACKEND BUILT
 - Play prerecorded streams - BACKEND BUILT
 - report content - BACKEND BUILT
-- View DJ profiles
-- View showtimes
-- View shows
+- View DJ profiles - BACKEND BUILT
+- View showtimes - BACKEND BUILT
+- View shows - BACKEND BUILT
 - View comments
 ALL USERS CAN:
 - Add favorites - BACKEND BUILT
