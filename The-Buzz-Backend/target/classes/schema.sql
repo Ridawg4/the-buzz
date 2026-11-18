@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS show_likes (
 );
 
 CREATE TABLE IF NOT EXISTS account_moderation (
+    action_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id BINARY(16) NOT NULL,
     moderation_desc VARCHAR(255),
     date_applied TIMESTAMP,
@@ -92,6 +93,7 @@ CREATE TABLE IF NOT EXISTS account_moderation (
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)
 );
+
 #self referencing itself allowing one comment to reply to another comment
 CREATE TABLE IF NOT EXISTS  comments (
     comment_id INTEGER PRIMARY KEY,
