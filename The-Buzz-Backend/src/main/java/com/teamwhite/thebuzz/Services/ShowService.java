@@ -1,6 +1,3 @@
-
-
-
 package com.teamwhite.thebuzz.Services;
 
 import com.teamwhite.thebuzz.Repositories.ShowRepository;
@@ -30,19 +27,16 @@ public class ShowService {
 
     /**
      * Creates a new radio show listing.
-     *
-     * @param show Show information
-     * @return true if the show was created
      */
     public boolean createShow(Show show) {
 
-        // Validate show information
         validateShow(show);
 
-        // Generate a unique ID for the new show
         show.setShowId(UUID.randomUUID());
 
-        // Save the show to the database
+        // New shows are visible by default
+        show.setIsVisible(true);
+
         showRepository.save(show);
 
         return true;
@@ -50,25 +44,18 @@ public class ShowService {
 
     /**
      * Modifies an existing radio show listing.
-     *
-     * @param showId ID of the show to update
-     * @param updatedShow New show information
-     * @return true if the show was updated
      */
     @Transactional
     public boolean updateShow(UUID showId, Show updatedShow) {
 
-        // Check that the show ID is provided
         if (showId == null) {
             throw new IllegalArgumentException(
                 "Show ID cannot be null"
             );
         }
 
-        // Validate the new show information
         validateShow(updatedShow);
 
-        // Find the existing show
         Show existingShow = showRepository.findById(showId)
                 .orElse(null);
 
@@ -76,7 +63,6 @@ public class ShowService {
             return false;
         }
 
-        // Update show information
         existingShow.setTitle(updatedShow.getTitle());
         existingShow.setDescription(updatedShow.getDescription());
         existingShow.setDjId(updatedShow.getDjId());
@@ -84,7 +70,60 @@ public class ShowService {
         existingShow.setEndTime(updatedShow.getEndTime());
         existingShow.setShowDate(updatedShow.getShowDate());
 
-        // Save updated information
+        // Preserve the existing visibility status
+
+        showRepository.save(existingShow);
+
+        return true;
+    }
+
+    /**
+     * Hides a show from the public schedule.
+     */
+    @Transactional
+    public boolean hideShow(UUID showId) {
+
+        if (showId == null) {
+            throw new IllegalArgumentException(
+                "Show ID cannot be null"
+            );
+        }
+
+        Show existingShow = showRepository.findById(showId)
+                .orElse(null);
+
+        if (existingShow == null) {
+            return false;
+        }
+
+        existingShow.setIsVisible(false);
+
+        showRepository.save(existingShow);
+
+        return true;
+    }
+
+    /**
+     * Makes a hidden show visible again.
+     */
+    @Transactional
+    public boolean showShow(UUID showId) {
+
+        if (showId == null) {
+            throw new IllegalArgumentException(
+                "Show ID cannot be null"
+            );
+        }
+
+        Show existingShow = showRepository.findById(showId)
+                .orElse(null);
+
+        if (existingShow == null) {
+            return false;
+        }
+
+        existingShow.setIsVisible(true);
+
         showRepository.save(existingShow);
 
         return true;
@@ -92,26 +131,20 @@ public class ShowService {
 
     /**
      * Deletes an existing radio show listing.
-     *
-     * @param showId ID of the show to delete
-     * @return true if the show was deleted
      */
     @Transactional
     public boolean deleteShow(UUID showId) {
 
-        // Check that the show ID is provided
         if (showId == null) {
             throw new IllegalArgumentException(
                 "Show ID cannot be null"
             );
         }
 
-        // Check whether the show exists
         if (!showRepository.existsById(showId)) {
             return false;
         }
 
-        // Delete the show
         showRepository.deleteById(showId);
 
         return true;
@@ -119,33 +152,29 @@ public class ShowService {
 
     /**
      * Retrieves all radio shows from the database.
-     *
-     * @return List of all shows
      */
     @Transactional(readOnly = true)
     public List<Show> getAllShows() {
 
-        // Create a list to store the shows
         List<Show> shows = new ArrayList<>();
 
-        // Retrieve all shows from the database
         showRepository.findAll().forEach(shows::add);
 
-        // Return all shows
         return shows;
     }
 
     /**
-     * Retrieves all shows ordered by their
-     * scheduled date and start time.
-     *
-     * @return List of shows in schedule order
+     * Retrieves visible shows ordered by date and start time.
      */
     @Transactional(readOnly = true)
     public List<Show> getShowSchedule() {
 
-        // Retrieve all shows
         List<Show> shows = getAllShows();
+
+        // Only display visible shows
+        shows.removeIf(show ->
+            !Boolean.TRUE.equals(show.getIsVisible())
+        );
 
         // Sort by show date, then start time
         shows.sort(
@@ -166,21 +195,16 @@ public class ShowService {
     }
 
     /**
-     * Validates show information before
-     * creating or updating a show.
-     *
-     * @param show Show to validate
+     * Validates show information before creating or updating.
      */
     private void validateShow(Show show) {
 
-        // Make sure show information is provided
         if (show == null) {
             throw new IllegalArgumentException(
                 "Show information cannot be null"
             );
         }
 
-        // Validate title
         if (show.getTitle() == null ||
                 show.getTitle().isBlank() ||
                 show.getTitle().length() > 255) {
@@ -190,7 +214,6 @@ public class ShowService {
             );
         }
 
-        // Validate description
         if (show.getDescription() != null &&
                 show.getDescription().length() > 1000) {
 
@@ -199,21 +222,18 @@ public class ShowService {
             );
         }
 
-        // Validate DJ ID
         if (show.getDjId() == null) {
             throw new IllegalArgumentException(
                 "DJ ID cannot be null"
             );
         }
 
-        // Validate show date
         if (show.getShowDate() == null) {
             throw new IllegalArgumentException(
                 "Show date cannot be null"
             );
         }
 
-        // Validate start and end times
         if (show.getStartTime() == null ||
                 show.getEndTime() == null) {
 
@@ -222,7 +242,6 @@ public class ShowService {
             );
         }
 
-        // Make sure end time is after start time
         if (!show.getEndTime().after(show.getStartTime())) {
             throw new IllegalArgumentException(
                 "End time must be after start time"
