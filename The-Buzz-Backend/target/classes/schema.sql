@@ -61,7 +61,8 @@ CREATE TABLE IF NOT EXISTS  shows (
     start_time TIMESTAMP,
     end_time TIMESTAMP,
     show_date DATE,
-
+    is_visible BOOLEAN NOT NULL DEFAULT TRUE,
+    
     FOREIGN KEY (dj_id)
         REFERENCES djs(dj_id)
 );
