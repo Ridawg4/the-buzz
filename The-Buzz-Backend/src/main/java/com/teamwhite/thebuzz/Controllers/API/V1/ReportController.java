@@ -55,6 +55,4 @@ public class ReportController {
 
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-
-    // @TODO IMPLEMENT HANDLING REPORTS
 }

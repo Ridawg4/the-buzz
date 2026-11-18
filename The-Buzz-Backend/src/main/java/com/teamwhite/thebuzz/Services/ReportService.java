@@ -116,7 +116,6 @@ public class ReportService {
                 accountModerationService.createAccountModeration(originalReport.getContentUuidId(), report.getExplanation(), report.getHandlerId(), report.getAction(), Timestamp.valueOf(unbanDateTime));
             }
         }
-        Logger.getGlobal().info(String.valueOf(report.getReportId()));
         handledReportRepository.createReport(report.getOriginalReport(), report.getHandlerId(), report.getAction(), report.getExplanation(), report.getDateHandled());
         activeReportRepository.deleteActiveReportById(report.getReportId());
     }
