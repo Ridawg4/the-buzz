@@ -1,5 +1,3 @@
-
-
 package com.teamwhite.thebuzz.Controllers.API.V1;
 
 import com.teamwhite.thebuzz.Services.ShowService;
@@ -7,6 +5,7 @@ import com.teamwhite.thebuzz.model.BuzzUser;
 import com.teamwhite.thebuzz.model.Show;
 import com.teamwhite.thebuzz.model.SessionPermissions;
 import com.teamwhite.thebuzz.Resources.PermissionValues;
+import com.teamwhite.thebuzz.Resources.PermissionNames;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +66,7 @@ public class ShowController {
     }
 
     /**
-     * Retrieves all shows ordered by
+     * Retrieves visible shows ordered by
      * their scheduled date and start time.
      */
     @GetMapping("/schedule")
@@ -86,7 +85,6 @@ public class ShowController {
             Authentication authentication,
             @RequestBody Show show) {
 
-        // Check if user is authenticated
         if (authentication == null ||
                 !authentication.isAuthenticated() ||
                 !(authentication.getPrincipal() instanceof BuzzUser)) {
@@ -96,10 +94,8 @@ public class ShowController {
                     .body("You must be logged in.");
         }
 
-        // Get authenticated user
         BuzzUser user = (BuzzUser) authentication.getPrincipal();
 
-        // Check permission to create show listings
         boolean canCreate = hasPermission(
                 user,
                 "CAN_CREATE_SHOW_LISTING"
@@ -112,7 +108,6 @@ public class ShowController {
         }
 
         try {
-            // Create show using service
             boolean created = showService.createShow(show);
 
             if (!created) {
@@ -141,7 +136,6 @@ public class ShowController {
             @PathVariable UUID showId,
             @RequestBody Show updatedShow) {
 
-        // Check if user is authenticated
         if (authentication == null ||
                 !authentication.isAuthenticated() ||
                 !(authentication.getPrincipal() instanceof BuzzUser)) {
@@ -151,10 +145,8 @@ public class ShowController {
                     .body("You must be logged in.");
         }
 
-        // Get authenticated user
         BuzzUser user = (BuzzUser) authentication.getPrincipal();
 
-        // Check permission to modify show listings
         boolean canModify = hasPermission(
                 user,
                 "CAN_MODIFY_SHOW_LISTING"
@@ -167,7 +159,6 @@ public class ShowController {
         }
 
         try {
-            // Update show using service
             boolean updated = showService.updateShow(
                     showId,
                     updatedShow
@@ -190,14 +181,14 @@ public class ShowController {
     }
 
     /**
-     * Deletes an existing radio show listing.
+     * Hides a show from the public schedule.
+     * The show remains stored in the database.
      */
-    @DeleteMapping("/{showId}")
-    public ResponseEntity<String> deleteShow(
+    @PutMapping("/{showId}/hide")
+    public ResponseEntity<String> hideShow(
             Authentication authentication,
             @PathVariable UUID showId) {
 
-        // Check if user is authenticated
         if (authentication == null ||
                 !authentication.isAuthenticated() ||
                 !(authentication.getPrincipal() instanceof BuzzUser)) {
@@ -207,10 +198,106 @@ public class ShowController {
                     .body("You must be logged in.");
         }
 
-        // Get authenticated user
         BuzzUser user = (BuzzUser) authentication.getPrincipal();
 
-        // Check permission to delete show listings
+        boolean canChangeVisibility = hasPermission(
+                user,
+                PermissionNames.CAN_MODIFY_SHOW_SCHEDULE_VISIBILITY
+        );
+
+        if (!canChangeVisibility) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("You do not have permission to change show visibility.");
+        }
+
+        try {
+            boolean hidden = showService.hideShow(showId);
+
+            if (!hidden) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Show not found.");
+            }
+
+            return ResponseEntity.ok(
+                    "Show hidden from the public schedule successfully!");
+
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(exception.getMessage());
+        }
+    }
+
+    /**
+     * Makes a hidden show visible on the public schedule again.
+     */
+    @PutMapping("/{showId}/show")
+    public ResponseEntity<String> showShow(
+            Authentication authentication,
+            @PathVariable UUID showId) {
+
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                !(authentication.getPrincipal() instanceof BuzzUser)) {
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("You must be logged in.");
+        }
+
+        BuzzUser user = (BuzzUser) authentication.getPrincipal();
+
+        boolean canChangeVisibility = hasPermission(
+                user,
+                PermissionNames.CAN_MODIFY_SHOW_SCHEDULE_VISIBILITY
+        );
+
+        if (!canChangeVisibility) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("You do not have permission to change show visibility.");
+        }
+
+        try {
+            boolean visible = showService.showShow(showId);
+
+            if (!visible) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Show not found.");
+            }
+
+            return ResponseEntity.ok(
+                    "Show is visible on the public schedule again!");
+
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(exception.getMessage());
+        }
+    }
+
+    /**
+     * Deletes an existing radio show listing.
+     */
+    @DeleteMapping("/{showId}")
+    public ResponseEntity<String> deleteShow(
+            Authentication authentication,
+            @PathVariable UUID showId) {
+
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                !(authentication.getPrincipal() instanceof BuzzUser)) {
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("You must be logged in.");
+        }
+
+        BuzzUser user = (BuzzUser) authentication.getPrincipal();
+
         boolean canDelete = hasPermission(
                 user,
                 "CAN_DELETE_SHOW_LISTING"
@@ -223,7 +310,6 @@ public class ShowController {
         }
 
         try {
-            // Delete show using service
             boolean deleted = showService.deleteShow(showId);
 
             if (!deleted) {
