@@ -60,6 +60,7 @@ public class SuccessfulAuthenticationHandler implements AuthenticationSuccessHan
     }
 
     private void denyAuthForOutstandingAccountActions(HttpServletRequest request, HttpServletResponse response, Authentication authentication, Object[] unAcknowledgedActionsResult, BuzzUser authenticatedUser) throws IOException {
+        // @TODO MAKE CUSTOM AUTHENTICATIONHANDLER CAUSE THIS DOESNT CONSISTENTLY DO WHAT I NEED
         AccountModeration[] actions = (AccountModeration[]) unAcknowledgedActionsResult[1];
         JsonObjectBuilder builder = Json.createObjectBuilder();
         JsonArrayBuilder arrBuilder = Json.createArrayBuilder();
