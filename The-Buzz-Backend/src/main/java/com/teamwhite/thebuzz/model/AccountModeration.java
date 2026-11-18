@@ -1,9 +1,11 @@
 package com.teamwhite.thebuzz.model;
+
 import java.sql.Timestamp;
 import java.util.UUID;
 
 public class AccountModeration {
 
+    private Integer actionId;
     private UUID userId;
     private String moderationDesc;
     private Timestamp dateApplied;
@@ -12,6 +14,14 @@ public class AccountModeration {
     private Timestamp dateExpires;
 
     public AccountModeration() {
+    }
+
+    public Integer getActionId() {
+        return actionId;
+    }
+
+    public void setActionId(Integer actionId) {
+        this.actionId = actionId;
     }
 
     public UUID getUserId() {
