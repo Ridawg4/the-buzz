@@ -4,49 +4,19 @@ import DJs from "./pages/DJs";
 import "./App.css";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
-import React, {useState} from "react";
-import {UserContext} from "./Contexts/UserContext.jsx";
+import {useState} from "react";
+import {UserContextProvider} from "./Contexts/UserContext.jsx";
 import Account from "./pages/Account.jsx";
-import PermissionsEdit from "./Components/PermissionsEdit.jsx";
-import PermissionList from "./pages/PermissionList.jsx";
-import UserList from "./pages/UserList.jsx";
+import PermissionList from "./pages/Moderation/PermissionList.jsx";
+import UserList from "./pages/Moderation/UserList.jsx";
 import Admin from "./pages/Admin.jsx";
-import ReportListItem from "./Components/ReportListItem.jsx";
-import ReportsList from "./pages/ReportsList.jsx";
+import ReportsList from "./pages/Moderation/ReportsList.jsx";
 
 function App() {
-    const [userId, setUserId] = useState(null);
     const [isError, setIsError] = useState(false);
     const [hasAlertedOfLogout, setHasAlertedOfLogout] = useState(false);
 
-    const checkUserAuth = () => {
-            fetch("http://localhost:8080/api/v1/user/AuthValid",
-                {credentials: "include", redirect: "error"})
-                .then(res => {
-                        if((res.ok)) {
-                            res.text()
-                                .then(text => {
-                                    if(userId === null) {
-                                        setIsError(false)
-                                        setHasAlertedOfLogout(false)
-                                        setUserId(text)
-                                    }
-                                }).catch((e) => {
-                                setUserId(null)
-                            })
-                        } if (res.status === 401) {
-                        setUserId(null)
-                        }
-                    }
-                ).catch((e) => {
-                setUserId(null)
-                if (hasAlertedOfLogout) {
-                    setIsError(true)
-                    setTimeout(setErrorFalse, 5000, []);
-                    setHasAlertedOfLogout(true)
-                }
-            })
-    }
+    // @TODO REWRITE AUTH VALIDATION OUTSIDE HERE TO USE SETINTERVAL
 
     const setErrorFalse = () => {
         setIsError(false);
@@ -64,14 +34,9 @@ function App() {
         }
     }
 
-    React.useEffect(() => {
-        checkUserAuth()
-        setInterval(checkUserAuth, 30000, [])
-    })
-
   return (
 		<BrowserRouter>
-            <UserContext.Provider value={{ userId, setUserId }}>
+            <UserContextProvider>
 			  <div className="app">
                   {showLogoutError()}
 
@@ -89,7 +54,7 @@ function App() {
                     <Route path="/admin/reports" element={<ReportsList />} />
 				</Routes>
 			  </div>
-            </UserContext.Provider>
+            </UserContextProvider>
 		</BrowserRouter>
   );
 }

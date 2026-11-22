@@ -1,9 +1,9 @@
 import React, {useContext} from "react";
 import {useNavigate} from "react-router-dom";
-import "../pages/css/Account.css"
-import AccountDetailsInputBox from "../Components/AccountDetailsInputBox.jsx";
-import AccountDetailsProfilePictureInput from "../Components/AccountDetailsProfilePictureInput.jsx";
-import AccountPasswordInputBox from "../Components/AccountPasswordInputBox.jsx";
+import "../../pages/css/Account.css"
+import AccountDetailsInputBox from "../AccountPage/AccountDetailsInputBox.jsx";
+import AccountDetailsProfilePictureInput from "../AccountPage/AccountDetailsProfilePictureInput.jsx";
+import AccountPasswordInputBox from "../AccountPage/AccountPasswordInputBox.jsx";
 
 function ReportUserEdit( {userObject, sendValuesToParent} ) {
 

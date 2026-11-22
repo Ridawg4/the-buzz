@@ -1,5 +1,5 @@
 import React from "react";
-import '../pages/css/PermissionListItem.css'
+import '../../pages/css/PermissionListItem.css'
 
 function PermissionListItem({ permissionId, permissionName, permissionDesc, createdBy, createdAt, isDefaultPermissions = false, editPage, deleteEntry}) {
     let [ isVisible, setIsVisible ] = React.useState(true);

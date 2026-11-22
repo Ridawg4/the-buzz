@@ -1,11 +1,11 @@
 import React, {useContext} from "react";
 import {useNavigate} from "react-router-dom";
-import {UserContext} from "../Contexts/UserContext.jsx";
+import {useUserAuth} from "../../Contexts/UserContext.jsx";
 
 function AccountDetailsInputBox({ userId = null, id, labelName, defaultText, canEdit = true, type = "password", children }) {
     const [isModifyValue, setModifyValue] = React.useState(false);
     const [lastValue, setLastValue] = React.useState('');
-    const { globalUserId, setGlobalUserId } = useContext(UserContext);
+    const { globalUserId } = useUserAuth();
     const navigate = useNavigate();
 
     const enableModifying = () => {

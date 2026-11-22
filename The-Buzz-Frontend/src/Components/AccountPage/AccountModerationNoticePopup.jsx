@@ -1,5 +1,5 @@
 import {useContext, useEffect, useState} from "react";
-import "../pages/css/AccountModerationEntry.css"
+import "../../pages/css/AccountModerationEntry.css"
 
 function AccountModerationNoticePopup({ key, userId, actions, closePopup }) {
     const [isVisible, setIsVisible] = useState(true);

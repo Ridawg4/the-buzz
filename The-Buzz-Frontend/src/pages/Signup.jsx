@@ -1,11 +1,13 @@
 import "./css/signup.css"
-import {useState} from "react";
+import {useContext, useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {useUserAuth} from "../Contexts/UserContext.jsx";
 
 function Signup() {
     const [emailError, setEmailError] = useState(false);
     const [passwordMatchError, setPasswordMatchError] = useState(false);
     const [globalError, setGlobalError] = useState(false);
+    const { signupUser, checkIfEmailIsNew } = useUserAuth();
     const navigate = useNavigate();
 
     const onSignup = (event) => {
@@ -20,35 +22,8 @@ function Signup() {
         signupForm.append("username", usernameField.value);
         signupForm.append("password", passwordField.value);
 
-        fetch("http://localhost:8080/api/v1/signup", {
-            method: "POST",
-            body: signupForm
-        }).then(res => {
-            console.log(res)
-            if (res.status !== 201) {
-                setGlobalError(true);
-            } else {
-                directToLogin()
-            }
-        })
+        let result = signupUser(signupForm);
     };
-
-    const checkIfEmailIsNew = () => {
-        const emailField = document.getElementById("email")
-        fetch("http://localhost:8080/api/v1/signup/emailExist?email=" + emailField.value)
-            .then(res => {
-                console.log(res)
-                if (res.status === 409) {
-                    setEmailError(true);
-                }
-                if (res.status === 401) {
-                    setEmailError(true);
-                }
-                if (res.status === 204) {
-                    setEmailError(false);
-                }
-            })
-    }
 
     const verifyPasswordsMatch = () => {
         const passwordField = document.getElementById("password")

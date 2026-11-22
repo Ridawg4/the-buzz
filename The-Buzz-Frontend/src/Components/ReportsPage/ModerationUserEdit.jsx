@@ -1,10 +1,10 @@
 import React, {useContext} from "react";
 import {useNavigate} from "react-router-dom";
-import "../pages/css/Account.css"
-import AccountDetailsInputBox from "../Components/AccountDetailsInputBox.jsx";
-import AccountDetailsProfilePictureInput from "../Components/AccountDetailsProfilePictureInput.jsx";
-import AccountPasswordInputBox from "../Components/AccountPasswordInputBox.jsx";
-import LogoutButton from "../Components/LogoutButton.jsx";
+import "../../pages/css/Account.css"
+import AccountDetailsInputBox from "../AccountPage/AccountDetailsInputBox.jsx";
+import AccountDetailsProfilePictureInput from "../AccountPage/AccountDetailsProfilePictureInput.jsx";
+import AccountPasswordInputBox from "../AccountPage/AccountPasswordInputBox.jsx";
+import LogoutButton from "../LogoutButton.jsx";
 
 function Account( {userId, username, email, joinDate, fullName, userDesc, endEditing} ) {
     const navigate = useNavigate();

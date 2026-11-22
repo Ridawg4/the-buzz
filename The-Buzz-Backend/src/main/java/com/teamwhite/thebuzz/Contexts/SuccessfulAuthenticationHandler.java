@@ -79,6 +79,8 @@ public class SuccessfulAuthenticationHandler implements AuthenticationSuccessHan
                 .path("/")
                 .maxAge(0)
                 .secure(true)
+                .httpOnly(true)
+                .sameSite("Lax")
                 .build();
         response.setHeader(HttpHeaders.SET_COOKIE, deleteSession.toString());
         response.setStatus(403);

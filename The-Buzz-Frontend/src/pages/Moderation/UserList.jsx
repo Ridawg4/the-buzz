@@ -1,9 +1,9 @@
-import Navbar from "../Components/Navbar.jsx";
+import Navbar from "../../Components/Navigation/Navbar.jsx";
 import {useEffect, useState} from "react";
-import UserListItem from "../Components/UserListItem.jsx";
-import "./css/user-list.css"
-import ModerationUserEdit from "../Components/ModerationUserEdit.jsx";
-import LoadingCircle from "../Components/LoadingCircle.jsx";
+import UserListItem from "../../Components/UserListPage/UserListItem.jsx";
+import "../css/user-list.css"
+import ModerationUserEdit from "../../Components/ReportsPage/ModerationUserEdit.jsx";
+import LoadingCircle from "../../Components/LoadingCircle.jsx";
 
 function UserList() {
     const [ userEntries, setUserEntries ] = useState([]);

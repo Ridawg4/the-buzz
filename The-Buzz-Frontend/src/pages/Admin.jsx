@@ -1,4 +1,4 @@
-import Navbar from "../Components/Navbar.jsx";
+import Navbar from "../Components/Navigation/Navbar.jsx";
 import {Link} from "react-router-dom";
 
 function Admin() {

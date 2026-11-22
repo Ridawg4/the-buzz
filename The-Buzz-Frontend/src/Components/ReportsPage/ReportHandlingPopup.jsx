@@ -1,4 +1,4 @@
-import AccountInfoPopup from "./AccountInfoPopup.jsx";
+import AccountInfoPopup from "../AccountPage/AccountInfoPopup.jsx";
 import {useState} from "react";
 import ModerationActionReport from "./ModerationActionReport.jsx";
 

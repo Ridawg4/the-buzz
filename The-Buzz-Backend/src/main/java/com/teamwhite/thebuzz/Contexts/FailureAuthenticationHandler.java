@@ -21,6 +21,8 @@ public class FailureAuthenticationHandler implements AuthenticationFailureHandle
                 .path("/")
                 .maxAge(0)
                 .secure(true)
+                .httpOnly(true)
+                .sameSite("Lax")
                 .build();
         response.setHeader(HttpHeaders.SET_COOKIE, deleteSession.toString());
         response.getOutputStream().print(message);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Navbar from "../Components/Navbar.jsx";
+import Navbar from "../Components/Navigation/Navbar.jsx";
 
 function Home() {
   const [isPlaying, setIsPlaying] = useState(false);

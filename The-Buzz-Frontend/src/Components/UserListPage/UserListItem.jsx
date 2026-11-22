@@ -1,9 +1,9 @@
-import AccountEditPermissions from "./AccountEditPermissions.jsx";
+import AccountEditPermissions from "../AccountPage/AccountEditPermissions.jsx";
 import {useContext} from "react";
-import {UserContext} from "../Contexts/UserContext.jsx";
+import {useUserAuth} from "../../Contexts/UserContext.jsx";
 
 function UserListItem({userId, username, email, joinDate, fullName, userDesc, permissionId, permissionGroups, setEditing}) {
-    const globalUser = useContext(UserContext);
+    const globalUser = useUserAuth();
 
     const editUser = () => {
         let userDetails = {};

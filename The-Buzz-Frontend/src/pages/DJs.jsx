@@ -1,6 +1,6 @@
 
 import "./css/DJs.css";
-import Navbar from "../Components/Navbar.jsx";
+import Navbar from "../Components/Navigation/Navbar.jsx";
 
 // Example DJ data - replace with real information later
 const liveDJs = [

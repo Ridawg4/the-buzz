@@ -1,11 +1,10 @@
 import {Link} from "react-router-dom";
-import logo from "../assets/wsbu-logo.png";
-import {UserContext} from "../Contexts/UserContext.jsx";
-import {useContext} from "react";
+import logo from "../../assets/wsbu-logo.png";
+import {useUserAuth} from "../../Contexts/UserContext.jsx";
 import AccountNavbarDropdown from "./AccountNavbarDropdown.jsx";
 
 function Navbar() {
-    const { userId, setUserId } = useContext(UserContext);
+    const { userId } = useUserAuth();
 
     return (
         <nav className="navbar">

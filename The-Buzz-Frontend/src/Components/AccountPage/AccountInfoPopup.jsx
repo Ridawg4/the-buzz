@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import "../pages/css/Account-Info-Popup.css"
-import LoadingCircle from "./LoadingCircle.jsx";
+import "../../pages/css/Account-Info-Popup.css"
+import LoadingCircle from "../LoadingCircle.jsx";
 
 function AccountInfoPopup({ userId }) {
     const [userObject, setUserObject] = useState({});

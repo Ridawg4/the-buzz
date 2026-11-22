@@ -1,9 +1,9 @@
-import Navbar from "../Components/Navbar.jsx";
+import Navbar from "../../Components/Navigation/Navbar.jsx";
 import {useEffect, useState} from "react";
-import "./css/reports-list.css"
-import ReportListItem from "../Components/ReportListItem.jsx";
-import LoadingCircle from "../Components/LoadingCircle.jsx";
-import ReportHandlingPopup from "../Components/ReportHandlingPopup.jsx";
+import "../css/reports-list.css"
+import ReportListItem from "../../Components/ReportsPage/ReportListItem.jsx";
+import LoadingCircle from "../../Components/LoadingCircle.jsx";
+import ReportHandlingPopup from "../../Components/ReportsPage/ReportHandlingPopup.jsx";
 
 function UserList() {
     const [ reportEntries, setReportEntries ] = useState([]);

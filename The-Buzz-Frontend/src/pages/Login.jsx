@@ -1,46 +1,35 @@
 import "./css/login.css"
-import {useContext, useState} from "react";
-import {UserContext} from "../Contexts/UserContext.jsx";
+import {useEffect, useState} from "react";
+import {useUserAuth} from "../Contexts/UserContext.jsx";
 import {useNavigate} from "react-router-dom";
-import AccountModerationNoticePopup from "../Components/AccountModerationNoticePopup.jsx";
+import AccountModerationNoticePopup from "../Components/AccountPage/AccountModerationNoticePopup.jsx";
 
 function Login() {
-    const { userId, setUserId } = useContext(UserContext);
-    const navigate = useNavigate();
-    const [isAccountAction, setIsAccountAction] = useState(false);
+    const { login, userIdFromAction, setLoggingIn } = useUserAuth();
     const [accountActions, setAccountActions] = useState([]);
-    const [userIdFromAction, setUserIdFromAction] = useState('');
+    const [isAccountAction, setIsAccountAction] = useState(false);
+    const navigate = useNavigate();
 
     const [error, setError] = useState(false);
-    const onLogin = (event) => {
+
+    const onLogin = async (event) => {
         event.preventDefault();
         const form = document.getElementById("loginForm");
-        fetch("http://localhost:8080/api/v1/login", {
-            method: "POST",
-            body: new FormData(form),
-            credentials: "include"
-        }).then(response => {
-            if(response.ok){
-                response.text()
-                    .then(text => {
-                        setUserId(text)
-                        directTo("/")
-                })
+
+        let results = await login(form)
+        console.log(results)
+
+            if (results.success) {
+                 directTo("/")
             }
-            if(response.status === 401) {
-                setError(true)
+            if(results.error) {
+                if (results.errorType === "UNACK-ACC-ACTIONS") {
+                    setAccountActions(results.actions);
+                    setIsAccountAction(true)
+                } else {
+                setError(true);
+                }
             }
-            if(response.status === 403) {
-                response.json()
-                    .then((data) => {
-                        if(data.error_code === "UNACK-ACC-ACTIONS") {
-                            setAccountActions(data.actions);
-                            setUserIdFromAction(data.userId);
-                            setIsAccountAction(true)
-                        }
-                    })
-            }
-        });
     }
 
     const directTo = (path) => {

@@ -1,10 +1,10 @@
-import Navbar from "../Components/Navbar.jsx";
-import PermissionEditBox from "../Components/PermissionEditBox.jsx";
+import Navbar from "../../Components/Navigation/Navbar.jsx";
+import PermissionEditBox from "../../Components/PermissionPage/PermissionEditBox.jsx";
 import {useContext, useEffect, useState} from "react";
-import PermissionListItem from "../Components/PermissionListItem.jsx";
-import PermissionsEdit from "../Components/PermissionsEdit.jsx";
-import PermissionsCreate from "../Components/PermissionsCreate.jsx";
-import LoadingCircle from "../Components/LoadingCircle.jsx";
+import PermissionListItem from "../../Components/PermissionPage/PermissionListItem.jsx";
+import PermissionsEdit from "../../Components/PermissionPage/PermissionsEdit.jsx";
+import PermissionsCreate from "../../Components/PermissionPage/PermissionsCreate.jsx";
+import LoadingCircle from "../../Components/LoadingCircle.jsx";
 
 function PermissionList() {
     const [ permissionEntries, setPermissionEntries ] = useState([]);

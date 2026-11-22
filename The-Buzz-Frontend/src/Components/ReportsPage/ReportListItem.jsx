@@ -1,9 +1,9 @@
 import {useContext} from "react";
-import {UserContext} from "../Contexts/UserContext.jsx";
-import AccountInfoPopup from "./AccountInfoPopup.jsx";
+import {useUserAuth} from "../../Contexts/UserContext.jsx";
+import AccountInfoPopup from "../AccountPage/AccountInfoPopup.jsx";
 
 function UserListItem({reportId, contentType, contentUUID = null, contentId = null, userWhoReported, dateReported, reason, setIsHandling}) {
-    const globalUser = useContext(UserContext);
+    const globalUser = useUserAuth();
 
     const handleReport = () => {
         setIsHandling(true, reportId)

@@ -1,8 +1,8 @@
 import React, {useContext} from "react";
 import ReportHandlingPopup from "./ReportHandlingPopup.jsx";
 import ReportUserEdit from "./ReportUserEdit.jsx";
-import {UserContext} from "../Contexts/UserContext.jsx";
-import LoadingCircle from "./LoadingCircle.jsx";
+import {useUserAuth} from "../../Contexts/UserContext.jsx";
+import LoadingCircle from "../LoadingCircle.jsx";
 
 function ModerationActionReport({ userObject, reportId, contentType, reportObject, closeHandlingReport }) {
     const [activeAction, setActiveAction] = React.useState("");
@@ -10,7 +10,7 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
     const [textFormData, setTextFormData] = React.useState(null);
     const [imageFormData, setImageFormData] = React.useState(null);
     const [savedReport, setSavedReport] = React.useState(false);
-    const globalUser = useContext(UserContext);
+    const globalUser = useUserAuth();
 
     const changeActionType = () => {
         let actionOption = document.getElementById(reportId + "-Action-Dropdown");

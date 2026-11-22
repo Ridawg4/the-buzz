@@ -1,4 +1,4 @@
-import fileUploadIcon from "../assets/uploadIcon.svg";
+import fileUploadIcon from "../../assets/uploadIcon.svg";
 import {useNavigate} from "react-router-dom";
 
 function AccountDetailsProfilePictureInput({userId = null, id, imagePath = "http://localhost:8080/api/v1/user/profile-picture?time=0", sendChangesToParent = null }) {
