@@ -93,7 +93,7 @@ function AccountDetailsInputBox({ userId = null, id, labelName, defaultText, can
     return (
         <div className="accountDetailsInputBox">
             <label>{labelName}</label>
-            <div>
+            <div className="accountDetailsInputBox-input">
             <input disabled id={id} defaultValue={defaultText} type={type}>
                 {children}
             </input>

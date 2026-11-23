@@ -13,7 +13,7 @@ function Account() {
     const navigate = useNavigate();
 
     const verifyAccountDeletion = () => {
-        document.getElementById("Account-Deletion-Confirmation-Popup").style.display = "flex";
+        document.getElementById("Account-Deletion-Confirmation-Popup").style.display = "grid";
     }
 
     const closePopup = () => {
@@ -48,6 +48,7 @@ function Account() {
                 <h3>
                     Account Details
                 </h3>
+            <div className="accountDetails">
                 <AccountDetailsProfilePictureInput id="pfp-location"/>
 
                 <AccountDetailsInputBox id="username" labelName = "Username"/>
@@ -61,9 +62,9 @@ function Account() {
                 <AccountDetailsInputBox id="full_name" labelName = "Full Name"/>
 
                 <AccountDetailsInputBox id="user_desc" labelName = "Description"/>
+            </div>
             <div className="options">
-                <button onClick = {verifyAccountDeletion}>Delete Account</button>
-                <LogoutButton />
+                <button className="deleteAccountButton" onClick = {verifyAccountDeletion}>Delete Account</button>
             </div>
         </div>
             <div id="Account-Deletion-Confirmation-Popup">

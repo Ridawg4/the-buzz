@@ -68,7 +68,6 @@ function AccountDetailsProfilePictureInput({userId = null, id, imagePath = "http
 
     return (
         <div className="profile-picture">
-            <label>Profile Picture</label>
             <img src={imagePath} id={id} alt="User's profile picture"/>
             <input id="fileUploadInput" type="file" onChange={uploadProfilePicture} />
             <div id="image-upload-identifier" onClick={() => {

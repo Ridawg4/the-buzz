@@ -1,92 +1,132 @@
 .report-list-item {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     border-bottom: 1px solid black;
     padding: 5px;
-    justify-content: space-between;
-    width: 100%;
-    align-items: center;
+    justify-content: left;
+    width: 95%;
+    /*align-items: center;*/
     margin: 5px;
     height: fit-content;
 }
 
-p {
-    margin: 5px;
+/*p {*/
+/*    margin: 5px;*/
+/*}*/
+
+
+/*.splitContentBox {*/
+/*    display: flex;*/
+/*    flex-direction: row;*/
+/*    width: 100%;*/
+/*    height: 75vh;*/
+/*    box-sizing: border-box;*/
+/*}*/
+
+/*.report-list {*/
+/*    flex: 1;*/
+/*    width: 50%;*/
+/*    height: 100%;*/
+/*    overflow-y: auto;*/
+/*    box-sizing: border-box;*/
+/*}*/
+
+/*.reportHandlingPopup {*/
+/*    flex: 1;*/
+/*    width: 50%;*/
+/*    height: 100%;*/
+/*    overflow-y: auto;*/
+/*    box-sizing: border-box;*/
+/*}*/
+
+/*.reportHandlingElement {*/
+/*    position: relative;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*}*/
+
+/*.reportHandlingPopupOptions {*/
+/*    position: relative;*/
+/*    display: flex;*/
+/*    flex-direction: row;*/
+/*}*/
+
+
+/* Modern Minimalist */
+.ModerationActionReport {
+    background: #ffffff;
+    color: #172235;
+    border: 1px solid #d8dfe8;
+    border-radius: 16px;
+    box-shadow: 0 24px 65px rgba(20, 35, 60, 0.22);
 }
 
-.report-list {
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 70vh;
-    border: 1px solid black;
-    overflow: scroll;
-    scroll-behavior: smooth;
-    overflow-anchor: none;
+.ModerationActionReport select,
+.ModerationActionReport input,
+.ModerationReasonTextArea {
+    background: #f8fafc;
+    color: #172235;
+    border: 1px solid #cbd5e1;
 }
+
+.ModerationActionReport select:focus,
+.ModerationActionReport input:focus,
+.ModerationReasonTextArea:focus {
+    outline: 2px solid #93c5fd;
+    border-color: #2563eb;
+}
+
+.ModerationActionReportOptions button:first-child {
+    background: #edf1f5;
+    color: #334155;
+}
+
+.ModerationActionReportOptions button:last-child {
+    background: #2563eb;
+    color: white;
+}
+
+.ModerationActionReportOptions button:last-child:hover {
+    background: #1d4ed8;
+}
+
+
 
 .splitContentBox {
-    position: relative;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin: 5px;
     width: 100%;
-    height: 100%;
+    height: 100vh;
 }
 
+.report-list,
 .reportHandlingPopup {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     height: 100%;
-    justify-content: center;
-    align-items: center;
 }
 
+.reportHandlingPopup,
 .reportHandlingElement {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.reportHandlingPopupOptions {
-    position: relative;
-    display: flex;
-    flex-direction: row;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    transform: none;
+    filter: none;
+    perspective: none;
 }
 
 .ModerationActionReport {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
+    position: fixed;
     top: 50%;
     left: 50%;
-    border-style: solid;
-    border-width: 1px;
-    border-color: black;
-    width: 75vw;
-    height: 75vh;
-    background-color: #d6b795;
-    inset: 0;
-    z-index: 2;
-    overflow: scroll;
-    transform: translate(-50%, -25%);
-}
+    transform: translate(-50%, -50%);
 
-.ModerationReasonTextArea {
-    position: relative;
-    display: flex;
-    resize: none;
-    width: 25%;
-    min-height: 25%;
-    max-height: 25%;
-    height: 25px;
-    margin: 15px;
+    width: min(90vw, 520px);
+    max-height: 85vh;
+    overflow-y: auto;
+
+    z-index: 1000;
 }
