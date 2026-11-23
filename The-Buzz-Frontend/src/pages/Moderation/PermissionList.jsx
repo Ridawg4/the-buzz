@@ -5,32 +5,18 @@ import PermissionListItem from "../../Components/PermissionPage/PermissionListIt
 import PermissionsEdit from "../../Components/PermissionPage/PermissionsEdit.jsx";
 import PermissionsCreate from "../../Components/PermissionPage/PermissionsCreate.jsx";
 import LoadingCircle from "../../Components/LoadingCircle.jsx";
+import {useModeration} from "../../Contexts/ModerationContext.jsx";
+import {useNavigate} from "react-router-dom";
+import {useUserAuth} from "../../Contexts/UserContext.jsx";
 
 function PermissionList() {
-    const [ permissionEntries, setPermissionEntries ] = useState([]);
     const [ isEditing, setIsEditing ] = useState(-1);
     const [ pemissionEditingName, setPemissionEditingName ] = useState('');
     const [ pemissionEditingDesc, setPemissionEditingDesc ] = useState('');
     const [ isCreating, setIsCreating ] = useState(-1);
-    const [ isLoading, setIsLoading ] = useState(true);
-
-
-    const getPermissions = () => {
-        if (!permissionEntries.length > 0) {
-            fetch("http://localhost:8080/api/v1/permissions", {
-                method: "GET",
-                credentials: "include",
-            }).then((response) => {
-                response.json().then((data) => {
-                    let permissionData = data.permissions
-                    console.log("permissionData", permissionData)
-
-                    setPermissionEntries(data.permissions)
-                    setIsLoading(false);
-                })
-            })
-        }
-    }
+    const { permissionData, isLoadingPermissionData, permissionLoadError } = useModeration();
+    const { isModerator } = useUserAuth();
+    const navigate = useNavigate();
 
     const prepareForEditing = (permissionId, permissionName, permissionDesc) => {
         setPemissionEditingName(permissionName)
@@ -39,50 +25,49 @@ function PermissionList() {
     }
 
     const removeEditing = () => {
-        setPermissionEntries([])
         setIsEditing(-1)
     }
 
     const removeCreating = () => {
-        setPermissionEntries([])
         setIsCreating(-1)
     }
 
     const newPermission = () => {
-        let nonUsedIndex = permissionEntries[permissionEntries.length - 1].permission_id + 1
+        let nonUsedIndex = permissionData[permissionData.length - 1].permission_id + 1
         setIsCreating(nonUsedIndex)
     }
 
     const setState = () => {
-        if(!isLoading) {
-            if (isEditing !== -1) {
-                return <PermissionsEdit permissionName={pemissionEditingName} permissionDesc={pemissionEditingDesc}
-                                        permissionId={isEditing} removeEditing={removeEditing}/>
-            } else if (isCreating !== -1) {
-                return <PermissionsCreate permissionId={isCreating} removeCreating={removeCreating}/>
+        if(isModerator) {
+            if (!isLoadingPermissionData) {
+                if (isEditing !== -1) {
+                    return <PermissionsEdit permissionName={pemissionEditingName} permissionDesc={pemissionEditingDesc}
+                                            permissionId={isEditing} removeEditing={removeEditing}/>
+                } else if (isCreating !== -1) {
+                    return <PermissionsCreate permissionId={isCreating} removeCreating={removeCreating}/>
+                } else {
+                    return (<div id="permission-list">
+                        {permissionData.map((object, index) => (
+                            <PermissionListItem key={index} permissionId={object.permission_id}
+                                                permissionName={object.permission_name}
+                                                permissionDesc={object.permission_desc} createdBy={object.created_by}
+                                                createdAt={object.created_at}
+                                                isDefaultPermissions={object.is_default_permission_group}
+                                                editPage={prepareForEditing}/>
+                        ))}
+                        <button onClick={newPermission}>Create New Permission Group</button>
+                    </div>)
+                }
             } else {
-                return (<div id="permission-list">
-                    {permissionEntries.map((object, index) => (
-                        <PermissionListItem key={index} permissionId={object.permission_id}
-                                            permissionName={object.permission_name}
-                                            permissionDesc={object.permission_desc} createdBy={object.created_by}
-                                            createdAt={object.created_at}
-                                            isDefaultPermissions={object.is_default_permission_group}
-                                            editPage={prepareForEditing}/>
-                    ))}
-                    <button onClick={newPermission}>Create New Permission Group</button>
-                </div>)
+                if(permissionLoadError.success !== null && permissionLoadError.success === false ) {
+                    return <p>You are not authorized to access this resource</p>
+                }
+                return (<div className="centerdiv"><LoadingCircle/></div>)
             }
         } else {
-            return (<div className="centerdiv"><LoadingCircle /></div>)
+            return (<div className="centerdiv"><LoadingCircle/></div>)
         }
     }
-
-    useEffect(() => {
-        getPermissions();
-    })
-    // @TODO Make getting all permission entries, this current file for editing those, setting default
-    // permission groups, and creating permission entries
 
     return (
         <>

@@ -4,28 +4,12 @@ import "../css/reports-list.css"
 import ReportListItem from "../../Components/ReportsPage/ReportListItem.jsx";
 import LoadingCircle from "../../Components/LoadingCircle.jsx";
 import ReportHandlingPopup from "../../Components/ReportsPage/ReportHandlingPopup.jsx";
+import {useModeration} from "../../Contexts/ModerationContext.jsx";
 
 function UserList() {
-    const [ reportEntries, setReportEntries ] = useState([]);
     const [ reportIdToHandle, setReportIdToHandle ] = useState(-1);
     const [ isHandling, setIsHandling ] = useState(false);
-    const [ isLoading, setIsLoading ] = useState(true);
-
-    const getReportEntries = () => {
-        if (!reportEntries.length > 0) {
-            fetch("http://localhost:8080/api/v1/reports", {
-                method: "GET",
-                credentials: "include",
-            }).then((response) => {
-                response.json().then((data) => {
-                    let reports = data.reports
-
-                    setReportEntries(reports)
-                    setIsLoading(false);
-                })
-            })
-        }
-    }
+    const {reportData, reportLoadError, isLoadingReportData} = useModeration();
 
     const handleReport = (isHandlingReport, reportId) => {
         setReportIdToHandle(reportId)
@@ -38,14 +22,14 @@ function UserList() {
     }
 
     const isEditingPageVisible = () => {
-        if(!isLoading) {
+        if(!isLoadingReportData) {
             if (isHandling) {
-                const reportIndex = reportEntries.findIndex((object) => object.reportId === reportIdToHandle);
-                if(reportEntries.length > 0) {
+                const reportIndex = reportData.findIndex((object) => object.reportId === reportIdToHandle);
+                if(reportData.length > 0) {
                     return (
                         <div className="splitContentBox">
                             <div className="report-list">
-                                {reportEntries.map((object, index) => (
+                                {reportData.map((object, index) => (
                                     <ReportListItem key={object.reportId} contentType={object.contentType}
                                                     userWhoReported={object.reporterId}
                                                     reason={object.reason} dateReported={object.dateReported}
@@ -54,14 +38,16 @@ function UserList() {
                                                     setIsHandling={handleReport}/>
                                 ))}
                             </div>
-                            <ReportHandlingPopup key={reportIdToHandle} reportId={reportEntries[reportIndex].reportId}
-                                                 contentType={reportEntries[reportIndex].contentType}
-                                                 userWhoReported={reportEntries[reportIndex].reporterId}
-                                                 reason={reportEntries[reportIndex].reason}
-                                                 dateReported={reportEntries[reportIndex].dateReported}
-                                                 contentUUID={reportEntries[reportIndex].contentUUID}
-                                                 contentId={reportEntries[reportIndex].contentId}
+                            <div className="reportHandlingPopup">
+                            <ReportHandlingPopup key={reportIdToHandle} reportId={reportData[reportIndex].reportId}
+                                                 contentType={reportData[reportIndex].contentType}
+                                                 userWhoReported={reportData[reportIndex].reporterId}
+                                                 reason={reportData[reportIndex].reason}
+                                                 dateReported={reportData[reportIndex].dateReported}
+                                                 contentUUID={reportData[reportIndex].contentUUID}
+                                                 contentId={reportData[reportIndex].contentId}
                                                  closeHandlingReport={closeHandleReport}/>
+                            </div>
                         </div>
                     )
                 } else {
@@ -76,11 +62,11 @@ function UserList() {
                     )
                 }
             } else {
-                if (reportEntries.length > 0) {
+                if (reportData.length > 0) {
                     return (
                         <div className="splitContentBox">
                             <div className="report-list">
-                                {reportEntries.map((object, index) => (
+                                {reportData.map((object, index) => (
                                     <ReportListItem key={object.reportId} contentType={object.contentType}
                                                     userWhoReported={object.reporterId}
                                                     reason={object.reason} dateReported={object.dateReported}
@@ -107,14 +93,12 @@ function UserList() {
                 }
             }
         } else {
+            if(reportLoadError.success !== null && reportLoadError.success === false ) {
+                return <p>You are not authorized to access this resource</p>
+            }
             return (<div className="centerdiv"><LoadingCircle /></div>)
         }
     }
-
-    useEffect(() => {
-        getReportEntries()
-        // setInterval(getReportEntries, 10000)
-    })
 
     return (
         <>

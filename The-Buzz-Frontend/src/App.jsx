@@ -11,6 +11,7 @@ import PermissionList from "./pages/Moderation/PermissionList.jsx";
 import UserList from "./pages/Moderation/UserList.jsx";
 import Admin from "./pages/Admin.jsx";
 import ReportsList from "./pages/Moderation/ReportsList.jsx";
+import {ModerationContextProvider} from "./Contexts/ModerationContext.jsx";
 
 function App() {
     const [isError, setIsError] = useState(false);
@@ -48,10 +49,18 @@ function App() {
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/account" element={<Account />} />
 
-                    <Route path="/admin" element={<Admin />} />
-                    <Route path="/admin/permissions" element={<PermissionList />} />
-                    <Route path="/admin/users" element={<UserList />} />
-                    <Route path="/admin/reports" element={<ReportsList />} />
+                    <Route path="/admin" element={<ModerationContextProvider>
+                            <Admin />
+                        </ModerationContextProvider>} />
+                    <Route path="/admin/permissions" element={<ModerationContextProvider>
+                            <PermissionList />
+                        </ModerationContextProvider>} />
+                    <Route path="/admin/users" element={<ModerationContextProvider>
+                            <UserList />
+                        </ModerationContextProvider>} />
+                    <Route path="/admin/reports" element={<ModerationContextProvider>
+                            <ReportsList />
+                        </ModerationContextProvider>} />
 				</Routes>
 			  </div>
             </UserContextProvider>

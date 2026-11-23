@@ -7,43 +7,48 @@ export function UserContextProvider({ children }) {
     const [ isDj, setIsDj ] = useState(false);
     const [ isModerator, setIsModerator ] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 const checkUserAuth = async () => {
         if(location.pathname !== "/login" && location.pathname !== "/signup") {
-            console.log("checkUserAuth");
-            return await fetch("http://localhost:8080/api/v1/user/AuthValid",
-                {credentials: "include", redirect: "error"})
-                .then(async res => {
-                    if ((res.ok)) {
-                        res.text()
-                            .then(text => {
-                                if (userId === null) {
-                                    setUserId(text)
-                                    hasDjRole()
-                                    hasAdminRole()
+            if(!isLoggingOut) {
+                return await fetch("http://localhost:8080/api/v1/user/AuthValid",
+                    {credentials: "include", redirect: "error"})
+                    .then(async res => {
+                            if ((res.ok)) {
+                                res.text()
+                                    .then(text => {
+                                        if (userId === null) {
+                                            setUserId(text)
+                                            hasDjRole()
+                                            hasAdminRole()
+                                            setIsLoading(false)
+                                        } else {
+                                            setUserId(text)
+                                        }
+                                    }).catch((e) => {
+                                    setUserId(null)
                                     setIsLoading(false)
+                                })
+                                if (userId !== null) {
+                                    return {success: false}
                                 }
-                            }).catch((e) => {
+                                return {success: true}
+                            }
+                            if (res.status === 401) {
                                 setUserId(null)
-                            setIsLoading(false)
-                            })
-                        if (userId !== null) {
-                            return {success: false}
+                                setIsLoading(false)
+                                return {success: false}
+                            }
                         }
-                        return {success: true}
-                    }
-                    if (res.status === 401) {
+                    ).catch((e) => {
                         setUserId(null)
                         setIsLoading(false)
                         return {success: false}
-                    }
-                }
-                ).catch((e) => {
-                    setUserId(null)
-                    setIsLoading(false)
-                    return {success: false}
-                })
+                    })
+            }
         } else {
+            setIsLoggingOut(false)
             return {success: false}
         }
     }
@@ -69,16 +74,18 @@ const checkUserAuth = async () => {
                 };
             }
             if(response.status === 403) {
-                let error =  response.json()
+                return response.json()
                     .then((data) => {
                         if(data.error_code === "UNACK-ACC-ACTIONS") {
                             return {success: false,
                                 error: "Account is banned",
                                 errorType: "UNACK-ACC-ACTIONS",
                             actions: data.actions};
+                        } else {
+                            return {success: false,
+                                error: "Unknown auth error"};
                         }
                     })
-                return error;
             }
             return {success: false,
                 error: "Unknown auth error"};
@@ -118,6 +125,9 @@ const checkUserAuth = async () => {
 
     const logout = ((event) => {
         event.preventDefault()
+        setIsLoggingOut(true)
+        setIsModerator(false)
+        setIsDj(false)
         fetch("http://localhost:8080/api/v1/logout", {
             credentials: "include",
             redirect: 'error'
@@ -133,7 +143,6 @@ const checkUserAuth = async () => {
     })
 
     const hasAdminRole = async () => {
-            console.log("checking moderator status")
             fetch("http://localhost:8080/api/v1/user/HasPermission?permissionToLookFor=CAN_SEE_ALL_SYSTEM_PANELS",
                 {credentials: "include"}
             ).then(response => {
@@ -150,7 +159,6 @@ const checkUserAuth = async () => {
     }
 
     const hasDjRole = async () => {
-            console.log("checking dj status")
             fetch("http://localhost:8080/api/v1/user/HasPermission?permissionToLookFor=CAN_SEE_DJ_SYSTEM_PANELS",
                 {credentials: "include"}
             ).then(response => {
@@ -238,7 +246,7 @@ const checkUserAuth = async () => {
 
 
     useEffect(() => {
-        checkUserAuth()
+        checkUserAuth();
         let userAuthInterval = setInterval(checkUserAuth, 5000)
         let hasDjInterval = setInterval(hasDjRole, 30000)
         let hasAdminInterval = setInterval(hasAdminRole, 30000)

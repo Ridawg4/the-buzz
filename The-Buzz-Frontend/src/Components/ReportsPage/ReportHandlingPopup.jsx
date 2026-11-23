@@ -54,7 +54,7 @@ function ReportHandlingPopup({ reportId, contentType, contentUUID = null, conten
             loadUserDetails()
             return (<>
                 <ModerationActionReport userObject = {loadedUserAccount} contentType = {contentType} reportId={reportId} reportObject={{reportId, contentType, contentUUID, contentId, userWhoReported, dateReported, reason}} closeHandlingReport = {cancelHandling}/>
-                <div className="reportHandlingPopup" id={reportId + "-handling-popup"}>
+                <div className="reportHandlingElement" id={reportId + "-handling-popup"}>
                 <label>Report Id:</label>
                 <p>{reportId}</p>
                 {showItemThatWasReported()}
@@ -70,7 +70,7 @@ function ReportHandlingPopup({ reportId, contentType, contentUUID = null, conten
                 </div>
             </div></>)
         } else {
-            return (<div className="reportHandlingPopup" id={reportId + "-handling-popup"}>
+            return (<div className="reportHandlingElement" id={reportId + "-handling-popup"}>
                 <label>Report Id:</label>
                 <p>{reportId}</p>
                 {showItemThatWasReported()}

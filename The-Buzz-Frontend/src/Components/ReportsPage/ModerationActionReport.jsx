@@ -3,6 +3,7 @@ import ReportHandlingPopup from "./ReportHandlingPopup.jsx";
 import ReportUserEdit from "./ReportUserEdit.jsx";
 import {useUserAuth} from "../../Contexts/UserContext.jsx";
 import LoadingCircle from "../LoadingCircle.jsx";
+import {useModeration} from "../../Contexts/ModerationContext.jsx";
 
 function ModerationActionReport({ userObject, reportId, contentType, reportObject, closeHandlingReport }) {
     const [activeAction, setActiveAction] = React.useState("");
@@ -11,6 +12,7 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
     const [imageFormData, setImageFormData] = React.useState(null);
     const [savedReport, setSavedReport] = React.useState(false);
     const globalUser = useUserAuth();
+    const {submitReport} = useModeration();
 
     const changeActionType = () => {
         let actionOption = document.getElementById(reportId + "-Action-Dropdown");
@@ -63,7 +65,7 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
         closeHandlingReport()
     }
 
-    const submitReport = () => {
+    const startSubmitReport = async () => {
         let formData = new FormData();
         let actionOption = document.getElementById(reportId + "-Action-Dropdown");
 
@@ -71,7 +73,7 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
         formData.append("originalReport", JSON.stringify(reportObject));
         formData.append("handlerId", globalUser.userId);
         formData.append("action", actionOption.value);
-        console.log(explanation);
+
         if (explanation !== "other") {
             let explanationOption = document.getElementById(reportId + "-Explanation-Dropdown");
             formData.append("explanation", explanationOption.value);
@@ -87,23 +89,15 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
 
         if(!savedReport) {
             setSavedReport(true);
-            fetch("http://localhost:8080/api/v1/reports/submit-report", {
-                method: "POST",
-                credentials: "include",
-                body: formData
-            }).then(res => {
-                if (res.status === 202) {
-                    if(actionOption.value === "edit") {
-                        if(textFormData !== null) {
-                            alterUserAccountDetails();
-                        }
-                        if(imageFormData !== null) {
-                            alterUserProfilePicture();
-                        }
-                    }
-                    cancelReport();
-                }
-            })
+            let result = await submitReport(formData, textFormData, imageFormData, actionOption)
+
+            if(result.success) {
+                cancelReport()
+            }
+            if(result.success) {
+                setSavedReport(false);
+                console.log("error submitting report");
+            }
         }
     }
 
@@ -116,42 +110,6 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
 
         setActiveAction(actionOption.value)
     })
-
-    const alterUserAccountDetails = () => {
-        fetch("http://localhost:8080/api/v1/user/modify-user", {
-            method: "POST",
-            credentials: "include",
-            body: textFormData
-        }).then(res => {
-            if (res.status === 403) {
-                console.log("Not authorized");
-            }
-            if (res.status === 400) {
-                console.log("Error modifying password | Bad Request");
-            }
-        })
-    }
-
-    const alterUserProfilePicture = () => {
-        fetch("http://localhost:8080/api/v1/user/modify-profile-picture?time=" + Date.now() + "&userId=" + userObject.userId, {
-            method: "POST",
-            credentials: "include",
-            body: imageFormData
-        }).then(res => {
-            if (res.status === 201) {
-                console.log("updated");
-            }
-            if (res.status === 403) {
-                console.log("Forbidden")
-            }
-            if (res.status === 400) {
-                console.log("Error modifying password | Bad Request");
-                res.text().then(text => {
-                    console.log("Error modifying password | Bad Request " + text);
-                })
-            }
-        })
-    }
 
 
     const isSubmitting = () => {
@@ -172,7 +130,7 @@ function ModerationActionReport({ userObject, reportId, contentType, reportObjec
                 {showExplanationBox()}
                 <div className="ModerationActionReportOptions">
                     <button onClick={cancelReport}>Cancel Report</button>
-                    <button onClick={submitReport}>Submit Report</button>
+                    <button onClick={startSubmitReport}>Submit Report</button>
                 </div>
             </div>)
         } else {

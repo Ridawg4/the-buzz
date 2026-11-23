@@ -90,7 +90,7 @@
 
 #dropdownOptions {
   display: none;
-  position: fixed;
+  position: absolute;
   flex-direction: column;
   background-color: #1476cc;
   right: 5%;
