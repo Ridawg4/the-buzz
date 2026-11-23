@@ -29,7 +29,7 @@ DJs CAN:
 - create show listing - BACKEND BUILT
 - modify show listing - BACKEND BUILT
 - delete show listing - BACKEND BUILT
-- upload prerecorded show audio
+- upload prerecorded show audio - BACKEND BUILT
 - delete prerecorded show audio
 MODERATORS CAN:
 - see ALL system panels - DONE
