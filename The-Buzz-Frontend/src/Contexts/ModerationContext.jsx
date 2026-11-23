@@ -95,7 +95,7 @@ export function ModerationContextProvider({ children }) {
         })
     }
 
-    const alterUserAccountDetails = (textFormData) => {
+    const alterUserAccountDetails = async (textFormData) => {
         fetch("http://localhost:8080/api/v1/user/modify-user", {
             method: "POST",
             credentials: "include",
@@ -110,7 +110,7 @@ export function ModerationContextProvider({ children }) {
         })
     }
 
-    const alterUserProfilePicture = (imageFormData) => {
+    const alterUserProfilePicture = async (imageFormData) => {
         fetch("http://localhost:8080/api/v1/user/modify-profile-picture?time=" + Date.now() + "&userId=" + userObject.userId, {
             method: "POST",
             credentials: "include",

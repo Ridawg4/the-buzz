@@ -47,11 +47,13 @@ public class ReportController {
         }
 
 
-        try {
-            reportService.createHandledReport(new HandledReport(Integer.parseInt(reportId), originalReport, handlerId, action, explanation), unbanDate);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create handled report: " + e.getMessage());
-        }
+        Executors.defaultThreadFactory().newThread(() -> {
+            try {
+                reportService.createHandledReport(new HandledReport(Integer.parseInt(reportId), originalReport, handlerId, action, explanation), unbanDate);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create handled report: " + e.getMessage());
+            }
+        }).start();
 
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }

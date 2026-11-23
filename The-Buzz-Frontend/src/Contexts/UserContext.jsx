@@ -77,6 +77,7 @@ const checkUserAuth = async () => {
                 return response.json()
                     .then((data) => {
                         if(data.error_code === "UNACK-ACC-ACTIONS") {
+                            logout(new MouseEvent('click'))
                             return {success: false,
                                 error: "Account is banned",
                                 errorType: "UNACK-ACC-ACTIONS",
@@ -126,13 +127,13 @@ const checkUserAuth = async () => {
     const logout = ((event) => {
         event.preventDefault()
         setIsLoggingOut(true)
+        setUserId(null);
         setIsModerator(false)
         setIsDj(false)
         fetch("http://localhost:8080/api/v1/logout", {
             credentials: "include",
             redirect: 'error'
         }).catch(error => {
-            setUserId(null);
             if(location.pathname === "/account") {
                 // navigate("/login")
             }
