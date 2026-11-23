@@ -1,20 +1,60 @@
-function PermissionEditBox( {keyName, value, allKeys, allVals, setValue}) {
+import { memo, useMemo } from "react";
+
+const PermissionEditBox = memo(function PermissionEditBox({
+                                                              keyName,
+                                                              value,
+                                                              allKeys,
+                                                              allVals,
+                                                              setValue
+                                                          }) {
 
     const updatePermission = () => {
-        let indexOfKey = allKeys.indexOf(keyName);
-        let updateFullValArray = allVals;
+        const selectBox = document.getElementsByClassName("permissionSelectBox");
+        let updateFullValArray = [];
 
-        updateFullValArray[indexOfKey] = 'allowed';
+        for(const currSelectBox of selectBox) {
+            updateFullValArray.push(currSelectBox.value);
+        }
+
+        let indexOfKey = allKeys.indexOf(keyName);
+        let currSelectBox = document.getElementById(keyName);
+
+        updateFullValArray[indexOfKey] = currSelectBox.value;
         setValue(updateFullValArray);
-        console.log(allVals);
+        console.log(updateFullValArray);
     }
+
+    const indexOfKey = allKeys.indexOf(keyName);
+
+    const permissionOptions = useMemo(() => {
+        // console.log("Regenerating options for:", keyName);
+
+        if (indexOfKey === -1) return [];
+
+        return allVals[indexOfKey].map((permission) => (
+            <option
+                key={`${keyName}-${permission}`}
+                value={permission}
+            >
+                {permission}
+            </option>
+        ));
+    }, [keyName, indexOfKey, allVals]);
 
     return (
         <div>
-            <label>{keyName}</label>
-            <button onClick={updatePermission}>{value}</button>
+            <label htmlFor={keyName}>{keyName}</label>
+
+            <select
+                id={keyName}
+                className="permissionSelectBox"
+                value={value}
+                onChange={updatePermission}
+            >
+                {permissionOptions}
+            </select>
         </div>
-    )
-}
+    );
+});
 
 export default PermissionEditBox;

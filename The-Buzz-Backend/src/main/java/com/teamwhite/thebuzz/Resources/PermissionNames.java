@@ -1,6 +1,11 @@
 package com.teamwhite.thebuzz.Resources;
 
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+
+import java.lang.reflect.Field;
 
 /** Describes all the permission names and their possible values
  * For using these with @PreAuthorize or @PostAuthorize, you must turn the values into constants
@@ -109,7 +114,36 @@ public class PermissionNames {
     public static final String CAN_DISABLE_LIVE_STREAM = "CAN_DISABLE_LIVE_STREAM";
 
     // @TODO IMPLEMENT
-    public JsonObject getAllPermissionsAndValues() {
-        return null;
+    public JsonObject getAllPermissionsAndValues() throws IllegalAccessException {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        JsonArrayBuilder arrBuilder = Json.createArrayBuilder();
+
+        for(Field var : PermissionNames.class.getDeclaredFields()) {
+            String currVarName = var.getName();
+
+            // Handles all permissons that value is Conditional-If-Owner or denied
+            if(currVarName.equals("CAN_DELETE_COMMENTS") ||currVarName.equals("CAN_SEE_ACCOUNT_INFO") ||
+                    currVarName.equals("CAN_MODIFY_ACCOUNT_INFO") || currVarName.equals("CAN_DELETE_ACCOUNT")
+                    || currVarName.equals("CAN_MODIFY_DJ_PROFILE") || currVarName.equals("CAN_DELETE_DJ_PROFILE")
+                    || currVarName.equals("CAN_MODIFY_SHOW_LISTING") || currVarName.equals("CAN_DELETE_SHOW_LISTING")
+                    || currVarName.equals("CAN_UPLOAD_PRERECORDED_SHOW_AUDIO")
+                    || currVarName.equals("CAN_DELETE_PRERECORDED_SHOW_AUDIO"))
+            {
+                arrBuilder.add(PermissionValues.DENIED)
+                        .add(PermissionValues.IF_OWNER);
+            }
+            // Handles all permissions that value is Conditional-If-Not-Exceeded-Limit
+            else if(currVarName.equals("CAN_CREATE_DJ_PROFILE") || currVarName.equals("CAN_CREATE_SHOW_LISTING")) {
+                arrBuilder.add(PermissionValues.DENIED)
+                        .add(PermissionValues.IF_NOT_EXCEEDED_LIMIT);
+            } else {
+                arrBuilder.add(PermissionValues.DENIED)
+                        .add(PermissionValues.ALLOWED);
+            }
+
+            builder.add(var.getName(), arrBuilder.build());
+        }
+
+        return builder.build();
     }
 }

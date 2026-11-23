@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 public class PermissionService {
@@ -22,11 +24,13 @@ public class PermissionService {
     }
 
     public Permissions getPermissionById(int id) {
-        List<Object[]> entries = repository.getAllPermissions();
+        List<Object[]> entries = repository.getPermissionById(id);
 
         if(entries.isEmpty()) {
             throw new RuntimeException("Permissions table is empty");
         }
+
+        Logger.getGlobal().info(id + ", " + Arrays.toString(entries.get(0)));
 
         Object[] currEntry = entries.get(0);
 

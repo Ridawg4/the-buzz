@@ -1,10 +1,14 @@
 import React from "react";
 import '../../pages/css/PermissionListItem.css'
+import {useModeration} from "../../Contexts/ModerationContext.jsx";
 
-function PermissionListItem({ permissionId, permissionName, permissionDesc, createdBy, createdAt, isDefaultPermissions = false, editPage, deleteEntry}) {
+function PermissionListItem({ permissionId, permissionName, permissionDesc, createdBy, createdAt, isDefaultPermissions = false, editPage, deleteEntry, isNewGroup}) {
     let [ isVisible, setIsVisible ] = React.useState(true);
+    const {setEditPermissionId} = useModeration();
+
 
     const editItem = () => {
+        setEditPermissionId(permissionId);
         editPage(permissionId, permissionName, permissionDesc);
     }
 

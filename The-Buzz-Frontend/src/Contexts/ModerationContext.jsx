@@ -13,9 +13,16 @@ export function ModerationContextProvider({ children }) {
     const [isLoadingPermissionData, setIsLoadingPermissionData] = useState(true);
     const [isLoadingUserData, setIsLoadingUserData] = useState(true);
     const [isLoadingReportData, setIsLoadingReportData] = useState(true);
+    const [editPermissionId, setEditPermissionId] = useState(null);
+
+    const [ permissionKeys, setPermissionKeys ] = useState([]);
+    const [ permissionVals, setPermissionVals ] = useState([]);
+    const [ allPermissionKeys, setAllPermissionKeys ] = useState([]);
+    const [ allPermissionVals, setAllPermissionVals ] = useState([]);
+    const [isLoadingAllPermissionValues, setIsLoadingAllPermissionValues] = useState(true);
     // const { isModerator, userId } = useUserAuth();
 
-    const getPermissions = async (permissionEntries) => {
+    const getPermissions = async () => {
             return await fetch("http://localhost:8080/api/v1/permissions", {
                 method: "GET",
                 credentials: "include",
@@ -152,12 +159,87 @@ export function ModerationContextProvider({ children }) {
         })
     }
 
+    const getPermissionValues = async (permissionId) => {
+            if(editPermissionId === null) {
+                return await fetch("http://localhost:8080/api/v1/permissions/defaults", {
+                    method: "GET",
+                    credentials: "include",
+                }).then((response) => {
+                    return response.json().then((data) => {
+                        let permissionData = JSON.parse(data.permission).permission_data
+                        let defaultPermissionData = JSON.parse(data.default_permissions)
+
+                        setPermissionKeys(Object.keys(permissionData))
+                        setPermissionVals(Object.values(permissionData))
+
+                        setAllPermissionKeys(Object.keys(defaultPermissionData))
+                        setAllPermissionVals(Object.values(defaultPermissionData))
+
+                        setIsLoadingAllPermissionValues(false)
+
+                        return {success: true};
+                    })
+                })
+            } else {
+                if(permissionId !== null && permissionId !== undefined) {
+                    return await fetch("http://localhost:8080/api/v1/permissions/defaults?permissionId=" + permissionId, {
+                        method: "GET",
+                        credentials: "include",
+                    }).then((response) => {
+                        return response.json().then((data) => {
+                            let permissionData = JSON.parse(data.permission).permission_data
+                            let defaultPermissionData = JSON.parse(data.default_permissions)
+
+                            setPermissionKeys(Object.keys(permissionData))
+                            setPermissionVals(Object.values(permissionData))
+
+                            setAllPermissionKeys(Object.keys(defaultPermissionData))
+                            setAllPermissionVals(Object.values(defaultPermissionData))
+
+                            setIsLoadingAllPermissionValues(false)
+
+                            return {success: true};
+                        })
+                    })
+                }
+                return await fetch("http://localhost:8080/api/v1/permissions/defaults?permissionId=" + editPermissionId, {
+                    method: "GET",
+                    credentials: "include",
+                }).then((response) => {
+                    return response.json().then((data) => {
+                        let permissionData = JSON.parse(data.permission).permission_data
+                        let defaultPermissionData = JSON.parse(data.default_permissions)
+
+                        setPermissionKeys(Object.keys(permissionData))
+                        setPermissionVals(Object.values(permissionData))
+
+                        setAllPermissionKeys(Object.keys(defaultPermissionData))
+                        setAllPermissionVals(Object.values(defaultPermissionData))
+
+                        setIsLoadingAllPermissionValues(false)
+
+                        return {success: true};
+                    })
+                })
+            }
+    }
+
     useEffect(() => {
         let permissionDataInterval;
         let userDataInterval;
         let reportDataInterval;
+        let permissionValuesInterval;
+        let timeoutInterval = setTimeout(async () => {
+            let data = await getPermissionValues();
+            if (data.success) {
+                if (!isLoadingAllPermissionValues) {
+                    setIsLoadingAllPermissionValues(false)
+                }
+            } else {
+                // setPermissionLoadError({success: false, error: "forbidden"})
+            }}, 5000)
 
-        if (location.pathname === "/admin/permission") {
+        if (location.pathname === "/admin/permissions") {
             permissionDataInterval = setInterval(async () => {
                 let data = await getPermissions();
                 if (data.success) {
@@ -166,6 +248,16 @@ export function ModerationContextProvider({ children }) {
                     setPermissionLoadError({success: false, error: "forbidden"})
                 }
             }, 5000)
+            permissionValuesInterval = setInterval(async () => {
+                let data = await getPermissionValues();
+                if (data.success) {
+                    if (!isLoadingAllPermissionValues) {
+                        setIsLoadingAllPermissionValues(false)
+                    }
+                } else {
+                    // setPermissionLoadError({success: false, error: "forbidden"})
+                }
+            }, 30000)
         }
         if (location.pathname === "/admin/users") {
             permissionDataInterval = setInterval(async () => {
@@ -198,10 +290,12 @@ export function ModerationContextProvider({ children }) {
             clearInterval(permissionDataInterval);
             clearInterval(userDataInterval);
             clearInterval(reportDataInterval);
+            clearInterval(permissionValuesInterval);
+            clearTimeout(timeoutInterval);
         };
     }, [reportData])
 
-    return (<ModerationContext.Provider value={{ permissionData, isLoadingPermissionData, permissionLoadError, userData, isLoadingUserData, userLoadError, reportData, reportLoadError, isLoadingReportData, submitReport, loadUserDetailsOfReport }} >
+    return (<ModerationContext.Provider value={{ permissionData, isLoadingPermissionData, permissionLoadError, userData, isLoadingUserData, userLoadError, reportData, reportLoadError, isLoadingReportData, submitReport, loadUserDetailsOfReport, permissionKeys, permissionVals, allPermissionKeys, allPermissionVals, isLoadingAllPermissionValues, setEditPermissionId, getPermissionValues }} >
         {children}
     </ModerationContext.Provider>);
 }

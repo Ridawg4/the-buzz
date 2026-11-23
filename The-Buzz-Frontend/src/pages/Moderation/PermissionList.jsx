@@ -1,6 +1,6 @@
 import Navbar from "../../Components/Navigation/Navbar.jsx";
 import PermissionEditBox from "../../Components/PermissionPage/PermissionEditBox.jsx";
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import PermissionListItem from "../../Components/PermissionPage/PermissionListItem.jsx";
 import PermissionsEdit from "../../Components/PermissionPage/PermissionsEdit.jsx";
 import PermissionsCreate from "../../Components/PermissionPage/PermissionsCreate.jsx";
@@ -14,13 +14,16 @@ function PermissionList() {
     const [ pemissionEditingName, setPemissionEditingName ] = useState('');
     const [ pemissionEditingDesc, setPemissionEditingDesc ] = useState('');
     const [ isCreating, setIsCreating ] = useState(-1);
-    const { permissionData, isLoadingPermissionData, permissionLoadError } = useModeration();
+    let isNewPermission = useRef(false);
+    const { permissionData, isLoadingPermissionData, permissionLoadError, setEditPermissionId, getPermissionValues } = useModeration();
     const { isModerator } = useUserAuth();
     const navigate = useNavigate();
 
     const prepareForEditing = (permissionId, permissionName, permissionDesc) => {
         setPemissionEditingName(permissionName)
         setPemissionEditingDesc(permissionDesc)
+        getPermissionValues(permissionId);
+        console.log("In permission list: " + permissionId)
         setIsEditing(permissionId)
     }
 
@@ -30,11 +33,15 @@ function PermissionList() {
 
     const removeCreating = () => {
         setIsCreating(-1)
+        isNewPermission.current = true;
     }
 
     const newPermission = () => {
         let nonUsedIndex = permissionData[permissionData.length - 1].permission_id + 1
         setIsCreating(nonUsedIndex)
+        setEditPermissionId(null);
+        getPermissionValues();
+        isNewPermission.current = true;
     }
 
     const setState = () => {

@@ -3,6 +3,7 @@ package com.teamwhite.thebuzz.Controllers.API.V1;
 import com.teamwhite.thebuzz.Exceptions.InvalidAuthenticationPrincipalException;
 import com.teamwhite.thebuzz.Exceptions.NoUserFoundException;
 import com.teamwhite.thebuzz.Records.ContentTypes;
+import com.teamwhite.thebuzz.Resources.PermissionNames;
 import com.teamwhite.thebuzz.Resources.ResourcePaths;
 import com.teamwhite.thebuzz.Services.AccountModerationService;
 import com.teamwhite.thebuzz.Services.LocalStorage;
@@ -15,6 +16,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 

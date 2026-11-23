@@ -1,10 +1,14 @@
 package com.teamwhite.thebuzz.Controllers.API.V1;
 
 import com.teamwhite.thebuzz.Records.ContentTypes;
+import com.teamwhite.thebuzz.Resources.PermissionNames;
 import com.teamwhite.thebuzz.Services.PermissionService;
 import com.teamwhite.thebuzz.model.BuzzUser;
 import com.teamwhite.thebuzz.model.Permissions;
 import com.teamwhite.thebuzz.model.SessionPermissions;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,17 +42,38 @@ public class PermissionsController {
 
     @GetMapping("/defaults")
     @PreAuthorize("hasAuthority('CAN_MODIFY_PERMISSION_GROUPS')")
-    public ResponseEntity<String> getAllPermissionNames(Authentication userAuth) {
-        if (!(userAuth.getPrincipal() instanceof BuzzUser)) {
-            throw new RuntimeException("Not a BuzzUser");
-        }
-        BuzzUser user = (BuzzUser) userAuth.getPrincipal();
+    public ResponseEntity<String> getAllPermissionNamesAndValues(@RequestParam(required = false) String permissionId) {
+        if(permissionId != null) {
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            Logger.getGlobal().info("getting permissions by index");
+            JsonObject permissionObject = permissionService.getPermissionById(Integer.parseInt(permissionId)).asJsonObject();
 
-        ResponseEntity<String> resp = new ResponseEntity<>(permissionService.getPermissionById(
-                permissionService.getDefaultPermissionGroupIndex()).asJsonObject().toString(), HttpStatus.OK);
+            try {
+                builder.add("permission", permissionObject.toString())
+                        .add("default_permissions", new PermissionNames().getAllPermissionsAndValues().toString());
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+            ResponseEntity<String> resp = new ResponseEntity<>(builder.build().toString(), HttpStatus.OK);
+            resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, ContentTypes.JSON);
+
+            return resp;
+        }
+
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        JsonObject permissionObject = permissionService.getPermissionById(permissionService.getDefaultPermissionGroupIndex()).asJsonObject();
+
+        try {
+            builder.add("permission", permissionObject.toString())
+                    .add("default_permissions", new PermissionNames().getAllPermissionsAndValues().toString());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+        ResponseEntity<String> resp = new ResponseEntity<>(builder.build().toString(), HttpStatus.OK);
         resp.getHeaders().add(HttpHeaders.CONTENT_TYPE, ContentTypes.JSON);
 
         return resp;
+
     }
 
     @PostMapping("/create-permission-group")
@@ -59,7 +84,6 @@ public class PermissionsController {
                                                         @RequestParam(required = false) boolean isDefaultPermissionGroup,
                                                         Authentication userAuth) {
         ResponseEntity<String> resp;
-        // @TODO TEST
         SessionPermissions permissionToCreate = new SessionPermissions(permissionObject);
         if (permissionService.doesPermissionExistAtIndex(permissionToCreate.getPermissionId())) {
             resp = new ResponseEntity<>("Entry already exists at that index", HttpStatus.BAD_REQUEST);
