@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Navbar from "../Components/Navigation/Navbar.jsx";
+import AudioPlayer from "../Components/AudioPlayer.jsx";
 
 function Home() {
-  const [isPlaying, setIsPlaying] = useState(false);
 
   return (
     <>
@@ -17,9 +17,7 @@ function Home() {
         <h2>Listen Live</h2>
         <p>WSBU 88.3 FM</p>
 
-        <button onClick={() => setIsPlaying(!isPlaying)}>
-          {isPlaying ? "Pause" : "▶ Play Radio"}
-        </button>
+        <AudioPlayer/>
       </section>
 
       <section id="schedule" className="content-section">

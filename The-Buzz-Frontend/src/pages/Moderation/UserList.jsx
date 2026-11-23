@@ -50,7 +50,6 @@ function UserList() {
             return (<div className="centerdiv"><LoadingCircle /></div>)
         }
     }
-    //@TODO MAKE USER LIST AND REPORT LIST USE MODERATORCONTEXT TO HANDLE METHOD CALLS AND POLLING
 
     return (
         <>
