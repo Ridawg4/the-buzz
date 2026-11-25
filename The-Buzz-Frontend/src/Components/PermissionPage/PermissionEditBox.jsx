@@ -27,7 +27,7 @@ const PermissionEditBox = memo(function PermissionEditBox({
     const indexOfKey = allKeys.indexOf(keyName);
 
     const permissionOptions = useMemo(() => {
-        // console.log("Regenerating options for:", keyName);
+        console.log("Regenerating options for:", keyName);
 
         if (indexOfKey === -1) return [];
 

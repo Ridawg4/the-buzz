@@ -12,6 +12,7 @@ import UserList from "./pages/Moderation/UserList.jsx";
 import Admin from "./pages/Admin.jsx";
 import ReportsList from "./pages/Moderation/ReportsList.jsx";
 import {ModerationContextProvider} from "./Contexts/ModerationContext.jsx";
+import {ContentContextProvider} from "./Contexts/ContentContext.jsx";
 
 function App() {
     const [isError, setIsError] = useState(false);
@@ -43,8 +44,12 @@ function App() {
 
 				{/* Page routes */}
 				<Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/djs" element={<DJs />} />
+                    <Route path="/" element={<ContentContextProvider>
+                        <Home />
+                    </ContentContextProvider>} />
+                    <Route path="/djs" element={<ContentContextProvider>
+                        <DJs />
+                    </ContentContextProvider>} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/account" element={<Account />} />
